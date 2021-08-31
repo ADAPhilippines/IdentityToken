@@ -1,0 +1,84 @@
+{
+  "format": 1,
+  "restore": {
+    "/home/pjon/projects/adaph/IdentityToken/src/IdentityToken/IdentityToken.csproj": {}
+  },
+  "projects": {
+    "/home/pjon/projects/adaph/IdentityToken/src/IdentityToken/IdentityToken.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/pjon/projects/adaph/IdentityToken/src/IdentityToken/IdentityToken.csproj",
+        "projectName": "IdentityToken",
+        "projectPath": "/home/pjon/projects/adaph/IdentityToken/src/IdentityToken/IdentityToken.csproj",
+        "packagesPath": "/home/pjon/.nuget/packages/",
+        "outputPath": "/home/pjon/projects/adaph/IdentityToken/src/IdentityToken/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/pjon/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netstandard2.1"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netstandard2.1": {
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netstandard2.1": {
+          "dependencies": {
+            "Microsoft.AspNetCore.Components.WebAssembly": {
+              "target": "Package",
+              "version": "[3.2.1, )"
+            },
+            "Microsoft.AspNetCore.Components.WebAssembly.Build": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.2.1, )"
+            },
+            "Microsoft.AspNetCore.Components.WebAssembly.DevServer": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.2.1, )"
+            },
+            "System.Net.Http.Json": {
+              "target": "Package",
+              "version": "[3.2.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "NETStandard.Library.Ref",
+              "version": "[2.1.0, 2.1.0]"
+            }
+          ],
+          "frameworkReferences": {
+            "NETStandard.Library": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/3.1.412/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
