@@ -1,29 +1,32 @@
 {
   "format": 1,
   "restore": {
-    "/home/pjon/projects/adaph/IdentityToken/src/IdentityToken/IdentityToken.csproj": {}
+    "F:\\Projects\\ADAPH\\IdentityToken\\src\\IdentityToken\\IdentityToken.csproj": {}
   },
   "projects": {
-    "/home/pjon/projects/adaph/IdentityToken/src/IdentityToken/IdentityToken.csproj": {
+    "F:\\Projects\\ADAPH\\IdentityToken\\src\\IdentityToken\\IdentityToken.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/pjon/projects/adaph/IdentityToken/src/IdentityToken/IdentityToken.csproj",
+        "projectUniqueName": "F:\\Projects\\ADAPH\\IdentityToken\\src\\IdentityToken\\IdentityToken.csproj",
         "projectName": "IdentityToken",
-        "projectPath": "/home/pjon/projects/adaph/IdentityToken/src/IdentityToken/IdentityToken.csproj",
-        "packagesPath": "/home/pjon/.nuget/packages/",
-        "outputPath": "/home/pjon/projects/adaph/IdentityToken/src/IdentityToken/obj/",
+        "projectPath": "F:\\Projects\\ADAPH\\IdentityToken\\src\\IdentityToken\\IdentityToken.csproj",
+        "packagesPath": "C:\\Users\\offic\\.nuget\\packages\\",
+        "outputPath": "F:\\Projects\\ADAPH\\IdentityToken\\src\\IdentityToken\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/pjon/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\offic\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
-          "netstandard2.1"
+          "net6.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "netstandard2.1": {
+          "net6.0": {
+            "targetAlias": "net6.0",
             "projectReferences": {}
           }
         },
@@ -34,25 +37,17 @@
         }
       },
       "frameworks": {
-        "netstandard2.1": {
+        "net6.0": {
+          "targetAlias": "net6.0",
           "dependencies": {
             "Microsoft.AspNetCore.Components.WebAssembly": {
               "target": "Package",
-              "version": "[3.2.1, )"
-            },
-            "Microsoft.AspNetCore.Components.WebAssembly.Build": {
-              "suppressParent": "All",
-              "target": "Package",
-              "version": "[3.2.1, )"
+              "version": "[6.0.0-preview.7.21378.6, )"
             },
             "Microsoft.AspNetCore.Components.WebAssembly.DevServer": {
               "suppressParent": "All",
               "target": "Package",
-              "version": "[3.2.1, )"
-            },
-            "System.Net.Http.Json": {
-              "target": "Package",
-              "version": "[3.2.0, )"
+              "version": "[6.0.0-preview.7.21378.6, )"
             }
           },
           "imports": [
@@ -67,16 +62,21 @@
           "warn": true,
           "downloadDependencies": [
             {
-              "name": "NETStandard.Library.Ref",
-              "version": "[2.1.0, 2.1.0]"
+              "name": "Microsoft.NETCore.App.Runtime.Mono.browser-wasm",
+              "version": "[6.0.0-preview.7.21377.19, 6.0.0-preview.7.21377.19]"
             }
           ],
           "frameworkReferences": {
-            "NETStandard.Library": {
+            "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/3.1.412/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100-preview.7.21379.14\\RuntimeIdentifierGraph.json"
+        }
+      },
+      "runtimes": {
+        "browser-wasm": {
+          "#import": []
         }
       }
     }
