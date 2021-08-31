@@ -1,0 +1,19 @@
+{
+  "name": "identitytoken.ui",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "build": "parcel build ./wwwroot/scripts/app.ts --bundle-node-modules --out-dir ./wwwroot/dist",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "parcel-bundler": "^1.12.5",
+    "typescript": "^4.4.2"
+  },
+  "dependencies": {
+    "@emurgo/cardano-serialization-lib-browser": "^7.1.0"
+  }
+}
