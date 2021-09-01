@@ -1,4 +1,4 @@
-import { CardanoWalletInterop } from "./CardanoWalletInterop";
+import CardanoWalletInterop from "./CardanoWalletInterop";
 
 window.CardanoWalletInterop = new CardanoWalletInterop();
 
