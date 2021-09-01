@@ -1,8 +1,10 @@
+using System;
+using System.Net.Http;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using IdentityToken.UI.WASM;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
-builder.RootComponents.Add<App>("#app");
+builder.RootComponents.Add<IdentityToken.UI.Common.App>("#app");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
