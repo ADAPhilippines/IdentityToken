@@ -1,9 +1,5 @@
-import CardanoWasmLoader from './CardanoWasmLoader'
-import { CardanoWalletInterop } from "./CardanoWalletInterop";
-
-
-declare global {
-	interface Window { CardanoWalletInterop: CardanoWalletInterop; }
-}
+import CardanoWalletInterop from "./CardanoWalletInterop";
 
 window.CardanoWalletInterop = new CardanoWalletInterop();
+
+window.CardanoWalletInterop.InitializeAsync("");
