@@ -1,25 +1,9 @@
 ﻿import CardanoWasmLoader from "./CardanoWasmLoader";
-import {Block, Paginate, ProtocolParameters} from "./Types";
+import ProtocolParameters from "./Types/ProtocolParameters";
+import Block from "./Types/Block";
 import {Utils} from "./Utils";
 import {Address, BaseAddress, Ed25519KeyHash, NativeScript, Value} from "@emurgo/cardano-serialization-lib-browser";
-
-const Buffer = require("buffer").Buffer;
-
-interface ICardanoDAPPConnector {
-    enable(): Promise<boolean>,
-
-    isEnabled(): Promise<boolean>,
-
-    getUsedAddresses(paginate?: Paginate): Promise<string[]>
-
-    getUtxos(): Promise<string[]>
-}
-
-declare global {
-    interface Window {
-        cardano: ICardanoDAPPConnector;
-    }
-}
+import {Buffer} from "Buffer";
 
 class CardanoWalletInterop {
     private static blockfrostPID: string;
@@ -27,21 +11,21 @@ class CardanoWalletInterop {
 
     constructor() {
     }
-
-    private static get BlockfrostBaseURL() {
-        return CardanoWalletInterop.isMainnet ? "https://cardano-mainnet.blockfrost.io/api/v0" : "https://cardano-testnet.blockfrost.io/api/v0";
-    }
-
-    public static async InitializeAsync(blockfrost_pid: string, isMainnet: boolean = true): Promise<void> {
+    
+    public async InitializeAsync(blockfrost_pid: string, isMainnet: boolean = true): Promise<void> {
         await CardanoWasmLoader.Load();
         CardanoWalletInterop.blockfrostPID = blockfrost_pid;
         CardanoWalletInterop.isMainnet = isMainnet;
 
         //Test
-        if (!await this.IsWalletConnectedAsync()) {
+        if (!await CardanoWalletInterop.IsWalletConnectedAsync()) {
             await CardanoWalletInterop.ConnectWalletAsync();
         }
         await CardanoWalletInterop.MintIdentityTokenAsync("TestId");
+    }
+
+    private static get BlockfrostBaseURL() {
+        return CardanoWalletInterop.isMainnet ? "https://cardano-mainnet.blockfrost.io/api/v0" : "https://cardano-testnet.blockfrost.io/api/v0";
     }
 
     public static MintIdentityTokenAsync = async (assetName: string): Promise<void> => {
@@ -79,6 +63,7 @@ class CardanoWalletInterop {
             )
         );
 
+        const latestBlock = await CardanoWalletInterop.GetLatestBlockAsync();
         const rawTxBody = CardanoWasmLoader.Cardano.TransactionBody.new(
             inputs,
             rawOutputs,
@@ -142,13 +127,12 @@ class CardanoWalletInterop {
         //return CardanoWasmLoader.Cardano.Transaction.new();
     }
 
-    private static async GetProtocolParametersAsync(): Promise<ProtocolParameters> {
-        let latestBlock = await this.GetLatestBlockAsync();
+    private static async GetProtocolParametersAsync(epoch: number): Promise<ProtocolParameters> {
         let protocolParameters: ProtocolParameters | null;
 
         while (true) {
             protocolParameters = await CardanoWalletInterop
-                .GetFromBlockfrostAsync<ProtocolParameters>(`epochs/${latestBlock.epoch}/parameters`);
+                .GetFromBlockfrostAsync<ProtocolParameters>(`epochs/${epoch}/parameters`);
             if (protocolParameters != null) {
                 break;
             } else {
