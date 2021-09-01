@@ -10,4 +10,11 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.0-preview.7.21378.6" PrivateAssets="all" />
   </ItemGroup>
 
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\dist\app.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\dist\app.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\dist\cardano_serialization_lib_bg.d32900f0.wasm" />
+    <_ContentIncludedByDefault Remove="wwwroot\dist\0cc1a4886a522c67a6f3.module.wasm" />
+  </ItemGroup>
+
 </Project>

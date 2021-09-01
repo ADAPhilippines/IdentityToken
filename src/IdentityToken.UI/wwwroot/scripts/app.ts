@@ -1,26 +1,15 @@
-import WasmLoader from './wasm-loader'
+import CardanoWasmLoader from './CardanoWasmLoader'
+import { CardanoWalletInterop } from "./CardanoWalletInterop";
 
-interface ICardanoInterop {
-	Greeting: string;
-}
 
 declare global {
-	interface Window { CardanoInterop: ICardanoInterop; }
+	interface Window { CardanoWalletInterop: CardanoWalletInterop; }
 }
 
 class Program {
 	public static Main(): void {
-		window.CardanoInterop = {
-			Greeting: "Hello, World"
-		};
-        console.log(window.CardanoInterop.Greeting);
-        Program.InitializeAsync();
+		window.CardanoWalletInterop = new CardanoWalletInterop();
 	}
-
-    public static async InitializeAsync() : Promise<void>
-    {
-        await WasmLoader.LoadModules();
-    }
 }
 
 Program.Main();
