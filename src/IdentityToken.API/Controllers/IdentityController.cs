@@ -1,4 +1,7 @@
+using IdentityToken.API.Helpers;
+using IdentityToken.API.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace IdentityToken.API.Controllers;
 
@@ -16,20 +19,62 @@ public class IdentityController : ControllerBase
         _httpClientFactory = httpClientFactory;
     }
 
-    
-
     [HttpGet("{walletAddress}")]
-    public async Task<object> Get(string walletAddress)
+    public async Task<IEnumerable<CardanoIdentityToken>> Get(string walletAddress)
     {   
-        /*
-        https://cardano-mainnet.blockfrost.io/api/v0/addresses/
-        https://cardano-mainnet.blockfrost.io/api/v0/accounts//addresses/assets
-        https://cardano-mainnet.blockfrost.io/api/v0/assets/
-        https://cardano-mainnet.blockfrost.io/api/v0/txs//metadata
-        */
-        var client = _httpClientFactory.CreateClient();
-        client.DefaultRequestHeaders.Add("project_id", "DytenUGdsxY8NTrJVCFI49H9oQsHTz2t");
-        var response = await client.GetAsync($"https://cardano-mainnet.blockfrost.io/api/v0/addresses/{walletAddress}");
-        return response.Content.ReadFromJsonAsync<object>();
+        // Create HttpClient
+        using var client = _httpClientFactory.CreateClient("blockfrost");
+
+        // Inspect Wallet Address
+        using var addressResp = await client.GetAsync($"addresses/{walletAddress}");
+        var address = await addressResp.Content.ReadFromJsonAsync<CardanoAddressResponse>();
+
+        // Inspect Assets
+        using var assetsResponse = await client.GetAsync($"accounts/{address.StakeAddress}/addresses/assets");
+        var addressAssets = await assetsResponse.Content.ReadFromJsonAsync<IEnumerable<CardanoAddressAssetResponse>>();
+        var tempIdentityTokens = addressAssets.Where(x => CardanoHelper.IsIdentityToken(x.Unit)).ToList();
+
+        // Initialize Identity Tokens
+        var identityTokens = new List<CardanoIdentityToken>();
+
+        // Construct Identity Tokens from Assets
+        foreach(var tempIdentityToken in tempIdentityTokens)
+        {
+            using var assetResponse = await client.GetAsync($"assets/{tempIdentityToken.Unit}");
+            var asset = await assetResponse.Content.ReadFromJsonAsync<CardanoAssetResponse>();
+            var assetName = CardanoHelper.HexToAscii(asset.AssetName);
+            var identityToken = new CardanoIdentityToken
+            {
+                PolicyId = asset.PolicyId,
+                AssetName = assetName
+            };
+
+            using var metadataResponse = await client.GetAsync($"txs/{asset.MintTxHash}/metadata");
+            var metadata = await metadataResponse.Content.ReadFromJsonAsync<IEnumerable<CardanoTxMetadataResponse>>();
+
+            foreach(var meta in metadata)
+            {
+                if(meta.Label == "7368")
+                {
+                    try
+                    {
+                        identityToken.Avatar = meta.JsonMetadata
+                            .GetProperty(asset.PolicyId)
+                            .GetProperty(assetName)
+                            .GetProperty("avatar")
+                            .GetString();
+                    }
+                    catch(Exception ex)
+                    {
+                        _logger.Log(LogLevel.Error, ex, "Error getting avatar");
+                    }
+                }
+            }
+                
+
+            identityTokens.Add(identityToken);
+        }
+
+        return identityTokens;
     }   
 }
