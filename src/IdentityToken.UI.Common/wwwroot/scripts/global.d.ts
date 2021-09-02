@@ -1,4 +1,4 @@
-﻿import {CardanoWalletInterop} from "./CardanoWalletInterop";
+﻿import CardanoWalletInterop from "./CardanoWalletInterop";
 import ICardanoDAPPConnector from "./Interfaces/ICardanoDAPPConnector";
 
 declare global {

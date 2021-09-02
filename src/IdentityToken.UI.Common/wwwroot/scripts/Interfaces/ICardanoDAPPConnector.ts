@@ -8,6 +8,8 @@ interface ICardanoDAPPConnector {
     getUsedAddresses(paginate?: Paginate): Promise<string[]>;
 
     getUtxos(): Promise<string[]>;
+
+    signTx(tx: string): Promise<string>;
 }
 
 export default ICardanoDAPPConnector;
