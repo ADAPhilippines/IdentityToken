@@ -1,0 +1,9 @@
+﻿@page "/Mint"
+
+@if (!IsWalletConnected)
+{
+    <button @onclick="OnConnectWalletBtnClicked">Connect Wallet</button>
+}
+<input @bind="Username" />
+<input @bind="IPFSHash" />
+<button @onclick="OnMintBtnClicked">Mint</button>
