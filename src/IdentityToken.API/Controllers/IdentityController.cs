@@ -49,9 +49,11 @@ public class IdentityController : ControllerBase
                 AssetName = assetName
             };
 
+            // Query Asset Metadata
             using var metadataResponse = await client.GetAsync($"txs/{asset.MintTxHash}/metadata");
             var metadata = await metadataResponse.Content.ReadFromJsonAsync<IEnumerable<CardanoTxMetadataResponse>>();
 
+            // Check if metadata contains IdentityToken definition
             foreach(var meta in metadata)
             {
                 if(meta.Label == "7368")
@@ -66,7 +68,7 @@ public class IdentityController : ControllerBase
                     }
                     catch(Exception ex)
                     {
-                        _logger.Log(LogLevel.Error, ex, "Error getting avatar");
+                        _logger.Log(LogLevel.Information, ex, "IdentityToken definition not found in metadata");
                     }
                 }
             }
