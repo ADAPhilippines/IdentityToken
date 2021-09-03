@@ -47,7 +47,7 @@ namespace IdentityToken.UI.Common.Pages
         {
             var metadata = new Models.IdentityToken
             {
-                Avatar = Avatar
+                Avatar = $"ipfs://{Avatar}"
             };
 
             var metadataString = JsonSerializer.Serialize(metadata, new JsonSerializerOptions
