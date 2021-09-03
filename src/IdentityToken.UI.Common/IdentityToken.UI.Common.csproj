@@ -14,4 +14,18 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.0-preview.7.21378.6" />
   </ItemGroup>
 
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\scripts\Interfaces\ICardanoDAPPConnector.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\scripts\app\Models\CardanoWalletInteropError.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\scripts\app\Types\TxOutput.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="wwwroot\scripts\app\Types\QuantifiedObject.ts" />
+    <TypeScriptCompile Include="wwwroot\scripts\app\Types\Tx.ts" />
+  </ItemGroup>
+
 </Project>
