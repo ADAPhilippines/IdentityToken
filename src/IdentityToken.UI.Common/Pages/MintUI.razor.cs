@@ -25,7 +25,7 @@ namespace IdentityToken.UI.Common.Pages
                 if (JsRuntime != null)
                 {
                     CardanoWalletInterop = new CardanoWalletInterop(JsRuntime);
-                    await CardanoWalletInterop.InitializeAsync("3Ojodngr06BReeSN9lhsow0hypKf8gu5");
+                    await CardanoWalletInterop.InitializeAsync("");
                     IsWalletConnected = await CardanoWalletInterop.IsWalletConnectedAsync();
                     await InvokeAsync(StateHasChanged);
                 }

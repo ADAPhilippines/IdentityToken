@@ -1,19 +1,26 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.JSInterop;
 
 namespace IdentityToken.UI.Common.JSInterop
 {
     public class CardanoWalletInterop
     {
+        private IJSRuntime JsRuntime { get; }
+        
+        private readonly Lazy<Task<IJSObjectReference>> _bootstrapModuleTask;
+        
         public CardanoWalletInterop(IJSRuntime jsRuntime)
         {
             JsRuntime = jsRuntime;
+            _bootstrapModuleTask = new Lazy<Task<IJSObjectReference>>(() => jsRuntime.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/IdentityToken.UI.Common/bootstrap.js").AsTask());
         }
-
-        private IJSRuntime JsRuntime { get; }
 
         public async ValueTask InitializeAsync(string blockfrostProjectId)
         {
+            var module = await _bootstrapModuleTask.Value;
+            await module.InvokeVoidAsync("injectCardanoWalletInterop");
             await JsRuntime.InvokeVoidAsync("CardanoWalletInterop.InitializeAsync", blockfrostProjectId);
         }
 
@@ -27,7 +34,7 @@ namespace IdentityToken.UI.Common.JSInterop
         {
             return await JsRuntime.InvokeAsync<bool>("CardanoWalletInterop.IsWalletConnectedAsync");
         }
-        
+
         public async ValueTask<bool> ConnectWalletAsync()
         {
             return await JsRuntime.InvokeAsync<bool>("CardanoWalletInterop.ConnectWalletAsync");
