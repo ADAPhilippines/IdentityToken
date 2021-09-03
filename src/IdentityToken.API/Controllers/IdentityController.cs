@@ -21,7 +21,7 @@ public class IdentityController : ControllerBase
 
     [HttpGet("{walletAddress}")]
     public async Task<IEnumerable<CardanoIdentityToken>> Get(string walletAddress)
-    {   
+    {
         // Create HttpClient
         using var client = _httpClientFactory.CreateClient("blockfrost");
 
@@ -38,7 +38,7 @@ public class IdentityController : ControllerBase
         var identityTokens = new List<CardanoIdentityToken>();
 
         // Construct Identity Tokens from Assets
-        foreach(var tempIdentityToken in tempIdentityTokens)
+        foreach (var tempIdentityToken in tempIdentityTokens)
         {
             using var assetResponse = await client.GetAsync($"assets/{tempIdentityToken.Unit}");
             var asset = await assetResponse.Content.ReadFromJsonAsync<CardanoAssetResponse>();
@@ -54,9 +54,9 @@ public class IdentityController : ControllerBase
             var metadata = await metadataResponse.Content.ReadFromJsonAsync<IEnumerable<CardanoTxMetadataResponse>>();
 
             // Check if metadata contains IdentityToken definition
-            foreach(var meta in metadata)
+            foreach (var meta in metadata)
             {
-                if(meta.Label == "7368")
+                if (meta.Label == "7368")
                 {
                     try
                     {
@@ -66,17 +66,17 @@ public class IdentityController : ControllerBase
                             .GetProperty("avatar")
                             .GetString();
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         _logger.Log(LogLevel.Information, ex, "IdentityToken definition not found in metadata");
                     }
                 }
             }
-                
+
 
             identityTokens.Add(identityToken);
         }
 
         return identityTokens;
-    }   
+    }
 }
