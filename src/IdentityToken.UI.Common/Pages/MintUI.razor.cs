@@ -9,19 +9,13 @@ using Microsoft.JSInterop;
 
 namespace IdentityToken.UI.Common.Pages
 {
-    public partial class MintUI : IAsyncDisposable
+    public partial class MintUI
     {
         [Inject] private IJSRuntime? JsRuntime { get; set; }
         private CardanoWalletInterop? CardanoWalletInterop { get; set; }
         private string Username { get; set; } = string.Empty;
         private string Avatar { get; set; } = string.Empty;
         private bool IsWalletConnected { get; set; }
-
-        public async ValueTask DisposeAsync()
-        {
-            if (CardanoWalletInterop != null)
-                await CardanoWalletInterop.DisposeAsync();
-        }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
