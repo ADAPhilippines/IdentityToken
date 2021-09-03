@@ -1,4 +1,4 @@
-﻿import CardanoWalletInteropErrorType from "../Models/CardanoWalletInteropErrorType";
+﻿import CardanoWalletInteropErrorType from "../Enums/CardanoWalletInteropErrorType";
 
 type CardanoWalletInteropError = {
     type: CardanoWalletInteropErrorType;

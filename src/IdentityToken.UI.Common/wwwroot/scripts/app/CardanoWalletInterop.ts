@@ -23,7 +23,7 @@ import TxOutput from "./Types/TxOutput";
 import Tx from "./Types/Tx";
 
 class CardanoWalletInterop {
-    private blockfrostPID: string = "";
+    private blockfrostProjectId: string = "";
     private isMainnet: boolean = true;
     private objectRef: ICardanoWalletInteropObjectRef | null = null;
 
@@ -174,7 +174,7 @@ class CardanoWalletInterop {
 
     public async InitializeAsync(blockfrost_pid: string, objectRef: ICardanoWalletInteropObjectRef, isMainnet: boolean = true): Promise<void> {
         await CardanoWasmLoader.Load();
-        this.blockfrostPID = blockfrost_pid;
+        this.blockfrostProjectId = blockfrost_pid;
         this.isMainnet = isMainnet;
         this.objectRef = objectRef;
     }
@@ -425,7 +425,7 @@ class CardanoWalletInterop {
     private async GetFromBlockfrostAsync<T>(endpoint: string): Promise<T | null> {
         const response = await fetch(`${this.BlockfrostBaseURL}/${endpoint}`, {
             headers: {
-                "project_id": this.blockfrostPID
+                "project_id": this.blockfrostProjectId
             }
         });
         const responseBody = await response.json();
@@ -439,7 +439,7 @@ class CardanoWalletInterop {
     private async SubmitTxAsync(transaction: Transaction): Promise<string | null> {
         const response = await fetch(`${this.BlockfrostBaseURL}/tx/submit`, {
             headers: {
-                "project_id": this.blockfrostPID,
+                "project_id": this.blockfrostProjectId,
                 "Content-Type": "application/cbor"
             },
             method: "POST",
