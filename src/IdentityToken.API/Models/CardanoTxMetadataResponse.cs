@@ -7,7 +7,7 @@ public class CardanoTxMetadataResponse
 {
 
     [JsonPropertyName("label")]
-    public string Label { get; set; }
+    public string? Label { get; set; }
 
     [JsonPropertyName("json_metadata")]
     public JsonElement JsonMetadata { get; set; }

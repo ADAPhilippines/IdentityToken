@@ -30,9 +30,11 @@ public class IdentityController : ControllerBase
         var address = await addressResp.Content.ReadFromJsonAsync<CardanoAddressResponse>();
 
         // Inspect Assets
+        if(address == null) throw new Exception("Wallet Address Not Found");
+
         using var assetsResponse = await client.GetAsync($"accounts/{address.StakeAddress}/addresses/assets");
         var addressAssets = await assetsResponse.Content.ReadFromJsonAsync<IEnumerable<CardanoAddressAssetResponse>>();
-        var tempIdentityTokens = addressAssets.Where(x => CardanoHelper.IsIdentityToken(x.Unit)).ToList();
+        var tempIdentityTokens = addressAssets?.Where(x => CardanoHelper.IsIdentityToken(x.Unit)).ToList() ?? new List<CardanoAddressAssetResponse>();
 
         // Initialize Identity Tokens
         var identityTokens = new List<CardanoIdentityToken>();
@@ -42,6 +44,9 @@ public class IdentityController : ControllerBase
         {
             using var assetResponse = await client.GetAsync($"assets/{tempIdentityToken.Unit}");
             var asset = await assetResponse.Content.ReadFromJsonAsync<CardanoAssetResponse>();
+
+            if(asset == null || asset.AssetName == null || asset.PolicyId == null) continue;
+
             var assetName = CardanoHelper.HexToAscii(asset.AssetName);
             var identityToken = new CardanoIdentityToken
             {
@@ -54,6 +59,8 @@ public class IdentityController : ControllerBase
             var metadata = await metadataResponse.Content.ReadFromJsonAsync<IEnumerable<CardanoTxMetadataResponse>>();
 
             // Check if metadata contains IdentityToken definition
+            if(metadata == null) continue;
+
             foreach (var meta in metadata)
             {
                 if (meta.Label == "7368")

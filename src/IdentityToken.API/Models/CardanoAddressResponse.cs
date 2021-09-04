@@ -6,8 +6,8 @@ namespace IdentityToken.API.Models;
 public record CardanoAddressResponse
 {
     [JsonPropertyName("address")]
-    public string Address { get; set; }
+    public string? Address { get; set; }
 
     [JsonPropertyName("stake_address")]
-    public string StakeAddress { get; set; }
+    public string? StakeAddress { get; set; }
 }

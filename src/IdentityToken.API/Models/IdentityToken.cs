@@ -2,8 +2,8 @@ namespace IdentityToken.API.Models;
 
 public record CardanoIdentityToken
 {
-    public string PolicyId { get; set; }
-    public string AssetName {get;set;}
-    public string Username { get { return AssetName[2..]; } }
-    public string Avatar { get; set; }
+    public string? PolicyId { get; set; }
+    public string? AssetName {get;set;}
+    public string Username => AssetName != null ? AssetName[2..] : string.Empty;
+    public string? Avatar { get; set; }
 }
