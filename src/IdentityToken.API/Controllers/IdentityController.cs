@@ -2,6 +2,7 @@ using IdentityToken.API.Helpers;
 using IdentityToken.API.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using System.IO;
 
 namespace IdentityToken.API.Controllers;
 
@@ -19,21 +20,51 @@ public class IdentityController : ControllerBase
         _httpClientFactory = httpClientFactory;
     }
 
-    [HttpGet("{walletAddress}")]
-    public async Task<IEnumerable<CardanoIdentityToken>> Get(string walletAddress)
+    [HttpGet("auth")]
+    public async Task<string> Auth()
     {
+        return await CardanoHelper.GenerateWalletAddressAsync();
+    }
+
+    [HttpGet("token/{authCode}")]
+    public async Task<IActionResult> Get(string authCode)
+    {
+        // Check if authCode is system wallet address if not throw error
+        if (!CardanoHelper.IsSystemWalletAddress(authCode)) throw new Exception("Invalid authCode");
+
         // Create HttpClient
         using var client = _httpClientFactory.CreateClient("blockfrost");
 
+        // Get System Wallet Address Transactions
+        var systemWalletAddressTxsResponse = await client.GetAsync($"addresses/{authCode}/transactions?order=desc");
+        if (!systemWalletAddressTxsResponse.IsSuccessStatusCode) return Unauthorized();
+        var systemWalletAddressTxs = await systemWalletAddressTxsResponse.Content.ReadFromJsonAsync<IEnumerable<CardanoAddressTxsResponse>>();
+        if (systemWalletAddressTxs == null) return BadRequest();
+
+        var latestTx = systemWalletAddressTxs.FirstOrDefault();
+        if (latestTx == null) return BadRequest();
+
+        // Get Latest Transaction UTXOs
+        var utxos = await client.GetFromJsonAsync<CardanoTxOutputsResponse>($"txs/{latestTx.TxHash}/utxos");
+        if (utxos == null || utxos.Outputs == null || utxos.Inputs == null) return Unauthorized();
+        
+        var getTotalLovelace = utxos.Outputs
+            .Where(x => x.Address == authCode)
+            .Select(x => x.Amount.Where(y => y.Unit == "lovelace").Sum(y => y.Quantity))
+            .Sum();
+
+        if (getTotalLovelace < 1200000) return Unauthorized();
+
+        var userWalletAddress = utxos.Inputs.FirstOrDefault()?.Address;
+        if (userWalletAddress == null) return BadRequest();
+
         // Inspect Wallet Address
-        using var addressResp = await client.GetAsync($"addresses/{walletAddress}");
-        var address = await addressResp.Content.ReadFromJsonAsync<CardanoAddressResponse>();
+        var address = await client.GetFromJsonAsync<CardanoAddressResponse>($"addresses/{userWalletAddress}");
 
         // Inspect Assets
-        if(address == null) throw new Exception("Wallet Address Not Found");
+        if (address == null) return BadRequest();
 
-        using var assetsResponse = await client.GetAsync($"accounts/{address.StakeAddress}/addresses/assets");
-        var addressAssets = await assetsResponse.Content.ReadFromJsonAsync<IEnumerable<CardanoAddressAssetResponse>>();
+        var addressAssets = await client.GetFromJsonAsync<IEnumerable<CardanoAddressAssetResponse>>($"accounts/{address.StakeAddress}/addresses/assets");
         var tempIdentityTokens = addressAssets?.Where(x => CardanoHelper.IsIdentityToken(x.Unit)).ToList() ?? new List<CardanoAddressAssetResponse>();
 
         // Initialize Identity Tokens
@@ -42,10 +73,9 @@ public class IdentityController : ControllerBase
         // Construct Identity Tokens from Assets
         foreach (var tempIdentityToken in tempIdentityTokens)
         {
-            using var assetResponse = await client.GetAsync($"assets/{tempIdentityToken.Unit}");
-            var asset = await assetResponse.Content.ReadFromJsonAsync<CardanoAssetResponse>();
+            var asset = await client.GetFromJsonAsync<CardanoAssetResponse>($"assets/{tempIdentityToken.Unit}");
 
-            if(asset == null || asset.AssetName == null || asset.PolicyId == null) continue;
+            if (asset == null || asset.AssetName == null || asset.PolicyId == null) continue;
 
             var assetName = CardanoHelper.HexToAscii(asset.AssetName);
             var identityToken = new CardanoIdentityToken
@@ -55,11 +85,10 @@ public class IdentityController : ControllerBase
             };
 
             // Query Asset Metadata
-            using var metadataResponse = await client.GetAsync($"txs/{asset.MintTxHash}/metadata");
-            var metadata = await metadataResponse.Content.ReadFromJsonAsync<IEnumerable<CardanoTxMetadataResponse>>();
+            var metadata = await client.GetFromJsonAsync<IEnumerable<CardanoTxMetadataResponse>>($"txs/{asset.MintTxHash}/metadata");
 
             // Check if metadata contains IdentityToken definition
-            if(metadata == null) continue;
+            if (metadata == null) continue;
 
             foreach (var meta in metadata)
             {
@@ -84,6 +113,6 @@ public class IdentityController : ControllerBase
             identityTokens.Add(identityToken);
         }
 
-        return identityTokens;
+        return Ok(identityTokens);
     }
 }
