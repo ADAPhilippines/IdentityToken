@@ -1,4 +1,4 @@
-﻿class Utils {
+﻿class Helpers {
     constructor() {
 
     }
@@ -12,4 +12,4 @@
     }
 }
 
-export default Utils
+export default Helpers;

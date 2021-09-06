@@ -25,18 +25,18 @@ namespace IdentityToken.UI.Common.JSInterop
         public async ValueTask InitializeAsync(string blockfrostProjectId)
         {
             var module = await _bootstrapModuleTask.Value;
-            await module.InvokeVoidAsync("injectCardanoWalletInterop");
+            await module.InvokeVoidAsync("injectCardanoWalletInteropAsync");
 
             await _jsRuntime.InvokeVoidAsync("CardanoWalletInterop.InitializeAsync", blockfrostProjectId, _objRef);
         }
 
-        public async ValueTask<Transaction> MintIdentityTokenAsync(string assetName, string metadata)
+        public async ValueTask<Transaction?> MintIdentityTokenAsync(string assetName, string metadata)
         {
             return await _jsRuntime
                 .InvokeAsync<Transaction>("CardanoWalletInterop.MintIdentityTokenAsync", assetName, metadata);
         }
         
-        public async ValueTask<Transaction> SendAdaAsync(IEnumerable<TxOutput> outputs)
+        public async ValueTask<Transaction?> SendAdaAsync(IEnumerable<TxOutput> outputs)
         {
             return await _jsRuntime
                 .InvokeAsync<Transaction>("CardanoWalletInterop.SendAdaAsync", outputs);
