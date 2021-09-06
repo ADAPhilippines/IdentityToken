@@ -1,4 +1,4 @@
-﻿export async function injectCardanoWalletInterop() {
+﻿export async function injectCardanoWalletInteropAsync() {
     return new Promise((resolve, reject) => {
         if (!window.CardanoWalletInterop) {
             let customScript = document.createElement('script');
