@@ -3,6 +3,7 @@ using IdentityToken.API.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.IO;
+using IdentityToken.API.Data;
 
 namespace IdentityToken.API.Controllers;
 
@@ -13,24 +14,35 @@ public class IdentityController : ControllerBase
 {
     private readonly ILogger<IdentityController> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IdentityDbContext _identityDbContext;
 
-    public IdentityController(ILogger<IdentityController> logger, IHttpClientFactory httpClientFactory)
+    public IdentityController(ILogger<IdentityController> logger, IHttpClientFactory httpClientFactory, IdentityDbContext identityDbContext)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
+        _identityDbContext = identityDbContext;
     }
 
     [HttpGet("auth")]
-    public async Task<string> Auth()
+    public async Task<IActionResult> AuthAsync()
     {
-        return await CardanoHelper.GenerateWalletAddressAsync();
+        // NOT THE BEST SECURITY PRACTICE ONLY FOR DEMO
+        var (mnemonic, address) = CardanoHelper.GenerateAuthWalletAddress();
+        _identityDbContext.IdentityAuthWallets?.Add(new()
+        {
+            Mnemonic = mnemonic,
+            Address = address
+        });
+        await _identityDbContext.SaveChangesAsync();
+        return Ok(address);
     }
 
     [HttpGet("token/{authCode}")]
-    public async Task<IActionResult> Get(string authCode)
+    public async Task<IActionResult> GetAsync(string authCode)
     {
         // Check if authCode is system wallet address if not throw error
-        if (!CardanoHelper.IsSystemWalletAddress(authCode)) throw new Exception("Invalid authCode");
+        var authWallet = _identityDbContext.IdentityAuthWallets?.FirstOrDefault(x => x.Address == authCode);
+        if (authWallet == null) return BadRequest("Invalid auth code");
 
         // Create HttpClient
         using var client = _httpClientFactory.CreateClient("blockfrost");
@@ -47,7 +59,7 @@ public class IdentityController : ControllerBase
         // Get Latest Transaction UTXOs
         var utxos = await client.GetFromJsonAsync<CardanoTxOutputsResponse>($"txs/{latestTx.TxHash}/utxos");
         if (utxos == null || utxos.Outputs == null || utxos.Inputs == null) return Unauthorized();
-        
+
         var getTotalLovelace = utxos.Outputs
             .Where(x => x.Address == authCode)
             .Select(x => x.Amount.Where(y => y.Unit == "lovelace").Sum(y => y.Quantity))

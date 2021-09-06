@@ -1,9 +1,10 @@
-using Microsoft.OpenApi.Models;
+using IdentityToken.API.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.Services.AddDbContext<IdentityDbContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("IdentityTokenDb")));
 builder.Services.AddControllers();
 builder.Services.AddHttpClient("blockfrost", c => {
     c.BaseAddress = new Uri("https://cardano-mainnet.blockfrost.io/api/v0/");
