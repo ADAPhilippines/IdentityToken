@@ -92,7 +92,7 @@ public class CardanoHelper
                 .AddInput(inputTxHash.HexToByteArray(), inputTxId)
                 .AddOutput(toAddrObj.GetBytes(), amount - 200000)
                 .SetTtl(1000)
-                .SetFee(0);
+                .SetFee(200000);
 
         var witnesses = TransactionWitnessSetBuilder.Create
            .AddVKeyWitness(paymentPub, paymentPrv);
