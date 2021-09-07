@@ -61,12 +61,15 @@ public class IdentityController : ControllerBase
         var utxos = await client.GetFromJsonAsync<CardanoTxOutputsResponse>($"txs/{latestTx.TxHash}/utxos");
         if (utxos == null || utxos.Outputs == null || utxos.Inputs == null) return Unauthorized();
 
-        var getTotalLovelace = (uint)(utxos.Outputs
-            .Where(x => x.Address == authCode)
-            .Select(x => x.Amount.Where(y => y.Unit == "lovelace").Sum(y => y.Quantity))
-            .Sum());
+        var txOutput = utxos.Outputs.Where(x => x.Address == authCode).FirstOrDefault();
+        if (txOutput == null) return Unauthorized();
 
-        if (getTotalLovelace < 1200000) return Unauthorized();
+        var txHash = utxos.Hash;
+        var txIndex = utxos.Outputs.ToList().IndexOf(txOutput);
+
+        var getTotalLovelace = (uint?)txOutput?.Amount?.Where(y => y.Unit == "lovelace").Sum(y => y.Quantity);
+
+        if (getTotalLovelace == null || getTotalLovelace < 1200000) return Unauthorized();
 
         var txInput = utxos.Inputs.FirstOrDefault();
         var userWalletAddress = txInput?.Address;
@@ -127,12 +130,18 @@ public class IdentityController : ControllerBase
             identityTokens.Add(identityToken);
         }
 
-        if (authWallet.Mnemonic == null
-            || txInput == null
-            || txInput.TxHash == null
-            || txInput.Index == null) return StatusCode(500);
+        // Get Cardano Protocol Params
+        var protocolParams = await client.GetFromJsonAsync<CardanoProtocolParamResponse>("epochs/latest/parameters");
+        if (protocolParams == null
+            || authWallet.Mnemonic == null
+            || txOutput == null
+            || txHash == null) return StatusCode(500);
 
-        var txBytes = CardanoHelper.BuildTxWithMneomnic(authWallet.Mnemonic, txInput.TxHash, (uint)txInput.Index, userWalletAddress, getTotalLovelace);
+        // Get Latest Cardano Block
+        var block = await client.GetFromJsonAsync<CardanoBlockResponse>("blocks/latest");
+        if (block == null) return StatusCode(500);
+
+        var txBytes = CardanoHelper.BuildTxWithMneomnic(authWallet.Mnemonic, txHash, (uint)txIndex, userWalletAddress, (uint)getTotalLovelace, block.Slot + 1000, protocolParams);
         var txCborHex = txBytes.ToStringHex();
 
         authWallet.IsActive = false;

@@ -83,24 +83,30 @@ public class CardanoHelper
         return (address, paymentPrv, paymentPub);
     }
 
-    public static byte[] BuildTxWithMneomnic(string mnemonic, string inputTxHash, uint inputTxId, string toWalletAddress, uint amount)
+    public static byte[] BuildTxWithMneomnic(string mnemonic, string inputTxHash, uint inputTxId, string toWalletAddress, uint amount, uint ttl, CardanoProtocolParamResponse protocolParam)
     {
         var (_, paymentPrv, paymentPub) = GetWalletWithMneomnic(mnemonic);
         var toAddrObj = new Address(toWalletAddress);
 
         var bodyBuilder = TransactionBodyBuilder.Create
                 .AddInput(inputTxHash.HexToByteArray(), inputTxId)
-                .AddOutput(toAddrObj.GetBytes(), amount - 200000)
-                .SetTtl(1000)
-                .SetFee(200000);
+                .AddOutput(toAddrObj.GetBytes(), amount)
+                .SetTtl(ttl)
+                .SetFee(0);
 
         var witnesses = TransactionWitnessSetBuilder.Create
            .AddVKeyWitness(paymentPub, paymentPrv);
 
-        var transaction = TransactionBuilder.Create
+        var transactionBuilder = TransactionBuilder.Create
                 .SetBody(bodyBuilder)
-                .SetWitnesses(witnesses)
-                .Build();
+                .SetWitnesses(witnesses);
+
+        var transaction = transactionBuilder.Build();
+
+        var fee = transaction.CalculateFee(protocolParam.TxFeePerByte, protocolParam.TxFeePerByte);
+        bodyBuilder.SetFee(fee);
+        transaction = transactionBuilder.Build();
+        transaction.TransactionBody.TransactionOutputs.Last().Value.Coin -= fee;
 
         return transaction.Serialize();
     }
