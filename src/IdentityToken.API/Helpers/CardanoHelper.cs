@@ -103,7 +103,7 @@ public class CardanoHelper
 
         var transaction = transactionBuilder.Build();
 
-        var fee = transaction.CalculateFee(protocolParam.TxFeePerByte, protocolParam.TxFeePerByte);
+        var fee = transaction.CalculateFee(protocolParam.TxFeePerByte, protocolParam.TxFeeFixed);
         bodyBuilder.SetFee(fee);
         transaction = transactionBuilder.Build();
         transaction.TransactionBody.TransactionOutputs.Last().Value.Coin -= fee;

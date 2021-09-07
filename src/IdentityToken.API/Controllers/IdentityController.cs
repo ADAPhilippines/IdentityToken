@@ -5,6 +5,7 @@ using System.Linq;
 using System.IO;
 using IdentityToken.API.Data;
 using CardanoSharp.Wallet.Extensions;
+using System.Net.Http.Headers;
 
 namespace IdentityToken.API.Controllers;
 
@@ -142,7 +143,11 @@ public class IdentityController : ControllerBase
         if (block == null) return StatusCode(500);
 
         var txBytes = CardanoHelper.BuildTxWithMneomnic(authWallet.Mnemonic, txHash, (uint)txIndex, userWalletAddress, (uint)getTotalLovelace, block.Slot + 1000, protocolParams);
-        var txCborHex = txBytes.ToStringHex();
+        
+        var byteContent = new ByteArrayContent(txBytes);
+        byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/cbor");
+        var txResponse = await client.PostAsync("tx/submit", byteContent);
+        var txId = await txResponse.Content.ReadAsStringAsync();
 
         authWallet.IsActive = false;
         _identityDbContext.Update(authWallet);
