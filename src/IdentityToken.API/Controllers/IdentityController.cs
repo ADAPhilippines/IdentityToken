@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.IO;
 using IdentityToken.API.Data;
+using CardanoSharp.Wallet.Extensions;
 
 namespace IdentityToken.API.Controllers;
 
@@ -41,7 +42,7 @@ public class IdentityController : ControllerBase
     public async Task<IActionResult> GetAsync(string authCode)
     {
         // Check if authCode is system wallet address if not throw error
-        var authWallet = _identityDbContext.IdentityAuthWallets?.FirstOrDefault(x => x.Address == authCode);
+        var authWallet = _identityDbContext.IdentityAuthWallets?.Where(x => x.IsActive).FirstOrDefault(x => x.Address == authCode);
         if (authWallet == null) return BadRequest("Invalid auth code");
 
         // Create HttpClient
@@ -60,14 +61,15 @@ public class IdentityController : ControllerBase
         var utxos = await client.GetFromJsonAsync<CardanoTxOutputsResponse>($"txs/{latestTx.TxHash}/utxos");
         if (utxos == null || utxos.Outputs == null || utxos.Inputs == null) return Unauthorized();
 
-        var getTotalLovelace = utxos.Outputs
+        var getTotalLovelace = (uint)(utxos.Outputs
             .Where(x => x.Address == authCode)
             .Select(x => x.Amount.Where(y => y.Unit == "lovelace").Sum(y => y.Quantity))
-            .Sum();
+            .Sum());
 
         if (getTotalLovelace < 1200000) return Unauthorized();
 
-        var userWalletAddress = utxos.Inputs.FirstOrDefault()?.Address;
+        var txInput = utxos.Inputs.FirstOrDefault();
+        var userWalletAddress = txInput?.Address;
         if (userWalletAddress == null) return BadRequest();
 
         // Inspect Wallet Address
@@ -124,6 +126,18 @@ public class IdentityController : ControllerBase
 
             identityTokens.Add(identityToken);
         }
+
+        if (authWallet.Mnemonic == null
+            || txInput == null
+            || txInput.TxHash == null
+            || txInput.Index == null) return StatusCode(500);
+
+        var txBytes = CardanoHelper.BuildTxWithMneomnic(authWallet.Mnemonic, txInput.TxHash, (uint)txInput.Index, userWalletAddress, getTotalLovelace);
+        var txCborHex = txBytes.ToStringHex();
+
+        authWallet.IsActive = false;
+        _identityDbContext.Update(authWallet);
+        await _identityDbContext.SaveChangesAsync();
 
         return Ok(identityTokens);
     }

@@ -8,5 +8,5 @@ public class CardanoAsset
     public string? Unit { get; set; }
 
     [JsonPropertyName("quantity")]
-    public long Quantity { get; set; }
+    public uint Quantity { get; set; }
 }
