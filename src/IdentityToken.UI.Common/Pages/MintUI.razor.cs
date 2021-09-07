@@ -99,10 +99,7 @@ namespace IdentityToken.UI.Common.Pages
             }
 
             metadataDictionary["avatar"] = $"ipfs://{metadataDictionary["avatar"]}";
-            var metadataString = JsonSerializer.Serialize(metadataDictionary, new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            });
+            var metadataString = JsonSerializer.Serialize(metadataDictionary);
 
             if (CardanoWalletInterop == null) return;
 
