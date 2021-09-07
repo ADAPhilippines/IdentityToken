@@ -17,6 +17,7 @@
   <ItemGroup>
     <_ContentIncludedByDefault Remove="wwwroot\scripts\Interfaces\ICardanoDAPPConnector.ts" />
     <_ContentIncludedByDefault Remove="wwwroot\scripts\app\Models\CardanoWalletInteropError.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\dist\styles\app.css" />
   </ItemGroup>
 
   <ItemGroup>
