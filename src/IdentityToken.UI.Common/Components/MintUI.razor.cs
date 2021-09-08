@@ -1,64 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using IdentityToken.UI.Common.JSInterop;
 using IdentityToken.UI.Common.Models;
+using IdentityToken.UI.Common.Services.JSInterop;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 
-namespace IdentityToken.UI.Common.Pages
+namespace IdentityToken.UI.Common.Components
 {
     public partial class MintUI
     {
-        [Inject] private IJSRuntime? JsRuntime { get; set; }
-        private CardanoWalletInterop? CardanoWalletInterop { get; set; }
-        private List<IdentityTokenMetadatum>? TokenMetadata { get; set; }
+        [Inject] private CardanoWalletInterop? CardanoWalletInterop { get; set; }
+        private List<IdentityTokenMetadatum> TokenMetadata { get; set; } = TokenMetadataInitialState;
         private string Message { get; set; } = string.Empty;
+
         private static List<IdentityTokenMetadatum> TokenMetadataInitialState =>
-            new ()
+            new()
             {
-                new()
+                new IdentityTokenMetadatum
                 {
                     Key = "username",
                     Value = string.Empty
                 },
-                new()
+                new IdentityTokenMetadatum
                 {
                     Key = "avatar",
                     Value = string.Empty
                 },
-                new()
+                new IdentityTokenMetadatum
                 {
                     Key = "twitter_profile",
                     Value = string.Empty
                 },
-                new()
+                new IdentityTokenMetadatum
                 {
                     Key = "facebook_profile",
                     Value = string.Empty
                 },
-                new()
+                new IdentityTokenMetadatum
                 {
                     Key = "instagram_profile",
                     Value = string.Empty
                 }
             };
 
-        protected override void OnInitialized()
-        {
-            TokenMetadata = TokenMetadataInitialState;
-            base.OnInitialized();
-        }
-        
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
-                if (JsRuntime != null)
+                if (CardanoWalletInterop != null)
                 {
-                    CardanoWalletInterop = new CardanoWalletInterop(JsRuntime);
-                    await CardanoWalletInterop.InitializeAsync("Fg86lNzv47LnrMQ6o03YvXcfQ9t2whDf");
+                    await CardanoWalletInterop.InjectScriptsAsync();
                     CardanoWalletInterop.Error += CardanoWalletInteropOnError;
                 }
 
@@ -73,9 +64,7 @@ namespace IdentityToken.UI.Common.Pages
 
         private async void OnMintBtnClicked()
         {
-            if (TokenMetadata == null) return;
-
-            if (TokenMetadata.GroupBy(m => m.Key.Trim()).Any(c => c.Count() > 1))
+            if (TokenMetadata.GroupBy(m => m.Key.Trim()).Any(c => c.Key.Length > 0 && c.Count() > 1))
             {
                 Message = "Duplicate Keys Detected!";
                 return;
@@ -105,13 +94,13 @@ namespace IdentityToken.UI.Common.Pages
 
             if (!await CardanoWalletInterop.IsWalletConnectedAsync())
                 await CardanoWalletInterop.ConnectWalletAsync();
-            
+
             Message = "Submitting Transaction...";
             await InvokeAsync(StateHasChanged);
-            
+
             var tx = await CardanoWalletInterop.MintIdentityTokenAsync($"ID{username}", metadataString);
             if (tx == null) return;
-            
+
             TokenMetadata = TokenMetadataInitialState;
             Message = $"Minting Transaction Successful! txId: {tx.Hash}";
             await InvokeAsync(StateHasChanged);

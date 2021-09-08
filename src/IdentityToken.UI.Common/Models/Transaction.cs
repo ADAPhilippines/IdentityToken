@@ -10,7 +10,7 @@ namespace IdentityToken.UI.Common.Models
         public string Fees { get; init; } = string.Empty;
         public string Deposit { get; init; } = string.Empty;
         public string InvalidHereafter { get; init; } = string.Empty;
-        public List<QuantifiedObject> OutputAmount { get; init; }
+        public List<QuantifiedObject>? OutputAmount { get; init; }
         public long BlockHeight { get; init; }
         public long Slot { get; init; }
         public long Index { get; init; }

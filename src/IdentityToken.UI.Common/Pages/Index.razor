@@ -1,15 +1,42 @@
 @page "/"
+@page "/{Page}"
 
 
-<div class="font-sans container flex flex-col bg-white overflow-hidden">
-    <div class="flex flex-col justify-center pt-64">
-        <div class="text-7xl tracking-wide font-semibold text-primary text-center mb-4">Identity Token</div>
-        <div class="text-4xl tracking-wide font-normal text-primary text-center mt-4 mb-10">On Cardano</div>
-        <div class="flex flex-col justify-center text-2xl tracking-wide font-normal text-title mt-10">
-            <p class="w-2/3 text-center mx-auto text-secondary">
+<div class="flex flex-col font-sans container bg-gray-400 overflow-hidden">
+    <div class="flex flex-col justify-center w-full pt-64">
+        <div class="text-8xl tracking-wide font-semibold text-primary text-center mb-6">Identity Token</div>
+        <div class="text-5xl tracking-wide font-normal text-primary text-center mt-6 mb-12">On Cardano</div>
+        <div class="justify-center mt-12 mb-12">
+            <p class="w-7/12 text-xl tracking-wide leading-10 font-medium text-center mx-auto text-secondary">
                 Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt 
-                ut laoreet dolore magna aliquam erat volutpat. 
+                ut laoreet dolore magna aliquam erat volutpat.
             </p>
+        </div>
+        <div class="flex flex-col rounded-md w-8/12 bg-white mt-10 mx-auto overflow-hidden">
+            <div class="flex w-full">
+                <nav class="flex flex-grow relative z-0 shadow flex" aria-label="Tabs">
+                    <NavLink href="/mint" class="flex-grow group relative min-w-0 flex-1 overflow-hidden bg-white py-6 px-6 text-sm font-medium text-center hover:bg-gray-50 focus:z-10">
+                        <span class="@GetTabFontClass("mint") text-lg">Mint</span>
+                        <span aria-hidden="true" class="@GetTabUnderlineClass("mint") absolute inset-x-0 bottom-0 h-0.5"></span>
+                    </NavLink>
+                
+                    <NavLink href="/demo" class="flex-grow group relative min-w-0 flex-1 overflow-hidden bg-white py-6 px-6 text-sm font-medium text-center hover:bg-gray-50 focus:z-10">
+                        <span class="@GetTabFontClass("demo") text-lg">Demo</span>
+                        <span aria-hidden="true" class="@GetTabUnderlineClass("demo") absolute inset-x-0 bottom-0 h-0.5"></span>
+                        <span class="bg-idt-indigo text-idt-indigo display-none"></span>
+                    </NavLink>
+                </nav>
+            </div>
+            <div class="flex w-full">
+                @if (Page == "mint")
+                {
+                    <MintUI />
+                }
+                else
+                {
+                    <DemoUI />
+                }
+            </div>
         </div>
     </div>
     <div class="flex justify-center">
