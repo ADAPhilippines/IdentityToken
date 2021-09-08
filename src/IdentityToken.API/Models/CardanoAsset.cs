@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace IdentityToken.API.Models;
 
-public class CardanoAsset
+public record CardanoAsset
 {
     [JsonPropertyName("unit")]
     public string? Unit { get; set; }

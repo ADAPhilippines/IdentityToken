@@ -115,4 +115,25 @@ public class CardanoHelper
     {
         return outputs.Select(x => x != null && x.Amount != null ? x.Amount.Where(y => y.Unit == "lovelace").Sum(y => y.Quantity) : 0).Sum();
     }
+
+    public static string Sha265(string input)
+    {
+        var sha = System.Security.Cryptography.SHA256.Create();
+        var inputBytes = Encoding.ASCII.GetBytes(input);
+        var hash = sha.ComputeHash(inputBytes);
+        return ByteToHex(hash);
+    }
+
+    public static string Base64Encode(string input)
+    {
+        var inputBytes = Encoding.ASCII.GetBytes(input);
+        return Convert.ToBase64String(inputBytes);
+    }
+
+    public static string GenerateRandomString(int length)
+    {
+        var random = new Random();
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        return new string(Enumerable.Repeat(chars, length).Select(s => s[random.Next(s.Length)]).ToArray());
+    }
 }

@@ -142,6 +142,19 @@ public class IdentityController : ControllerBase
         var block = await client.GetFromJsonAsync<CardanoBlockResponse>("blocks/latest");
         if (block == null) return StatusCode(500);
 
+
+        // Pick the first IdentityToken
+        var firstIDToken = identityTokens.FirstOrDefault();
+        if(firstIDToken == null || firstIDToken.PolicyId == null || firstIDToken.AssetName == null) return StatusCode(500);
+        var authenticatedIdentity = new AuthenticatedIdentity { 
+            PolicyId = firstIDToken.PolicyId,
+            AssetName = firstIDToken.AssetName,
+            Avatar = firstIDToken.Avatar,
+            Key = CardanoHelper.Sha265($"{firstIDToken.PolicyId}{firstIDToken.AssetName}{CardanoHelper.GenerateRandomString(128)}"),
+            ExpiresIn = 60 * 60 * 24 * 365,
+        };
+        _identityDbContext.AuthenticatedIdentities?.Add(authenticatedIdentity);
+        
         // Return Change ADA Address
         var txBytes = CardanoHelper.BuildTxWithMneomnic(authWallet.Mnemonic, txHash, (uint)txIndex, userWalletAddress, (uint)getTotalLovelace, block.Slot + 1000, protocolParams);
         var byteContent = new ByteArrayContent(txBytes);
@@ -156,6 +169,6 @@ public class IdentityController : ControllerBase
         // Commit database updates
         await _identityDbContext.SaveChangesAsync();
 
-        return Ok(identityTokens);
+        return Ok(authenticatedIdentity);
     }
 }
