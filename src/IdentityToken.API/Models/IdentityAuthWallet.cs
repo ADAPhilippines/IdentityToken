@@ -1,6 +1,6 @@
 namespace IdentityToken.API.Models;
 
-public class IdentityAuthWallet
+public record IdentityAuthWallet
 {
     public Guid Id { get; set; }
     public string? Address { get; set; }

@@ -142,15 +142,18 @@ public class IdentityController : ControllerBase
         var block = await client.GetFromJsonAsync<CardanoBlockResponse>("blocks/latest");
         if (block == null) return StatusCode(500);
 
+        // Return Change ADA Address
         var txBytes = CardanoHelper.BuildTxWithMneomnic(authWallet.Mnemonic, txHash, (uint)txIndex, userWalletAddress, (uint)getTotalLovelace, block.Slot + 1000, protocolParams);
-        
         var byteContent = new ByteArrayContent(txBytes);
         byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/cbor");
         var txResponse = await client.PostAsync("tx/submit", byteContent);
         var txId = await txResponse.Content.ReadAsStringAsync();
-
+        
+        // Make sure no one can use the same auth code
         authWallet.IsActive = false;
         _identityDbContext.Update(authWallet);
+
+        // Commit database updates
         await _identityDbContext.SaveChangesAsync();
 
         return Ok(identityTokens);

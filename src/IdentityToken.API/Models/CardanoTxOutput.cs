@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace IdentityToken.API.Models;
 
-public class CardanoTxOutput
+public record CardanoTxOutput
 {
     [JsonPropertyName("address")]
     public string? Address { get; set; }

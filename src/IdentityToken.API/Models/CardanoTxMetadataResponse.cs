@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace IdentityToken.API.Models;
 
-public class CardanoTxMetadataResponse
+public record CardanoTxMetadataResponse
 {
 
     [JsonPropertyName("label")]

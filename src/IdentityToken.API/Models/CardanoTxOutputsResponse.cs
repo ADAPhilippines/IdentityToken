@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace IdentityToken.API.Models;
 
-public class CardanoTxOutputsResponse
+public record CardanoTxOutputsResponse
 {
     [JsonPropertyName("hash")]
     public string? Hash { get; set; }
