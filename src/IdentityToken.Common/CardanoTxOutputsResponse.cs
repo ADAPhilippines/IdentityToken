@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace IdentityToken.API.Models;
+namespace IdentityToken.Common.Models;
 
 public record CardanoTxOutputsResponse
 {

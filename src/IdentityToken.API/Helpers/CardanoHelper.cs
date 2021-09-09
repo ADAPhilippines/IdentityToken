@@ -4,13 +4,8 @@ using CardanoSharp.Wallet.Enums;
 using CardanoSharp.Wallet.Extensions.Models;
 using CardanoSharp.Wallet.Models.Addresses;
 using CardanoSharp.Wallet.Models.Keys;
-using CardanoSharp.Wallet.Models.Transactions;
 using CardanoSharp.Wallet.Extensions.Models.Transactions;
-//For CBOR Utilities
-using PeterO.Cbor2;
-
-using IdentityToken.API.Models;
-using CardanoSharp.Wallet.Encoding;
+using IdentityToken.Common.Models;
 using CardanoSharp.Wallet.TransactionBuilding;
 using CardanoSharp.Wallet.Extensions;
 

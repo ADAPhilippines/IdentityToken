@@ -1,4 +1,4 @@
-namespace IdentityToken.API.Models;
+namespace IdentityToken.Common.Models;
 
 public record IdentityAuthWallet
 {

@@ -1,4 +1,4 @@
-using IdentityToken.API.Models;
+using IdentityToken.Common.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace IdentityToken.API.Data;

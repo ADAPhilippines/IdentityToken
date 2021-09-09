@@ -1,12 +1,13 @@
 using System.Text.Json.Serialization;
 
-namespace IdentityToken.API.Models;
+namespace IdentityToken.Common.Models;
 
-public record CardanoAsset
+
+public record CardanoAddressAssetResponse
 {
     [JsonPropertyName("unit")]
     public string? Unit { get; set; }
 
     [JsonPropertyName("quantity")]
-    public uint Quantity { get; set; }
+    public string? Quantity { get; set; }
 }

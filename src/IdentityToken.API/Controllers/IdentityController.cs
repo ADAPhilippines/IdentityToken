@@ -1,10 +1,7 @@
 using IdentityToken.API.Helpers;
-using IdentityToken.API.Models;
+using IdentityToken.Common.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
-using System.IO;
 using IdentityToken.API.Data;
-using CardanoSharp.Wallet.Extensions;
 using System.Net.Http.Headers;
 
 namespace IdentityToken.API.Controllers;
@@ -44,7 +41,7 @@ public class IdentityController : ControllerBase
     {
         // Check if authCode is system wallet address if not throw error
         var authWallet = _identityDbContext.IdentityAuthWallets?.Where(x => x.IsActive).FirstOrDefault(x => x.Address == authCode);
-        if (authWallet == null) return BadRequest("Invalid auth code");
+        if (authWallet is null) return BadRequest("Invalid auth code");
 
         // Create HttpClient
         using var client = _httpClientFactory.CreateClient("blockfrost");
@@ -53,35 +50,34 @@ public class IdentityController : ControllerBase
         var systemWalletAddressTxsResponse = await client.GetAsync($"addresses/{authCode}/transactions?order=desc");
         if (!systemWalletAddressTxsResponse.IsSuccessStatusCode) return Unauthorized();
         var systemWalletAddressTxs = await systemWalletAddressTxsResponse.Content.ReadFromJsonAsync<IEnumerable<CardanoAddressTxsResponse>>();
-        if (systemWalletAddressTxs == null) return BadRequest();
+        if (systemWalletAddressTxs is null) return BadRequest();
 
         var latestTx = systemWalletAddressTxs.FirstOrDefault();
-        if (latestTx == null) return BadRequest();
+        if (latestTx is null) return BadRequest();
 
         // Get Latest Transaction UTXOs
         var utxos = await client.GetFromJsonAsync<CardanoTxOutputsResponse>($"txs/{latestTx.TxHash}/utxos");
-        if (utxos == null || utxos.Outputs == null || utxos.Inputs == null) return Unauthorized();
+        if (utxos is null || utxos.Outputs is null || utxos.Inputs is null) return Unauthorized();
 
         var txOutput = utxos.Outputs.Where(x => x.Address == authCode).FirstOrDefault();
-        if (txOutput == null) return Unauthorized();
+        if (txOutput is null) return Unauthorized();
 
         var txHash = utxos.Hash;
         var txIndex = utxos.Outputs.ToList().IndexOf(txOutput);
 
         var getTotalLovelace = (uint?)txOutput?.Amount?.Where(y => y.Unit == "lovelace").Sum(y => y.Quantity);
 
-        if (getTotalLovelace == null || getTotalLovelace < 1200000) return Unauthorized();
+        if (getTotalLovelace is null || getTotalLovelace < 1200000) return Unauthorized();
 
         var txInput = utxos.Inputs.FirstOrDefault();
         var userWalletAddress = txInput?.Address;
-        if (userWalletAddress == null) return BadRequest();
+        if (userWalletAddress is null) return BadRequest();
 
         // Inspect Wallet Address
         var address = await client.GetFromJsonAsync<CardanoAddressResponse>($"addresses/{userWalletAddress}");
-
+        if (address is null) return BadRequest();
+        
         // Inspect Assets
-        if (address == null) return BadRequest();
-
         var addressAssets = await client.GetFromJsonAsync<IEnumerable<CardanoAddressAssetResponse>>($"accounts/{address.StakeAddress}/addresses/assets");
         var tempIdentityTokens = addressAssets?.Where(x => CardanoHelper.IsIdentityToken(x.Unit)).ToList() ?? new List<CardanoAddressAssetResponse>();
 
@@ -93,7 +89,7 @@ public class IdentityController : ControllerBase
         {
             var asset = await client.GetFromJsonAsync<CardanoAssetResponse>($"assets/{tempIdentityToken.Unit}");
 
-            if (asset == null || asset.AssetName == null || asset.PolicyId == null) continue;
+            if (asset is null || asset.AssetName is null || asset.PolicyId is null) continue;
 
             var assetName = CardanoHelper.HexToAscii(asset.AssetName);
             var identityToken = new CardanoIdentityToken
@@ -106,7 +102,7 @@ public class IdentityController : ControllerBase
             var metadata = await client.GetFromJsonAsync<IEnumerable<CardanoTxMetadataResponse>>($"txs/{asset.MintTxHash}/metadata");
 
             // Check if metadata contains IdentityToken definition
-            if (metadata == null) continue;
+            if (metadata is null) continue;
 
             foreach (var meta in metadata)
             {
@@ -133,19 +129,19 @@ public class IdentityController : ControllerBase
 
         // Get Cardano Protocol Params
         var protocolParams = await client.GetFromJsonAsync<CardanoProtocolParamResponse>("epochs/latest/parameters");
-        if (protocolParams == null
-            || authWallet.Mnemonic == null
-            || txOutput == null
-            || txHash == null) return StatusCode(500);
+        if (protocolParams is null
+            || authWallet.Mnemonic is null
+            || txOutput is null
+            || txHash is null) return StatusCode(500);
 
         // Get Latest Cardano Block
         var block = await client.GetFromJsonAsync<CardanoBlockResponse>("blocks/latest");
-        if (block == null) return StatusCode(500);
+        if (block is null) return StatusCode(500);
 
 
         // Pick the first IdentityToken
         var firstIDToken = identityTokens.FirstOrDefault();
-        if(firstIDToken == null || firstIDToken.PolicyId == null || firstIDToken.AssetName == null) return StatusCode(500);
+        if(firstIDToken is null || firstIDToken.PolicyId is null || firstIDToken.AssetName is null) return StatusCode(500);
         var authenticatedIdentity = new AuthenticatedIdentity { 
             PolicyId = firstIDToken.PolicyId,
             AssetName = firstIDToken.AssetName,
@@ -155,14 +151,14 @@ public class IdentityController : ControllerBase
         };
         _identityDbContext.AuthenticatedIdentities?.Add(authenticatedIdentity);
         
-        // Return Change ADA Address
+        // Return Change ADA to Address
         var txBytes = CardanoHelper.BuildTxWithMneomnic(authWallet.Mnemonic, txHash, (uint)txIndex, userWalletAddress, (uint)getTotalLovelace, block.Slot + 1000, protocolParams);
         var byteContent = new ByteArrayContent(txBytes);
         byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/cbor");
         var txResponse = await client.PostAsync("tx/submit", byteContent);
         var txId = await txResponse.Content.ReadAsStringAsync();
         
-        // Make sure no one can use the same auth code
+        // Make sure no one can use the same auth code again
         authWallet.IsActive = false;
         _identityDbContext.Update(authWallet);
 
