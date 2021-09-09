@@ -33,10 +33,13 @@ module.exports = {
             'idt-indigo': '#4C4DE7',
             'idt-purple': '#7A60CA'
         },
+        placeholderColor: {
+            ...colors,
+            'focused': '#1E2835',
+            'unfocused': '#808088'
+        },
         extend: {},
     },
-    variants: {
-        extend: {},
-    },
+    variants: {},
     plugins: [],
 }

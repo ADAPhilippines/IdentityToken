@@ -31,5 +31,10 @@ namespace IdentityToken.UI.Common.Components
         {
             IsFocused = false;
         }
+
+        private string GetLabelColorClass()
+        {
+            return IsFocused ? "text-idt-indigo" : "text-idt-gray";
+        }
     }
 }

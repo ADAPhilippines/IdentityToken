@@ -12,5 +12,14 @@ namespace IdentityToken.UI.Common.Pages
             Page ??= "mint";
             base.OnInitialized();
         }
+
+        private string GetTabTextColorClass(string tabName)
+        {
+            return tabName == Page ? "text-idt-indigo" : "text-idt-gray";
+        }
+        private string GetTabUnderlineColorClass(string tabName)
+        {
+            return tabName == Page ? "bg-idt-indigo" : "bg-transparent";
+        }
     }
 }
