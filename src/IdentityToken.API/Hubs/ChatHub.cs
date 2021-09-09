@@ -8,7 +8,6 @@ namespace IdentityToken.API.Hubs;
 public class ChatHub : Hub
 {
     private readonly IdentityDbContext _identityDbContext;
-    private Dictionary<string, AuthenticatedIdentity> Users { get; set; } = new Dictionary<string, AuthenticatedIdentity>();
 
     public ChatHub(IdentityDbContext identityDbContext)
     {
@@ -23,8 +22,15 @@ public class ChatHub : Hub
 
             if (authenticatedIdentity is not null)
             {
-                Users.Add(Context.ConnectionId, authenticatedIdentity);
+                var newChatUser = new ChatUser
+                {
+                    ConnectionId = Context.ConnectionId,
+                    Identity = authenticatedIdentity
+                };
+
+                _identityDbContext.Add(newChatUser);
                 await Clients.Caller.SendAsync("Authenticated", authenticatedIdentity);
+                await _identityDbContext.SaveChangesAsync();
             }
             else
             {
@@ -33,8 +39,26 @@ public class ChatHub : Hub
         }
     }
 
-    public async Task SendMessage(string user, string message)
+    public async Task SendMessage(string message)
     {
-        await Clients.All.SendAsync("ReceiveMessage", user, message);
+        if (_identityDbContext is not null && _identityDbContext.ChatUsers is not null)
+        {
+            var chatUser = await _identityDbContext.ChatUsers
+                .Include( u => u.Identity)
+                .FirstOrDefaultAsync(x => x.ConnectionId == Context.ConnectionId);
+
+            if (chatUser is not null)
+            {
+                var chatMessage = new ChatMessage
+                {
+                    Sender = chatUser.Identity,
+                    Message = message
+                };
+
+                _identityDbContext.Add(chatMessage);
+                await Clients.All.SendAsync("ReceiveMessage", chatUser.Identity, message);
+                await _identityDbContext.SaveChangesAsync();
+            }
+        }
     }
 }

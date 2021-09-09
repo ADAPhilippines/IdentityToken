@@ -12,10 +12,14 @@ public class IdentityDbContext : DbContext
 
     public DbSet<IdentityAuthWallet>? IdentityAuthWallets { get; set; }
     public DbSet<AuthenticatedIdentity>? AuthenticatedIdentities { get; set; }
+    public DbSet<ChatUser>? ChatUsers { get; set; }
+    public DbSet<ChatMessage>? ChatMessages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<IdentityAuthWallet>().ToTable("IdentityAuthWallets");
         modelBuilder.Entity<AuthenticatedIdentity>().ToTable("AuthenticatedIdentities");
+        modelBuilder.Entity<ChatUser>().ToTable("ChatUsers");
+        modelBuilder.Entity<ChatMessage>().ToTable("ChatMessages");
     }
 }
