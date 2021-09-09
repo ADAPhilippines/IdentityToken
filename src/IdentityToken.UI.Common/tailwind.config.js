@@ -6,7 +6,7 @@ module.exports = {
         enabled: true,
         content: [
             './**/*.html',
-            './**/*.razor'
+            './TailwindClasses.razor'
         ],
     },
     darkMode: 'class', // or 'media' or 'class'
@@ -22,7 +22,8 @@ module.exports = {
             'idt-indigo': '#4C4DE7',
             'idt-purple': '#7A60CA',
             'idt-gray': '#808088',
-            'idt-gray-light': '#CFD1DC'
+            'idt-gray-light': '#CFD1DC',
+            'idt-gray-lightest': '#CFD1DC'
         },
         textColor: {
             ...colors,
