@@ -16,22 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <_ContentIncludedByDefault Remove="wwwroot\scripts\Interfaces\ICardanoDAPPConnector.ts" />
-    <_ContentIncludedByDefault Remove="wwwroot\scripts\app\Models\CardanoWalletInteropError.ts" />
-    <_ContentIncludedByDefault Remove="wwwroot\dist\styles\app.css" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="wwwroot\scripts\app\Types\TxOutput.ts" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <TypeScriptCompile Include="wwwroot\scripts\app\Types\QuantifiedObject.ts" />
-    <TypeScriptCompile Include="wwwroot\scripts\app\Types\Tx.ts" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\IdentityToken.Common\IdentityToken.Common.csproj" />
   </ItemGroup>
+
 
 </Project>
