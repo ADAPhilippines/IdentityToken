@@ -6,7 +6,7 @@ module.exports = {
         enabled: true,
         content: [
             './**/*.html',
-            './TailwindClasses.razor'
+            './**/*.razor'
         ],
     },
     darkMode: 'class', // or 'media' or 'class'
