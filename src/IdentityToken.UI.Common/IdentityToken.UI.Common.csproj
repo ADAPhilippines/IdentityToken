@@ -12,30 +12,22 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.0-preview.7.21378.6" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.0-preview.7.21378.6" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.0-preview.7.21378.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0-preview.7.21377.19" />
   </ItemGroup>
 
   <ItemGroup>
-    <_ContentIncludedByDefault Remove="wwwroot\scripts\Interfaces\ICardanoDAPPConnector.ts" />
-    <_ContentIncludedByDefault Remove="wwwroot\scripts\app\Models\CardanoWalletInteropError.ts" />
-    <_ContentIncludedByDefault Remove="wwwroot\dist\styles\app.css" />
+    <ProjectReference Include="..\IdentityToken.Common\IdentityToken.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\scripts\app\Types\TxOutput.ts" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <TypeScriptCompile Include="wwwroot\scripts\app\Types\QuantifiedObject.ts" />
-    <TypeScriptCompile Include="wwwroot\scripts\app\Types\Tx.ts" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Microsoft.AspNetCore, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60">
+    <Reference Include="Microsoft.AspNetCore, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60"  Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' ">
+      <HintPath>/usr/local/share/dotnet/shared/Microsoft.AspNetCore.App/6.0.0-preview.7.21378.6/Microsoft.AspNetCore.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60" Condition=" '$(OS)' == 'Windows_NT' ">
       <HintPath>C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\6.0.0-preview.7.21378.6\Microsoft.AspNetCore.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Extensions.Configuration, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60" />
   </ItemGroup>
 
 </Project>

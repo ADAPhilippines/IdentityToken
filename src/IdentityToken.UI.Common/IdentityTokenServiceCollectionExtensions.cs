@@ -6,10 +6,10 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using IdentityToken.UI.Common.Models;
 using IdentityToken.UI.Common.Services.JSInterop;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Builder;
 
 namespace IdentityToken.UI.Common
 {
