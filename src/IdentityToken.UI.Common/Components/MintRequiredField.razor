@@ -1,0 +1,11 @@
+﻿<div class="@Class">
+    <label class="@GetLabelColorClass() block text-sm font-medium">@Label</label>
+    <input type="text"
+           class="text-primary placeholder-unfocused focus:placeholder-focused mt-3 pb-3 block w-full pr-10 border-b-2 border-b-idt-gray focus:outline-none focus:border-b-idt-indigo sm:text-sm"
+           placeholder="@Placeholder"
+           @bind="Value"
+           @onfocusin="OnFocusIn"
+           @onfocusout="OnFocusOut"
+           spellcheck="false"
+           maxlength="64">
+</div>

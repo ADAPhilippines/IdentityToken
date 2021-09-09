@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace IdentityToken.UI.Common.Components
 {
-    public partial class MintUI
+    public partial class Mint
     {
         [Inject] private CardanoWalletInterop? CardanoWalletInterop { get; set; }
         private List<IdentityTokenMetadatum> TokenMetadata { get; set; } = TokenMetadataInitialState;
@@ -29,12 +29,12 @@ namespace IdentityToken.UI.Common.Components
                 },
                 new IdentityTokenMetadatum
                 {
-                    Key = "twitter_profile",
+                    Key = "facebook_profile",
                     Value = string.Empty
                 },
                 new IdentityTokenMetadatum
                 {
-                    Key = "facebook_profile",
+                    Key = "twitter_profile",
                     Value = string.Empty
                 },
                 new IdentityTokenMetadatum

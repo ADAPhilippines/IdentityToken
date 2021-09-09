@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using IdentityToken.UI.Common.Models;
+using Microsoft.Extensions.Configuration;
 using Microsoft.JSInterop;
 
 namespace IdentityToken.UI.Common.Services.JSInterop
@@ -13,12 +14,12 @@ namespace IdentityToken.UI.Common.Services.JSInterop
         private readonly IJSRuntime? _jsRuntime;
         private readonly DotNetObjectReference<CardanoWalletInterop> _objRef;
 
-        public CardanoWalletInterop(IJSRuntime? jsRuntime, string blockfrostProjectId)
+        public CardanoWalletInterop(IJSRuntime? jsRuntime, IConfiguration config)
         {
             _jsRuntime = jsRuntime;
             _objRef = DotNetObjectReference.Create(this);
-            _blockfrostProjectId = blockfrostProjectId;
-
+            _blockfrostProjectId = config["BlockfrostProjectId"];
+            
             if (jsRuntime == null) return;
             _bootstrapModuleTask = new Lazy<Task<IJSObjectReference>>(() => jsRuntime.InvokeAsync<IJSObjectReference>(
                 "import", "./_content/IdentityToken.UI.Common/bootstrap.js").AsTask());

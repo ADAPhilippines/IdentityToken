@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityToken.UI.Server", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityToken.UI.WASM", "IdentityToken.UI.WASM\IdentityToken.UI.WASM.csproj", "{5ED2D035-B777-442F-970F-CBB3627DFB15}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityToken.Common", "IdentityToken.Common\IdentityToken.Common.csproj", "{9D2916E9-8F6C-4914-9E28-BE3BE70681FA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{5ED2D035-B777-442F-970F-CBB3627DFB15}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5ED2D035-B777-442F-970F-CBB3627DFB15}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5ED2D035-B777-442F-970F-CBB3627DFB15}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D2916E9-8F6C-4914-9E28-BE3BE70681FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D2916E9-8F6C-4914-9E28-BE3BE70681FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D2916E9-8F6C-4914-9E28-BE3BE70681FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D2916E9-8F6C-4914-9E28-BE3BE70681FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

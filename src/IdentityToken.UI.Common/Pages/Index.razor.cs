@@ -13,14 +13,13 @@ namespace IdentityToken.UI.Common.Pages
             base.OnInitialized();
         }
 
-        private string GetTabUnderlineClass(string link)
+        private string GetTabTextColorClass(string tabName)
         {
-            return link == Page ? "bg-idt-indigo" : "bg-transparent";
+            return tabName == Page ? "text-idt-indigo" : "text-idt-gray";
         }
-        
-        private string GetTabFontClass(string link)
+        private string GetTabUnderlineColorClass(string tabName)
         {
-            return link == Page ? "text-idt-indigo" : "text-secondary";
+            return tabName == Page ? "bg-idt-indigo" : "bg-transparent";
         }
     }
 }

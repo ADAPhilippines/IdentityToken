@@ -1,0 +1,40 @@
+﻿<div class="flex flex-col w-full h-full justify-center mx-auto">
+    <div class="flex h-[173px] bg-gray-lightest relative justify-center items-center">
+        <div class="absolute w-full h-full bg-center bg-cover" style="background-image: url('./_content/IdentityToken.UI.Common/images/mint_banner.png')"></div>
+        <div class="flex text-2xl tracking-wide text-idt-purple">Create your own Identity</div>
+    </div>
+    <div class="w-6/12 mx-auto pt-8 flex flex-col justify-center">
+        <MintRequiredField Label="Username" Placeholder="Your Username Here" @bind-Value="TokenMetadata[0].Value"/>
+        <MintRequiredField Class="mt-8" Label="Avatar (Provide IPFS)" Placeholder="QmfDh9JKLL..." @bind-Value="TokenMetadata[1].Value"/>
+        <div class="mt-8 text-xs text-idt-gray">
+            <span>Paste any IPFS Image Content Hash as your identity Token Avatar. If you don’t have one yet, you can sign-up for free at </span>
+            <a class="text-idt-purple" href="https://www.pinata.cloud/" target="_blank">pinata.cloud</a>
+            <span> or any other IPFS hosting service to upload your avatar and get a IPFS Content Hash.</span>
+        </div>
+        <div class="mt-8 mb-8 text-sm text-idt-gray italic">Optional Fields</div>
+        <MintOptionalField Icon="facebook_logo.svg" ValuePlaceholder="Facebook link" @bind-Value="TokenMetadata[2].Value" IsDefault="@(true)"/>
+        <MintOptionalField Icon="twitter_logo.svg" ValuePlaceholder="Twitter link" @bind-Value="TokenMetadata[3].Value" IsDefault="@(true)"/>
+        <MintOptionalField Icon="instagram_logo.svg" ValuePlaceholder="Instagram link" @bind-Value="TokenMetadata[4].Value" IsDefault="@(true)"/>
+        
+        @for (var i = 5; i < TokenMetadata.Count; i++)
+        {
+            var j = i;
+            <MintOptionalField 
+                KeyPlaceholder="Enter Key" 
+                ValuePlaceholder="Enter Value" 
+                @bind-Key="TokenMetadata[j].Key" 
+                @bind-Value="TokenMetadata[j].Value"
+                OnDeleteBtnClickCallback="args => OnRemoveMetadataBtnClicked(TokenMetadata[j])"/>
+        }
+        
+        <button class="border border-dotted border-idt-gray-light h-[48px] rounded-full mb-8 text-center align-middle"
+                @onclick="OnAddNewMetadataBtnClicked">
+            <img class="inline h-[32px]" src="./_content/IdentityToken.UI.Common/images/add_icon.svg" alt=""/>
+            <span class="text-idt-gray text-sm">Add New</span>
+        </button>
+        <button class="mx-auto h-[48px] w-6/12 text-sm rounded-full border border-idt-purple mb-16 hover:bg-gradient-to-r hover:from-[#7A60C9] hover:to-[#4C4CE8] hover:text-white"
+                @onclick="OnMintBtnClicked">
+            Mint
+        </button>
+    </div>
+</div>
