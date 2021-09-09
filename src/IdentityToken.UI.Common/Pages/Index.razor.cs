@@ -12,15 +12,5 @@ namespace IdentityToken.UI.Common.Pages
             Page ??= "mint";
             base.OnInitialized();
         }
-
-        private string GetTabUnderlineClass(string link)
-        {
-            return link == Page ? "bg-idt-indigo" : "bg-transparent";
-        }
-        
-        private string GetTabFontClass(string link)
-        {
-            return link == Page ? "text-idt-indigo" : "text-secondary";
-        }
     }
 }

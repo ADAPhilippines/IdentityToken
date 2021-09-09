@@ -1,0 +1,38 @@
+﻿<div class="flex flex-col w-full h-full justify-center mx-auto">
+    <div class="flex h-[173px] bg-[#E8EAEF] relative justify-center items-center">
+        <div class="absolute w-full h-full bg-center bg-cover" style="background-image: url('./_content/IdentityToken.UI.Common/images/mint_banner.png')"></div>
+        <div class="flex text-2xl tracking-wide text-idt-purple">Create your own Identity</div>
+    </div>
+    <div class="w-6/12 mx-auto pt-8 flex flex-col">
+        <MintRequiredField Label="Username" Placeholder="Your Username Here" @bind-Value="TokenMetadata[0].Value"/>
+        <MintRequiredField Class="mt-8" Label="Avatar (Provide IPFS)" Placeholder="QmfDh9JKLL..." @bind-Value="TokenMetadata[1].Value"/>
+        <div class="mt-8 font-xs text-idt-gray">
+            <span>Paste any IPFS Image Content Hash as your identity Token Avatar. If you don’t have one yet, you can sign-up for free at </span>
+            <a class="text-idt-purple" href="https://www.pinata.cloud/" target="_blank">pinata.cloud</a>
+            <span> or any other IPFS hosting service to upload your avatar and get a IPFS Content Hash.</span>
+        </div>
+        <div class="mt-8 mb-8 font-sm text-idt-gray italic">Optional Fields</div>
+        <MintOptionalField Icon="facebook_logo.svg" Placeholder="Facebook link" @bind-Value="TokenMetadata[2].Value" IsDefault="@(true)"/>
+        <MintOptionalField Icon="twitter_logo.svg" Placeholder="Twitter link" @bind-Value="TokenMetadata[3].Value" IsDefault="@(true)"/>
+        <MintOptionalField Icon="instagram_logo.svg" Placeholder="Instagram link" @bind-Value="TokenMetadata[4].Value" IsDefault="@(true)"/>
+    </div>
+    @for (var i = 2; i < 5; i++)
+    {
+        var j = i;
+        <input @bind="TokenMetadata[j].Key" disabled="@true"/>
+        <input @bind="TokenMetadata[j].Value" maxlength="64"/>
+        <br/>
+    }
+    @for (var i = 5; i < TokenMetadata.Count; i++)
+    {
+        var j = i;
+        <input @bind="TokenMetadata[j].Key" maxlength="64"/>
+        <input @bind="TokenMetadata[j].Value" maxlength="64"/>
+        <button @onclick="@(() => OnRemoveMetadataBtnClicked(TokenMetadata[j]))">Remove -</button>
+        <br/>
+    }
+    <button @onclick="OnAddNewMetadataBtnClicked">Add New +</button>
+    <br/>
+    <h4>@Message</h4>
+    <button @onclick="OnMintBtnClicked">Mint</button>
+</div>

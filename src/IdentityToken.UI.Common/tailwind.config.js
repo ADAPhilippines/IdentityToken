@@ -1,36 +1,41 @@
 const colors = require('tailwindcss/colors')
 
 module.exports = {
-  mode: "jit",
-  purge: {
-    enabled: true,
-    content: [
-      './**/*.html',
-      './**/*.razor'
-    ],
-  },
-  darkMode: 'class', // or 'media' or 'class'
-  theme: {
-    container: {
-      center: true,
+    mode: "jit",
+    purge: {
+        enabled: true,
+        content: [
+            './**/*.html',
+            './**/*.razor'
+        ],
     },
-    fontFamily: {
-      'sans': ['Poppins', 'sans-serif']
+    darkMode: 'class', // or 'media' or 'class'
+    theme: {
+        container: {
+            center: true,
+        },
+        fontFamily: {
+            'sans': ['Poppins', 'sans-serif']
+        },
+        colors: {
+            ...colors,
+            'idt-indigo': '#4C4DE7',
+            'idt-purple': '#7A60CA',
+            'idt-gray': '#808088',
+            'idt-gray-light': '#CFD1DC'
+        },
+        textColor: {
+            ...colors,
+            'primary': '#1E2835',
+            'secondary': '#606066',
+            'idt-gray': '#808088',
+            'idt-indigo': '#4C4DE7',
+            'idt-purple': '#7A60CA'
+        },
+        extend: {},
     },
-    colors: {
-      ...colors,
-      'idt-indigo': '#4C4DE7'
+    variants: {
+        extend: {},
     },
-    textColor: {
-      ...colors,
-      'primary': '#1E2835',
-      'secondary': '#606066',
-      'idt-indigo': '#4C4DE7'
-    },
-    extend: {},
-  },
-  variants: {
-    extend: {},
-  },
-  plugins: [],
+    plugins: [],
 }

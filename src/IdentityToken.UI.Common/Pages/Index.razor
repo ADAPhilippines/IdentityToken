@@ -15,22 +15,36 @@
         <div class="flex flex-col rounded-md w-8/12 bg-white mt-10 mx-auto overflow-hidden">
             <div class="flex w-full">
                 <nav class="flex flex-grow relative z-0 shadow flex" aria-label="Tabs">
-                    <NavLink href="/mint" class="flex-grow group relative min-w-0 flex-1 overflow-hidden bg-white py-6 px-6 text-sm font-medium text-center hover:bg-gray-50 focus:z-10">
-                        <span class="@GetTabFontClass("mint") text-lg">Mint</span>
-                        <span aria-hidden="true" class="@GetTabUnderlineClass("mint") absolute inset-x-0 bottom-0 h-0.5"></span>
-                    </NavLink>
-                
-                    <NavLink href="/demo" class="flex-grow group relative min-w-0 flex-1 overflow-hidden bg-white py-6 px-6 text-sm font-medium text-center hover:bg-gray-50 focus:z-10">
-                        <span class="@GetTabFontClass("demo") text-lg">Demo</span>
-                        <span aria-hidden="true" class="@GetTabUnderlineClass("demo") absolute inset-x-0 bottom-0 h-0.5"></span>
-                        <span class="bg-idt-indigo text-idt-indigo display-none"></span>
-                    </NavLink>
+                    @if (Page == "mint")
+                    {
+                        <NavLink href="/mint" class="flex-grow group relative min-w-0 flex-1 overflow-hidden bg-white py-6 px-6 text-sm font-medium text-center hover:bg-gray-50 focus:z-10">
+                            <span class="text-idt-indigo text-lg">Mint</span>
+                            <span aria-hidden="true" class="bg-idt-indigo absolute inset-x-0 bottom-0 h-0.5"></span>
+                        </NavLink>
+
+                        <NavLink href="/demo" class="flex-grow group relative min-w-0 flex-1 overflow-hidden bg-white py-6 px-6 text-sm font-medium text-center hover:bg-gray-50 focus:z-10">
+                            <span class="text-idt-gray text-lg">Demo</span>
+                            <span aria-hidden="true" class="bg-transparent absolute inset-x-0 bottom-0 h-0.5"></span>
+                        </NavLink>
+                    }
+                    else if (Page == "demo")
+                    {
+                        <NavLink href="/mint" class="flex-grow group relative min-w-0 flex-1 overflow-hidden bg-white py-6 px-6 text-sm font-medium text-center hover:bg-gray-50 focus:z-10">
+                            <span class="text-idt-gray text-lg">Mint</span>
+                            <span aria-hidden="true" class="bg-transparent absolute inset-x-0 bottom-0 h-0.5"></span>
+                        </NavLink>
+
+                        <NavLink href="/demo" class="flex-grow group relative min-w-0 flex-1 overflow-hidden bg-white py-6 px-6 text-sm font-medium text-center hover:bg-gray-50 focus:z-10">
+                            <span class="text-idt-indigo text-lg">Demo</span>
+                            <span aria-hidden="true" class="bg-idt-indigo absolute inset-x-0 bottom-0 h-0.5"></span>
+                        </NavLink>
+                    }
                 </nav>
             </div>
             <div class="flex w-full">
                 @if (Page == "mint")
                 {
-                    <MintUI />
+                    <Mint />
                 }
                 else
                 {

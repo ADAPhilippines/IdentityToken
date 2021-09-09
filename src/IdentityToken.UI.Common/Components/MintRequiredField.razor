@@ -1,0 +1,18 @@
+﻿<div class="@Class">
+    @if (IsFocused)
+    {
+        <label class="block text-sm font-medium text-idt-indigo">@Label</label>
+    }
+    else
+    {
+        <label class="block text-sm font-medium text-idt-gray">@Label</label>
+    }
+    <input type="text"
+           class="mt-3 pb-3 block w-full pr-10 border-b-2 border-b-idt-gray focus:outline-none focus:border-b-idt-indigo sm:text-sm"
+           placeholder="@Placeholder"
+           @bind="Value"
+           @onfocusin="OnFocusIn"
+           @onfocusout="OnFocusOut"
+           spellcheck="false"
+           maxlength="64">
+</div>
