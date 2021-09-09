@@ -1,5 +1,10 @@
-﻿<div class="container mx-auto flex flex-col">
-    <h3>Demo</h3>
+﻿<div class="flex flex-col w-full">
+    <div class="text-2xl tracking-wide text-idt-purple w-full text-center mt-10 mb-10">Sample Identity Token Chat Room</div>
+    <div class="flex w-full">
+        <div>
+          <img class="inline-block h-9 w-9 rounded-full" src="https://ipfs.blockfrost.dev/ipfs/@(CurrentUser?.Avatar?.Replace("ipfs://", string.Empty))" alt="avatar">
+        </div>
+    </div>
     @if (CurrentUser != null)
     {
         <div class="flex flex-row">

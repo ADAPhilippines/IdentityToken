@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using IdentityToken.Common.Models;
+using Microsoft.Extensions.Configuration;
 
 
 namespace IdentityToken.UI.Common.Components
@@ -14,11 +15,12 @@ namespace IdentityToken.UI.Common.Components
         private List<string> Messages { get; set; } = new List<string>();
         private string CurrentMessage { get; set; } = string.Empty;
         private AuthenticatedIdentity? CurrentUser { get; set; }
+        [Inject] private IConfiguration? Config { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
             HubConnection = new HubConnectionBuilder()
-                .WithUrl("http://localhost:6000/chat")
+                .WithUrl($"{Config.GetValue<string>("APIUrl")}/chat")
                 .Build();
 
             HubConnection.On<AuthenticatedIdentity, string>("ReceiveMessage", OnReceiveMessage);
