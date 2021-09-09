@@ -24,4 +24,8 @@
     <ProjectReference Include="..\IdentityToken.Common\IdentityToken.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="MSBuild_Logs" />
+  </ItemGroup>
+
 </Project>

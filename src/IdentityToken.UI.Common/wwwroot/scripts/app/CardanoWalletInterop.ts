@@ -437,7 +437,6 @@ class CardanoWalletInterop {
     }
 
     private async SubmitTxAsync(transaction: Transaction): Promise<string | null> {
-        console.log(Buffer.from(transaction.to_bytes()).toString("hex"));
         const response = await fetch(`${this.BlockfrostBaseURL}/tx/submit`, {
             headers: {
                 "project_id": this.blockfrostProjectId,
