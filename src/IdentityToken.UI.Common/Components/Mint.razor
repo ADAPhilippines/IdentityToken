@@ -1,38 +1,56 @@
-﻿<div class="flex flex-col w-full h-full justify-center mx-auto">
-    <div class="flex h-[173px] bg-gray-lightest relative justify-center items-center">
-        <div class="absolute w-full h-full bg-center bg-cover" style="background-image: url('./_content/IdentityToken.UI.Common/images/mint_banner.png')"></div>
-        <div class="flex text-2xl tracking-wide text-idt-purple">Create your own Identity</div>
+﻿<div class="flex flex-col w-full h-full justify-center mx-auto relative overflow-hidden">
+    @if (IsLoading)
+    {
+        <div class="w-full h-full absolute bg-white bg-opacity-70">
+            <div class="mt-[175px] w-32 flex mx-auto">
+                <div style="border-top-color:transparent"
+                     class="mt-64 w-32 h-32 border-8 border-idt-purple border-solid rounded-full animate-spin"></div>
+            </div>
+            <div class="w-full mt-4 text-center text-lg text-idt-purple tracking-wide font-normal ">@LoadingMessage</div>
+        </div>
+    }
+    <Toast Message="@ToastMessage" IsError="@IsToastError" @bind-ShouldShow="@ShouldShowToast"/>
+    <div class="flex h-[173px] bg-idt-gray-lightest relative justify-center items-center">
+        <div class="absolute w-full h-full bg-center bg-cover" style="background-image: url('/_content/IdentityToken.UI.Common/images/mint_banner.png')"></div>
+        <div class="select-none flex text-2xl tracking-wide text-idt-purple">Create your own Identity</div>
     </div>
-    <div class="w-6/12 mx-auto pt-8 flex flex-col justify-center">
+    <div class="w-10/12 xl:w-6/12 mx-auto pt-8 flex flex-col justify-center">
         <MintRequiredField Label="Username" Placeholder="Your Username Here" @bind-Value="TokenMetadata[0].Value"/>
-        <MintRequiredField Class="mt-8" Label="Avatar (Provide IPFS)" Placeholder="QmfDh9JKLL..." @bind-Value="TokenMetadata[1].Value"/>
-        <div class="mt-8 text-xs text-idt-gray">
+        <MintRequiredField Class="mt-8" Label="Avatar (Provide IPFS hash)" Placeholder="QmfDh9JKLL..." @bind-Value="TokenMetadata[1].Value"/>
+        <div class="select-none mt-8 text-xs text-idt-gray">
             <span>Paste any IPFS Image Content Hash as your identity Token Avatar. If you don’t have one yet, you can sign-up for free at </span>
             <a class="text-idt-purple" href="https://www.pinata.cloud/" target="_blank">pinata.cloud</a>
             <span> or any other IPFS hosting service to upload your avatar and get a IPFS Content Hash.</span>
+            <br/>
+            <br/>
+            <span class="italic">Please make sure you enter a valid IPFS hash as it will be used to complete your profile in this demo.</span>
         </div>
-        <div class="mt-8 mb-8 text-sm text-idt-gray italic">Optional Fields</div>
+        <div class="select-none mt-8 mb-8 text-sm text-idt-gray italic">Optional Fields</div>
         <MintOptionalField Icon="facebook_logo.svg" ValuePlaceholder="Facebook link" @bind-Value="TokenMetadata[2].Value" IsDefault="@(true)"/>
         <MintOptionalField Icon="twitter_logo.svg" ValuePlaceholder="Twitter link" @bind-Value="TokenMetadata[3].Value" IsDefault="@(true)"/>
         <MintOptionalField Icon="instagram_logo.svg" ValuePlaceholder="Instagram link" @bind-Value="TokenMetadata[4].Value" IsDefault="@(true)"/>
-        
+
         @for (var i = 5; i < TokenMetadata.Count; i++)
         {
             var j = i;
-            <MintOptionalField 
-                KeyPlaceholder="Enter Key" 
-                ValuePlaceholder="Enter Value" 
-                @bind-Key="TokenMetadata[j].Key" 
+            <MintOptionalField
+                KeyPlaceholder="Enter Key"
+                ValuePlaceholder="Enter Value"
+                @bind-Key="TokenMetadata[j].Key"
                 @bind-Value="TokenMetadata[j].Value"
                 OnDeleteBtnClickCallback="args => OnRemoveMetadataBtnClicked(TokenMetadata[j])"/>
         }
-        
-        <button class="border border-dotted border-idt-gray-light h-[48px] rounded-full mb-8 text-center align-middle"
+
+        <button class="border border-dotted border-idt-gray-light h-[48px] rounded-full mb-4 text-center align-middle select-none"
                 @onclick="OnAddNewMetadataBtnClicked">
-            <img class="inline h-[32px]" src="./_content/IdentityToken.UI.Common/images/add_icon.svg" alt=""/>
+            <img class="inline h-[32px]" src="/_content/IdentityToken.UI.Common/images/add_icon.svg" alt=""/>
             <span class="text-idt-gray text-sm">Add New</span>
         </button>
-        <button class="mx-auto h-[48px] w-6/12 text-sm rounded-full border border-idt-purple mb-16 hover:bg-gradient-to-r hover:from-[#7A60C9] hover:to-[#4C4CE8] hover:text-white"
+        <div class="select-none mt-8 text-xs text-idt-gray text-center">
+            <span>As of now we only support the latest version of the</span>
+            <a class="text-idt-purple" href="https://namiwallet.io/" target="_blank">Nami Wallet.</a>
+        </div>
+        <button class="select-none mx-auto h-[48px] w-4/12 text-sm rounded-full mt-4 mb-12 bg-gradient-to-r from-[#7A60C9] to-[#4C4CE8] text-white hover:to-transparent hover:from-transparent hover:border hover:border-idt-purple hover:text-black hover:bg-transparent"
                 @onclick="OnMintBtnClicked">
             Mint
         </button>
