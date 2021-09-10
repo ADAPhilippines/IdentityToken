@@ -19,6 +19,7 @@ module.exports = {
         },
         colors: {
             ...colors,
+            'transparent': 'transparent',
             'idt-indigo': '#4C4DE7',
             'idt-purple': '#7A60CA',
             'idt-gray': '#808088',

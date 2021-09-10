@@ -143,29 +143,25 @@ class CardanoWalletInterop {
         return result;
     }
 
-    public async MintIdentityTokenAsync(assetName: string, metadata: string): Promise<Tx | null> {
-        let result: Tx | null = null;
-        const transaction = await this.CreateMintTx(assetName, metadata);
+    public async MintIdentityTokenAsync(assetName: string, avatar: string, metadata: string): Promise<string | null> {
+        let result: string | null = null;
+        const transaction = await this.CreateMintTx(assetName, avatar, metadata);
         if (transaction !== null) {
             const signedTx = await this.signTxAsync(transaction);
             if (signedTx !== null) {
-                let txHash = await this.SubmitTxAsync(signedTx);
-                if(txHash !== null)
-                    result = await this.GetTransactionAsync(txHash)
+                result = await this.SubmitTxAsync(signedTx);
             }
         }
         return result;
     }
 
-    public async SendAdaAsync(outputs: TxOutput[]): Promise<Tx | null> {
-        let result: Tx | null = null;
+    public async SendAdaAsync(outputs: TxOutput[]): Promise<string | null> {
+        let result: string | null = null;
         const transaction = await this.CreateNormalTx(outputs);
         if (transaction !== null) {
             const signedTx = await this.signTxAsync(transaction);
             if (signedTx != null) {
-                let txHash = await this.SubmitTxAsync(signedTx);
-                if(txHash !== null)
-                    result = await this.GetTransactionAsync(txHash)
+                result = await this.SubmitTxAsync(signedTx);
             }
         }
         
@@ -311,7 +307,7 @@ class CardanoWalletInterop {
     }
 
 
-    private async CreateMintTx(assetName: string, metadata: string): Promise<Transaction | null> {
+    private async CreateMintTx(assetName: string, avatar: string, metadata: string): Promise<Transaction | null> {
         try {
             const MAX_INPUTS = 20;
             const addressHex = (await window.cardano.getUsedAddresses())[0];
@@ -363,9 +359,20 @@ class CardanoWalletInterop {
 
             const mint = CardanoWalletInterop.CreateTxMint(assetName, script);
             rawTxBody.set_mint(mint);
-
-            metadata = `{\"${assetName}\":${metadata}}`;
-            metadata = `{\"${policyId}\":${metadata}}`;
+            
+            let metadataJson = JSON.parse(metadata);
+            metadataJson.avatar = {
+                src: avatar,
+                protocol: "ipfs"
+            }
+            
+            metadataJson = {
+                [policyId]: {
+                    [assetName]: metadataJson
+                }
+            }
+            metadata = JSON.stringify(metadataJson);
+            
             const generalMetadata = CardanoWasmLoader.Cardano.GeneralTransactionMetadata.new();
             generalMetadata.insert(
                 CardanoWasmLoader.Cardano.BigNum.from_str("7368"),
@@ -488,14 +495,17 @@ class CardanoWalletInterop {
         return latestBlock;
     }
 
-    private async GetTransactionAsync(hash: string): Promise<Tx | null> {
-        let transaction: Tx | null;
-        while (true) {
+    public async GetTransactionAsync(hash: string): Promise<Tx | null> {
+        const limit = 20;
+        let transaction: Tx | null = null;
+        let attempts = 0;
+        while (attempts < limit) {
             transaction = await this.GetFromBlockfrostAsync<Tx>(`txs/${hash}`);
             if (transaction !== null) {
                 break;
             } else {
                 await Helpers.Delay(3000);
+                attempts++;
             }
         }
         return transaction;

@@ -1,13 +1,13 @@
 ﻿<div class="@Class @GetBorderColorClass() @GetRightPaddingClass() flex border h-[48px] rounded-full mb-8 pl-5">
     @if (Icon != null)
     {
-        <div class="@GetIconBgColorClass() flex rounded-full justify-center min-w-[48px] w-[48px] h-[48px] mt-[-1px] -ml-6 mr-5 text-center items-center">
+        <div class="@GetIconBgColorClass() flex select-none rounded-full justify-center min-w-[48px] w-[48px] h-[48px] mt-[-1px] -ml-6 mr-5 text-center items-center">
             <img class="h-2/6" src="./_content/IdentityToken.UI.Common/images/@(Icon)" alt=""/>
         </div>
     }
     @if (!IsDefault)
     {
-        <input class="text-primary placeholder-unfocused focus:placeholder-focused w-4/12 text-sm focus:outline-none border-r mr-5 pr-2" 
+        <input class="select-none text-primary placeholder-unfocused w-4/12 text-sm border-r mr-5 pr-2 bg-transparent focus:placeholder-focused focus:outline-none" 
             placeholder="@KeyPlaceholder" 
             @bind="Key"
             @onfocusin="OnFocusIn"
@@ -15,7 +15,7 @@
             spellcheck="false"
             maxlength="64"/>
     }
-    <input class="text-primary focus:placeholder-focused flex-1 text-sm focus:outline-none" 
+    <input class="select-none text-primary flex-1 text-sm bg-transparent focus:placeholder-focused focus:outline-none" 
            placeholder="@ValuePlaceholder" 
            @bind="Value"
            @onfocusin="OnFocusIn"
@@ -24,7 +24,7 @@
            maxlength="64"/>
     @if (!IsDefault)
     {
-        <button class="flex rounded-full justify-center min-w-[48px] w-[48px] h-[48px] mt-[-1px] text-center items-center"
+        <button class="flex select-none rounded-full justify-center min-w-[48px] w-[48px] h-[48px] mt-[-1px] text-center items-center"
                 @onclick="OnDeleteBtnClickCallback">
              <img class="h-2/6" src="./_content/IdentityToken.UI.Common/images/delete_icon.svg" alt=""/>
          </button>

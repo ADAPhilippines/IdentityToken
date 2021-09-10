@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -13,7 +14,8 @@ namespace IdentityToken.UI.Common.Components
         [Inject] private CardanoWalletInterop? CardanoWalletInterop { get; set; }
         private List<IdentityTokenMetadatum> TokenMetadata { get; set; } = TokenMetadataInitialState;
         private string Message { get; set; } = string.Empty;
-
+        private bool IsToastError { get; set; }
+        private bool ShouldShowToast { get; set; }
         private static List<IdentityTokenMetadatum> TokenMetadataInitialState =>
             new()
             {
@@ -44,6 +46,9 @@ namespace IdentityToken.UI.Common.Components
                 }
             };
 
+        private bool IsLoading { get; set; }
+        private string LoadingMessage { get; set; } = string.Empty;
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
@@ -58,51 +63,79 @@ namespace IdentityToken.UI.Common.Components
 
         private void CardanoWalletInteropOnError(object? sender, CardanoWalletInteropError e)
         {
-            Message = e.Message;
+            IsLoading = false;
+            ShowToast(true, e.Message);
             StateHasChanged();
         }
 
         private async void OnMintBtnClicked()
         {
-            if (TokenMetadata.GroupBy(m => m.Key.Trim()).Any(c => c.Key.Length > 0 && c.Count() > 1))
+            IsLoading = true;
+            LoadingMessage = "Validating Inputs...";
+            if (TokenMetadata[0].Value.Length == 0 || TokenMetadata[1].Value.Length == 0)
             {
-                Message = "Duplicate Keys Detected!";
+                IsLoading = false;
+                ShowToast(true, "Username and Avatar fields are required.");
                 return;
             }
 
-            if (TokenMetadata[0].Value.Length == 0 || TokenMetadata[1].Value.Length == 0)
+            if (TokenMetadata.Where(m => m.Key.Length > 0).GroupBy(m => m.Key.Trim())
+                .Any(c => c.Key.Length > 0 && c.Count() > 1))
             {
-                Message = "Username and Avatar fields are required.";
+                IsLoading = false;
+                ShowToast(true, "Duplicate Keys Detected!");
                 return;
             }
 
             var username = TokenMetadata[0].Value;
-
+            var avatar = TokenMetadata[1].Value;
+            
             var metadataDictionary = new Dictionary<string, string>();
             foreach (var metadata in TokenMetadata)
             {
                 var key = metadata.Key.Trim();
                 var value = metadata.Value.Trim();
 
-                if (key.Length > 0 && value.Length > 0 && !key.Contains("username")) metadataDictionary.Add(key, value);
+                if (key.Length > 0 
+                    && value.Length > 0 
+                    && !key.Contains("username") 
+                    && !key.Contains("avatar"))
+                    metadataDictionary.Add(key, value);
             }
 
-            metadataDictionary["avatar"] = $"ipfs://{metadataDictionary["avatar"]}";
             var metadataString = JsonSerializer.Serialize(metadataDictionary);
-
+            
+            LoadingMessage = "Building Transaction...";
             if (CardanoWalletInterop == null) return;
-
+            
             if (!await CardanoWalletInterop.IsWalletConnectedAsync())
                 await CardanoWalletInterop.ConnectWalletAsync();
 
-            Message = "Submitting Transaction...";
+            LoadingMessage = "Signing and Submitting Transaction...";
             await InvokeAsync(StateHasChanged);
-
-            var tx = await CardanoWalletInterop.MintIdentityTokenAsync($"ID{username}", metadataString);
-            if (tx == null) return;
-
+            
+            var txHash = await CardanoWalletInterop.MintIdentityTokenAsync($"ID{username}", avatar, metadataString);
+            if (txHash == null)
+            {
+                IsLoading = false;
+                ShowToast(true, "Transaction Submission failed!");
+                return;
+            }
+            
+            LoadingMessage = $"Transaction Submitted to the Blockchain! Confirming Tx: {txHash}";
+            await InvokeAsync(StateHasChanged);
+            
+            var tx = await CardanoWalletInterop.GetTransactionAsync(txHash);
+            if (tx == null)
+            {
+                IsLoading = false;
+                ShowToast(true, "Unable to confirm transaction!");
+                return;
+            }
+            
+            IsLoading = false;
             TokenMetadata = TokenMetadataInitialState;
-            Message = $"Minting Transaction Successful! txId: {tx.Hash}";
+            ShowToast(false, $"Minting Transaction Successful!");
             await InvokeAsync(StateHasChanged);
         }
 
@@ -114,6 +147,13 @@ namespace IdentityToken.UI.Common.Components
         private void OnRemoveMetadataBtnClicked(IdentityTokenMetadatum metadata)
         {
             TokenMetadata?.Remove(metadata);
+        }
+
+        private void ShowToast(bool isError, string message)
+        {
+            IsToastError = isError;
+            Message = message;
+            ShouldShowToast = true;
         }
     }
 }
