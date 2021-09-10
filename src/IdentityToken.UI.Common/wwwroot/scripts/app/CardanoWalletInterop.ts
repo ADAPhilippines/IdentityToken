@@ -124,8 +124,20 @@ class CardanoWalletInterop {
         return CardanoWasmLoader.Cardano.Value.new(minFee);
     }
 
-    public async IsWalletConnectedAsync(): Promise<boolean> {
-        return await window.cardano.isEnabled();
+    public async IsWalletConnectedAsync(): Promise<boolean | null> {
+        if(window.cardano)
+        {
+            return await window.cardano.isEnabled();
+        }
+        else
+        {
+            let err: CardanoWalletInteropError = {
+                type: CardanoWalletInteropErrorType.noWalletError,
+                message: "No compatible wallet detected!"
+            }
+            await this.ThrowErrorAsync(err);
+            return false;
+        }
     }
 
     public async ConnectWalletAsync(): Promise<boolean> {
@@ -136,7 +148,7 @@ class CardanoWalletInterop {
             console.error("Connect Wallet Error: ", e);
             let err: CardanoWalletInteropError = {
                 type: CardanoWalletInteropErrorType.connectWalletError,
-                message: e
+                message: "Failed to connect to a compatible wallet."
             }
             await this.ThrowErrorAsync(err);
         }

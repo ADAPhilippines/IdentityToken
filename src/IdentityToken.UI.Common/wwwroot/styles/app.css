@@ -7,3 +7,11 @@ body {
     width: 100%;
     overflow-x: hidden;
 }
+
+@layer utilities {
+    .demo-panel-shadow {
+        box-shadow: -15px -15px 30px 0 rgba(255,255,255,0.5);
+        -webkit-box-shadow: -15px -15px 30px 0 rgba(255,255,255,0.5);
+        -moz-box-shadow: -15px -15px 30px 0 rgba(255,255,255,0.5);
+    }
+}

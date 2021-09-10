@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Components;
 using System.Timers;
 using Timer = System.Timers.Timer;
 
-namespace IdentityToken.UI.Common.Components
+namespace IdentityToken.UI.Common.Shared
 {
-    partial class MintToast
+    partial class Toast
     {
         [Parameter] public string Message { get; set; } = string.Empty;
         [Parameter] public bool IsError { get; set; }
@@ -26,8 +26,8 @@ namespace IdentityToken.UI.Common.Components
                     StartCountdown();
             }
         }
-        private string ColorClassPrefix => IsError ? "red" : "green";
-        private string ToastPosition => ShouldShow ? "transform -translate-y-48" : "";
+        private string ColorClassPrefix => IsError ? "idt-danger" : "idt-success";
+        private string ToastPosition => ShouldShow ? "transform -translate-y-60" : "";
         private Timer? _countdown;
 
         private void StartCountdown()

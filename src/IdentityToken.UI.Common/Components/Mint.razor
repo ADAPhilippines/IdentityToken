@@ -9,12 +9,12 @@
             <div class="w-full mt-4 text-center text-lg text-idt-purple tracking-wide font-normal ">@LoadingMessage</div>
         </div>
     }
-    <MintToast Message="@Message" IsError="@IsToastError" @bind-ShouldShow="ShouldShowToast"/>
+    <Toast Message="@ToastMessage" IsError="@IsToastError" @bind-ShouldShow="@ShouldShowToast"/>
     <div class="flex h-[173px] bg-idt-gray-lightest relative justify-center items-center">
-        <div class="absolute w-full h-full bg-center bg-cover" style="background-image: url('./_content/IdentityToken.UI.Common/images/mint_banner.png')"></div>
+        <div class="absolute w-full h-full bg-center bg-cover" style="background-image: url('/_content/IdentityToken.UI.Common/images/mint_banner.png')"></div>
         <div class="select-none flex text-2xl tracking-wide text-idt-purple">Create your own Identity</div>
     </div>
-    <div class="sm:w-10/12 md:w-6/12 mx-auto pt-8 flex flex-col justify-center">
+    <div class="w-10/12 xl:w-6/12 mx-auto pt-8 flex flex-col justify-center">
         <MintRequiredField Label="Username" Placeholder="Your Username Here" @bind-Value="TokenMetadata[0].Value"/>
         <MintRequiredField Class="mt-8" Label="Avatar (Provide IPFS hash)" Placeholder="QmfDh9JKLL..." @bind-Value="TokenMetadata[1].Value"/>
         <div class="select-none mt-8 text-xs text-idt-gray">
@@ -43,7 +43,7 @@
 
         <button class="border border-dotted border-idt-gray-light h-[48px] rounded-full mb-4 text-center align-middle select-none"
                 @onclick="OnAddNewMetadataBtnClicked">
-            <img class="inline h-[32px]" src="./_content/IdentityToken.UI.Common/images/add_icon.svg" alt=""/>
+            <img class="inline h-[32px]" src="/_content/IdentityToken.UI.Common/images/add_icon.svg" alt=""/>
             <span class="text-idt-gray text-sm">Add New</span>
         </button>
         <div class="select-none mt-8 text-xs text-idt-gray text-center">

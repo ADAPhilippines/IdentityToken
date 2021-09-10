@@ -3,7 +3,8 @@
     connectWalletError,
     createTxError,
     signTxError,
-    submitTxError
+    submitTxError,
+    noWalletError
 }
 
 export default CardanoWalletInteropErrorType;

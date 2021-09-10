@@ -24,13 +24,17 @@ module.exports = {
             'idt-purple': '#7A60CA',
             'idt-gray': '#808088',
             'idt-gray-light': '#CFD1DC',
-            'idt-gray-lightest': '#CFD1DC'
+            'idt-gray-lightest': '#CFD1DC',
+            'idt-green-darkest': '#1E2835',
+            'idt-success': '#198754',
+            'idt-danger': '#DC3545'
         },
         textColor: {
             ...colors,
             'primary': '#1E2835',
             'secondary': '#606066',
             'idt-gray': '#808088',
+            'idt-gray-light': '#676C71',
             'idt-indigo': '#4C4DE7',
             'idt-purple': '#7A60CA'
         },

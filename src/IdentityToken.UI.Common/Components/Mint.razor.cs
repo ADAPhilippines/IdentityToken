@@ -13,7 +13,7 @@ namespace IdentityToken.UI.Common.Components
     {
         [Inject] private CardanoWalletInterop? CardanoWalletInterop { get; set; }
         private List<IdentityTokenMetadatum> TokenMetadata { get; set; } = TokenMetadataInitialState;
-        private string Message { get; set; } = string.Empty;
+        private string ToastMessage { get; set; } = string.Empty;
         private bool IsToastError { get; set; }
         private bool ShouldShowToast { get; set; }
         private static List<IdentityTokenMetadatum> TokenMetadataInitialState =>
@@ -107,10 +107,13 @@ namespace IdentityToken.UI.Common.Components
             
             LoadingMessage = "Building Transaction...";
             if (CardanoWalletInterop == null) return;
-            
-            if (!await CardanoWalletInterop.IsWalletConnectedAsync())
-                await CardanoWalletInterop.ConnectWalletAsync();
 
+            var isWalletConnected = await CardanoWalletInterop.IsWalletConnectedAsync();
+            if (!isWalletConnected)
+                isWalletConnected = await CardanoWalletInterop.ConnectWalletAsync();
+
+            if (!isWalletConnected) return;
+            
             LoadingMessage = "Signing and Submitting Transaction...";
             await InvokeAsync(StateHasChanged);
             
@@ -152,7 +155,7 @@ namespace IdentityToken.UI.Common.Components
         private void ShowToast(bool isError, string message)
         {
             IsToastError = isError;
-            Message = message;
+            ToastMessage = message;
             ShouldShowToast = true;
         }
     }
