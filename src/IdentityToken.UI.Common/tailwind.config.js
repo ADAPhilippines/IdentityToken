@@ -22,6 +22,7 @@ module.exports = {
             'idt-indigo': '#4C4DE7',
             'idt-purple': '#7A60CA',
             'idt-gray': '#808088',
+            'idt-gray-2': '#E8EAEF',
             'idt-gray-light': '#CFD1DC',
             'idt-gray-lightest': '#CFD1DC'
         },
