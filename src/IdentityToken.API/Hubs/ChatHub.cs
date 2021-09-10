@@ -44,7 +44,7 @@ public class ChatHub : Hub
         if (_identityDbContext is not null && _identityDbContext.ChatUsers is not null)
         {
             var chatUser = await _identityDbContext.ChatUsers
-                .Include( u => u.Identity)
+                .Include(u => u.Identity)
                 .FirstOrDefaultAsync(x => x.ConnectionId == Context.ConnectionId);
 
             if (chatUser is not null)
@@ -56,8 +56,33 @@ public class ChatHub : Hub
                 };
 
                 _identityDbContext.Add(chatMessage);
-                await Clients.All.SendAsync("ReceiveMessage", chatUser.Identity, message);
+                await Clients.All.SendAsync("ReceiveMessage", chatMessage);
                 await _identityDbContext.SaveChangesAsync();
+            }
+        }
+    }
+
+    public async Task GetChatHistory(ChatHistoryRequest request)
+    {
+        var fromDate = request.From;
+        var limit = request.Limit;
+        
+        if (_identityDbContext is not null && _identityDbContext.ChatMessages is not null && _identityDbContext.ChatUsers is not null)
+        {
+            var chatUser = await _identityDbContext.ChatUsers
+                .Include(u => u.Identity)
+                .FirstOrDefaultAsync(x => x.ConnectionId == Context.ConnectionId);
+
+            if (chatUser is not null)
+            {
+                var chatMessages = await _identityDbContext.ChatMessages
+                    .Include(m => m.Sender)
+                    .Where(m => m.Sent >= fromDate)
+                    .OrderByDescending(m => m.Sent)
+                    .Take(limit)
+                    .ToListAsync();
+
+                await Clients.Caller.SendAsync("ReceiveChatHistory", chatMessages);
             }
         }
     }
