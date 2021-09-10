@@ -45,18 +45,25 @@ namespace IdentityToken.UI.Common.Services.JSInterop
             }
         }
 
-        public async ValueTask<Transaction?> MintIdentityTokenAsync(string assetName, string metadata)
+        public async ValueTask<string?> MintIdentityTokenAsync(string assetName, string avatar,string metadata)
         {
             if (_jsRuntime == null) return null;
             return await _jsRuntime
-                .InvokeAsync<Transaction>("CardanoWalletInterop.MintIdentityTokenAsync", assetName, metadata);
+                .InvokeAsync<string?>("CardanoWalletInterop.MintIdentityTokenAsync", assetName, avatar, metadata);
         }
 
-        public async ValueTask<Transaction?> SendAdaAsync(IEnumerable<TxOutput> outputs)
+        public async ValueTask<string?> SendAdaAsync(IEnumerable<TxOutput> outputs)
         {
             if (_jsRuntime == null) return null;
             return await _jsRuntime
-                .InvokeAsync<Transaction>("CardanoWalletInterop.SendAdaAsync", outputs);
+                .InvokeAsync<string?>("CardanoWalletInterop.SendAdaAsync", outputs);
+        }
+        
+        public async ValueTask<Transaction?> GetTransactionAsync(string hash)
+        {
+            if (_jsRuntime == null) return null;
+            return await _jsRuntime
+                .InvokeAsync<Transaction?>("CardanoWalletInterop.GetTransactionAsync", hash);
         }
 
         public async ValueTask<bool> IsWalletConnectedAsync()
