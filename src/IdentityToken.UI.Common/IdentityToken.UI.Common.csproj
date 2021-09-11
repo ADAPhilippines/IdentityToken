@@ -29,23 +29,4 @@
       <HintPath>C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\6.0.0-preview.7.21378.6\Microsoft.AspNetCore.dll</HintPath>
     </Reference>
   </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="MSBuild_Logs\**" />
-    <Compile Remove="Services\JSInterop\CardanoWalletInterop.cs" />
-    <Compile Remove="IdentityTokenServiceCollectionExtensions.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Remove="MSBuild_Logs\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="MSBuild_Logs\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Remove="MSBuild_Logs\**" />
-  </ItemGroup>
-
 </Project>

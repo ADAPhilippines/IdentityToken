@@ -2,11 +2,11 @@
     @if (IsLoading)
     {
         <div class="w-full h-full absolute bg-white bg-opacity-70">
-            <div class="mt-[175px] w-32 flex mx-auto">
+            <div class="pt-[175px] flex flex-col w-full h-full justify-center items-center">
                 <div style="border-top-color:transparent"
-                     class="mt-64 w-32 h-32 border-8 border-idt-purple border-solid rounded-full animate-spin"></div>
+                     class="w-32 h-32 border-8 border-idt-purple border-solid rounded-full animate-spin"></div>
+                <div class="w-full mt-6 text-center text-lg text-idt-purple tracking-wide font-normal">@LoadingMessage</div>   
             </div>
-            <div class="w-full mt-4 text-center text-lg text-idt-purple tracking-wide font-normal ">@LoadingMessage</div>
         </div>
     }
     <Toast Message="@ToastMessage" IsError="@IsToastError" @bind-ShouldShow="@ShouldShowToast"/>
@@ -51,7 +51,7 @@
             <a class="text-idt-purple" href="https://namiwallet.io/" target="_blank">Nami Wallet. </a>
             <span>More wallets will be supported in the future.</span>
         </div>
-        <button class="select-none mx-auto h-[48px] w-4/12 text-sm rounded-full mt-4 mb-12 bg-gradient-to-r from-[#7A60C9] to-[#4C4CE8] text-white hover:to-transparent hover:from-transparent hover:border hover:border-idt-purple hover:text-black hover:bg-transparent"
+        <button class="select-none mx-auto h-[48px] w-8/12 sm:w-4/12 text-sm rounded-full mt-4 mb-12 bg-gradient-to-r from-[#7A60C9] to-[#4C4CE8] text-white hover:to-transparent hover:from-transparent hover:border hover:border-idt-purple hover:text-black hover:bg-transparent"
                 @onclick="OnMintBtnClicked">
             Mint Identity
         </button>
