@@ -36,6 +36,7 @@ module.exports = {
             'secondary': '#606066',
             'idt-gray': '#808088',
             'idt-gray-light': '#676C71',
+            'idt-gray-light-2': '#CFD1DC',
             'idt-indigo': '#4C4DE7',
             'idt-purple': '#7A60CA'
         },

@@ -9,25 +9,28 @@ namespace IdentityToken.UI.Common.Services.JSInterop
 {
     public class CardanoWalletInterop : IAsyncDisposable
     {
-        private readonly string _blockfrostProjectId;
         private readonly Lazy<Task<IJSObjectReference>>? _bootstrapModuleTask;
         private readonly IJSRuntime? _jsRuntime;
-        private readonly DotNetObjectReference<CardanoWalletInterop> _objRef;
 
         public CardanoWalletInterop(IJSRuntime? jsRuntime, IConfiguration config)
         {
             _jsRuntime = jsRuntime;
-            _objRef = DotNetObjectReference.Create(this);
-            _blockfrostProjectId = config["BlockfrostProjectId"];
-            
+            var objRef = DotNetObjectReference.Create(this);
+            var blockfrostProjectId = config["BlockfrostProjectId"];
+
             if (jsRuntime == null) return;
-            _bootstrapModuleTask = new Lazy<Task<IJSObjectReference>>(() => jsRuntime.InvokeAsync<IJSObjectReference>(
-                "import", "./_content/IdentityToken.UI.Common/bootstrap.js").AsTask());
+            _bootstrapModuleTask = new Lazy<Task<IJSObjectReference>>(() => Task.Run(async () =>
+            {
+                var module = await jsRuntime.InvokeAsync<IJSObjectReference>(
+                    "import", "./_content/IdentityToken.UI.Common/bootstrap.js");
+                await module.InvokeVoidAsync("injectCardanoWalletInteropAsync", blockfrostProjectId, objRef);
+                return module;
+            }));
         }
 
         public async ValueTask DisposeAsync()
         {
-            if (_bootstrapModuleTask is {IsValueCreated: true})
+            if (_bootstrapModuleTask is { IsValueCreated: true })
             {
                 var module = await _bootstrapModuleTask.Value;
                 await module.DisposeAsync();
@@ -36,48 +39,71 @@ namespace IdentityToken.UI.Common.Services.JSInterop
 
         public event EventHandler<CardanoWalletInteropError>? Error;
 
-        public async ValueTask InjectScriptsAsync()
+        private async Task EnsureLoadedAsync()
         {
-            if (_bootstrapModuleTask != null && _jsRuntime != null)
-            {
-                var module = await _bootstrapModuleTask.Value;
-                await module.InvokeVoidAsync("injectCardanoWalletInteropAsync", _blockfrostProjectId, _objRef);
-            }
+            if (_bootstrapModuleTask is null) return;
+            var module = await _bootstrapModuleTask.Value;
         }
-
-        public async ValueTask<string?> MintIdentityTokenAsync(string assetName, string avatar,string metadata)
+        
+        public async ValueTask<string?> MintIdentityTokenAsync(string assetName, string avatar, string metadata)
         {
-            if (_jsRuntime == null) return null;
+            await EnsureLoadedAsync();
+            if (_jsRuntime is null) return null;
             return await _jsRuntime
                 .InvokeAsync<string?>("CardanoWalletInterop.MintIdentityTokenAsync", assetName, avatar, metadata);
         }
 
         public async ValueTask<string?> SendAdaAsync(IEnumerable<TxOutput> outputs)
         {
-            if (_jsRuntime == null) return null;
+            await EnsureLoadedAsync();
+            if (_jsRuntime is null) return null;
             return await _jsRuntime
                 .InvokeAsync<string?>("CardanoWalletInterop.SendAdaAsync", outputs);
         }
-        
+
         public async ValueTask<Transaction?> GetTransactionAsync(string hash)
         {
-            if (_jsRuntime == null) return null;
+            await EnsureLoadedAsync();
+            if (_jsRuntime is null) return null;
             return await _jsRuntime
                 .InvokeAsync<Transaction?>("CardanoWalletInterop.GetTransactionAsync", hash);
         }
 
         public async ValueTask<bool> IsWalletConnectedAsync()
         {
-            if (_jsRuntime == null) return false;
+            await EnsureLoadedAsync();
+            if (_jsRuntime is null) return false;
             return await _jsRuntime.InvokeAsync<bool>("CardanoWalletInterop.IsWalletConnectedAsync");
         }
 
         public async ValueTask<bool> ConnectWalletAsync()
         {
-            if (_jsRuntime == null) return false;
+            await EnsureLoadedAsync();
+            if (_jsRuntime is null) return false;
             return await _jsRuntime.InvokeAsync<bool>("CardanoWalletInterop.ConnectWalletAsync");
         }
 
+        public async Task ScrollToElementBottomAsync(string selector)
+        {
+            await EnsureLoadedAsync();
+            if (_jsRuntime is null) return;
+            await _jsRuntime.InvokeVoidAsync("window.ScrollToElementBottom", selector);
+        }
+        
+        public async Task<int> GetElementScrollTopAsync(string selector)
+        {
+            await EnsureLoadedAsync();
+            if (_jsRuntime is null) return -1;
+            return await _jsRuntime.InvokeAsync<int>("window.GetElementScrollTop", selector);
+        }
+        
+        public async Task ScrollToMessageId(Guid id)
+        {
+            await EnsureLoadedAsync();
+            if (_jsRuntime is null) return;
+            await _jsRuntime.InvokeVoidAsync("window.ScrollToMessageId", id);
+        }
+        
         [JSInvokable]
         public void OnError(CardanoWalletInteropError error)
         {

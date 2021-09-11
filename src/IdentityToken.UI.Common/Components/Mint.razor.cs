@@ -54,7 +54,6 @@ namespace IdentityToken.UI.Common.Components
             if (firstRender)
                 if (CardanoWalletInterop != null)
                 {
-                    await CardanoWalletInterop.InjectScriptsAsync();
                     CardanoWalletInterop.Error += CardanoWalletInteropOnError;
                 }
 

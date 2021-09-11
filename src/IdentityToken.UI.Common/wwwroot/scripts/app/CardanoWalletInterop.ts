@@ -1,7 +1,7 @@
 ﻿import CardanoWasmLoader from "./Helpers/CardanoWasmLoader";
 import ProtocolParameters from "./Types/ProtocolParameters";
 import Block from "./Types/Block";
-import Helpers from "./Helpers/Helpers";
+import Helper from "./Helpers/Helper";
 import {
     Address,
     BaseAddress,
@@ -488,7 +488,7 @@ class CardanoWalletInterop {
             if (protocolParameters !== null) {
                 break;
             } else {
-                await Helpers.Delay(1000);
+                await Helper.Delay(1000);
             }
         }
         return protocolParameters;
@@ -501,7 +501,7 @@ class CardanoWalletInterop {
             if (latestBlock !== null) {
                 break;
             } else {
-                await Helpers.Delay(1000);
+                await Helper.Delay(1000);
             }
         }
         return latestBlock;
@@ -516,7 +516,7 @@ class CardanoWalletInterop {
             if (transaction !== null) {
                 break;
             } else {
-                await Helpers.Delay(3000);
+                await Helper.Delay(3000);
                 attempts++;
             }
         }
