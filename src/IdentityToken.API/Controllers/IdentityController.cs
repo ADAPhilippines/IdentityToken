@@ -92,6 +92,8 @@ public class IdentityController : ControllerBase
             var assets = await client
                 .GetFromJsonAsync<IEnumerable<CardanoAssetHistoryResponse>>($"assets/{tempIdentityToken.Unit}/history");
 
+            assets = assets?.Where(x => x.Action == "minted").ToList();
+
             if (assets is null || !assets.Any()) continue;
             foreach(var asset in assets)
             {
