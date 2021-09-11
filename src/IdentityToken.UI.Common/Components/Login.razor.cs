@@ -21,6 +21,7 @@ namespace IdentityToken.UI.Common.Components
         private string LoadingMessage { get; set; } = string.Empty;
         private bool IsLoading { get; set; }
         private bool IsTxFailed { get; set; }
+        private bool IsLoginSuccess { get; set; }
         
         public void Dispose()
         {
@@ -71,6 +72,10 @@ namespace IdentityToken.UI.Common.Components
                 await InvokeAsync(StateHasChanged);
                 await CardanoWalletInteropService.GetTransactionAsync(txHash);
                 var identity = await AuthService.Authorize(WalletAddress);
+                
+                IsLoginSuccess = true;
+                await InvokeAsync(StateHasChanged);
+                
                 await LocalStorageService.SetItemAsync("identity", identity);
                 AuthService.Authorized();
             }
