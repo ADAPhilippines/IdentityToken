@@ -5,3 +5,4 @@
 **/.cache/**
 .DS_Store
 src/IdentityToken.sln.DotSettings.user
+**/MSBuild_Logs/**

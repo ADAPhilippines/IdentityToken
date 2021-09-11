@@ -1,26 +1,8 @@
-﻿<div class="flex flex-col w-full p-10">
-    <div class="text-2xl tracking-wide text-idt-purple w-full text-center mt-10 mb-10">Sample Identity Token Chat Room</div>
-    <div class="flex w-full">
-        @if (CurrentUser is not null)
-        {
-            <div>
-                <span class="inline-block relative">
-                  <img class="h-16 w-16 rounded-full" src="https://ipfs.blockfrost.dev/ipfs/@(CurrentUser?.Avatar?.Replace("ipfs://", string.Empty))" alt="avatar">
-                  <span class="absolute top-0 right-0 block h-1.5 w-1.5 rounded-full ring-2 ring-white bg-gray-300"></span>
-                </span>
-            </div>
-            <div>@CurrentUser?.Username</div>
-        }
-    </div>
-    <div class="flex flex-row">
-        <img width="100" height="100" src="https://ipfs.blockfrost.dev/ipfs/@(CurrentUser?.Avatar?.Replace("ipfs://", string.Empty))" alt="avatar"/>
-    </div>
-    <div class="mx-auto flex flex-col">
-        @foreach (var m in Messages)
-        {
-            <div class="mt-1">@m</div>
-        }
-    </div>
-    <input type="text" @bind-value="CurrentMessage"/>
-    <button @onclick="OnBtnSendClicked">Send</button>
-</div>
+﻿@if (IsLoggedIn)
+{
+    <Chat />
+}
+else
+{
+    <Login />
+}

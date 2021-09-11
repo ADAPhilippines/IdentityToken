@@ -1,7 +1,7 @@
 ﻿import CardanoWasmLoader from "./Helpers/CardanoWasmLoader";
 import ProtocolParameters from "./Types/ProtocolParameters";
 import Block from "./Types/Block";
-import Helpers from "./Helpers/Helpers";
+import Helper from "./Helpers/Helper";
 import {
     Address,
     BaseAddress,
@@ -26,6 +26,7 @@ class CardanoWalletInterop {
     private blockfrostProjectId: string = "";
     private isMainnet: boolean = true;
     private objectRef: ICardanoWalletInteropObjectRef | null = null;
+    private errorCallbackName: string = "OnError";
 
     constructor() {
     }
@@ -123,6 +124,11 @@ class CardanoWalletInterop {
 
         return CardanoWasmLoader.Cardano.Value.new(minFee);
     }
+    
+    public SetErrorHandlerCallback(objectRef: ICardanoWalletInteropObjectRef, callbackName: string) {
+        this.objectRef = objectRef;
+        this.errorCallbackName = callbackName;
+    }
 
     public async IsWalletConnectedAsync(): Promise<boolean | null> {
         if(window.cardano)
@@ -180,11 +186,10 @@ class CardanoWalletInterop {
         return result;
     }
 
-    public async InitializeAsync(blockfrost_pid: string, objectRef: ICardanoWalletInteropObjectRef, isMainnet: boolean = true): Promise<void> {
+    public async InitializeAsync(blockfrost_pid: string, isMainnet: boolean = true): Promise<void> {
         await CardanoWasmLoader.Load();
         this.blockfrostProjectId = blockfrost_pid;
         this.isMainnet = isMainnet;
-        this.objectRef = objectRef;
     }
 
     private async signTxAsync(transaction: Transaction): Promise<Transaction | null> {
@@ -476,7 +481,7 @@ class CardanoWalletInterop {
 
     private async ThrowErrorAsync(e: CardanoWalletInteropError): Promise<void> {
         if (this.objectRef) {
-            await this.objectRef?.invokeMethodAsync("OnError", e);
+            await this.objectRef?.invokeMethodAsync(this.errorCallbackName, e);
         }
     }
 
@@ -488,7 +493,7 @@ class CardanoWalletInterop {
             if (protocolParameters !== null) {
                 break;
             } else {
-                await Helpers.Delay(1000);
+                await Helper.Delay(1000);
             }
         }
         return protocolParameters;
@@ -501,7 +506,7 @@ class CardanoWalletInterop {
             if (latestBlock !== null) {
                 break;
             } else {
-                await Helpers.Delay(1000);
+                await Helper.Delay(1000);
             }
         }
         return latestBlock;
@@ -516,7 +521,7 @@ class CardanoWalletInterop {
             if (transaction !== null) {
                 break;
             } else {
-                await Helpers.Delay(3000);
+                await Helper.Delay(3000);
                 attempts++;
             }
         }

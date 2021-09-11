@@ -1,10 +1,9 @@
 @page "/"
-@page "/{Page}"
 
 
 <div class="flex flex-col font-sans w-full">
-    <div class="flex w-full bg-[#CFD1DC]">
-        <div class="flex flex-col justify-center container pt-24 md:pt-28 relative bg-center bg-cover" style="background-image: url('/_content/IdentityToken.UI.Common/images/demo_section_bg.png')">
+    <div class="flex w-full bg-center overflow-hidden bg-no-repeat" style="background-image: url('/_content/IdentityToken.UI.Common/images/demo_section_bg.png')">
+        <div class="flex flex-col justify-center container pt-24 md:pt-28 relative" >
             <div class="w-full mb-10 h-20 flex justify-center">
                 <img class="h-full" src="/_content/IdentityToken.UI.Common/images/adaph_logo_dark.svg" alt=""/>
             </div>
@@ -22,19 +21,21 @@
             <div class="flex flex-col rounded-md w-11/12 lg:w-8/12 bg-white bg-opacity-70 mt-10 mb-48 mx-auto overflow-hidden relative z-1 demo-panel-shadow">
                 <div class="flex w-full">
                     <nav class="flex flex-grow relative z-0 shadow flex" aria-label="Tabs">
-                        <NavLink href="/mint" class="flex-grow group relative min-w-0 flex-1 overflow-hidden bg-white py-6 px-6 text-sm font-medium text-center hover:bg-gray-50 focus:z-10">
+                        <div @onclick="@(() => SwitchActivePanel("mint"))" 
+                            class="flex-grow group relative min-w-0 flex-1 overflow-hidden bg-white py-6 px-6 text-sm font-medium text-center hover:bg-gray-50 focus:z-10 hover:cursor-pointer">
                             <span class="@GetTabTextColorClass("mint") text-lg">Mint</span>
                             <span aria-hidden="true" class="@GetTabUnderlineColorClass("mint") absolute inset-x-0 bottom-0 h-0.5"></span>
-                        </NavLink>
+                        </div>
 
-                        <NavLink href="/demo" class="flex-grow group relative min-w-0 flex-1 overflow-hidden bg-white py-6 px-6 text-sm font-medium text-center hover:bg-gray-50 focus:z-10">
+                        <div @onclick="@(() => SwitchActivePanel("demo"))"
+                            class="flex-grow group relative min-w-0 flex-1 overflow-hidden bg-white py-6 px-6 text-sm font-medium text-center hover:bg-gray-50 focus:z-10 hover:cursor-pointer">
                             <span class="@GetTabTextColorClass("demo") text-lg">Demo</span>
                             <span aria-hidden="true" class="@GetTabUnderlineColorClass("demo") absolute inset-x-0 bottom-0 h-0.5"></span>
-                        </NavLink>
+                        </div>
                     </nav>
                 </div>
                 <div class="flex w-full">
-                    @if (Page == "mint")
+                    @if (ActivePanel == "mint")
                     {
                         <Mint/>
                     }
@@ -55,27 +56,27 @@
         </div>
     </div>
     <div class="flex w-full bg-idt-green-darkest">
-        <div class="flex flex-col justify-center container py-8 relative overflow-hidden">
+        <div class="flex flex-col justify-center container pt-8 md:py-8 relative overflow-hidden">
             <div class="flex h-20 md:h-24">
-                <div class="flex flex-grow lg:flex-grow-0 h-full lg:pr-10 border-r border-r-[#2A3849] justify-center">
+                <div class="flex w-3/12 sm:flex-grow lg:flex-grow-0 h-full lg:pr-10 border-r border-r-[#2A3849] justify-center">
                     <img class="h-full" src="/_content/IdentityToken.UI.Common/images/developed_by_adaph.svg" alt=""/>
                 </div>
-                <div class="flex flex-grow lg:flex-grow-0 h-full lg:pl-10 justify-center">
+                <div class="flex w-3/12 sm:flex-grow lg:flex-grow-0 h-full lg:pl-10 justify-center">
                     <img class="h-full" src="/_content/IdentityToken.UI.Common/images/powered_by_cardano.svg" alt=""/>
                 </div>
                 <div class="h-full px-10 items-center justify-center text-center hidden lg:flex lg:flex-grow">
-                    <span class="font-light text-sm md:text-md text-idt-gray-light">© 2021 ADA PH Corporation, Cebu, Philippines. All rights reserved.</span>
+                    <span class="font-light text-sm md:text-md text-idt-gray-light">© 2021 ADAPH. All rights reserved.</span>
                 </div>
-                <div class="flex flex-grow lg:flex-grow-0 h-full lg:pr-10 items-center justify-center border-r border-r-[#2A3849]">
-                    <a href="" class="font-light text-sm md:text-md text-idt-gray-light">Terms of Use</a>
+                <div class="flex w-3/12 sm:flex-grow lg:flex-grow-0 h-full lg:pr-10 items-center justify-center border-r border-r-[#2A3849]">
+                    <a href="" class="font-light text-sm md:text-md text-idt-gray-light text-center">Terms of Use</a>
                 </div>
-                <div class="flex flex-grow lg:flex-grow-0 h-full lg:pl-10 items-center justify-center">
-                    <a href="" class="font-light text-md text-idt-gray-light">Privacy Policy</a>
+                <div class="flex w-3/12 sm:flex-grow lg:flex-grow-0 h-full lg:pl-10 items-center justify-center">
+                    <a href="" class="font-light text-md text-idt-gray-light text-center">Privacy Policy</a>
                 </div>
             </div>
             <div class="flex h-24 lg:hidden mt-8 border-t border-t-[#2A3849]">
                 <div class="flex w-full h-full px-10 items-center justify-center text-center">
-                    <span class="font-light text-sm md:text-md text-idt-gray-light">© 2021 ADA PH Corporation, Cebu, Philippines. All rights reserved.</span>
+                    <span class="font-light text-sm md:text-md text-idt-gray-light">© 2021 ADAPH. All rights reserved.</span>
                 </div>
             </div>
         </div>

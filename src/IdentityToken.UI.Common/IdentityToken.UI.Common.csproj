@@ -29,5 +29,4 @@
       <HintPath>C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\6.0.0-preview.7.21378.6\Microsoft.AspNetCore.dll</HintPath>
     </Reference>
   </ItemGroup>
-
 </Project>

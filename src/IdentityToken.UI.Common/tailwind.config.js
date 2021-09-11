@@ -23,6 +23,7 @@ module.exports = {
             'idt-indigo': '#4C4DE7',
             'idt-purple': '#7A60CA',
             'idt-gray': '#808088',
+            'idt-gray-2': '#E8EAEF',
             'idt-gray-light': '#CFD1DC',
             'idt-gray-lightest': '#CFD1DC',
             'idt-green-darkest': '#1E2835',
@@ -35,6 +36,7 @@ module.exports = {
             'secondary': '#606066',
             'idt-gray': '#808088',
             'idt-gray-light': '#676C71',
+            'idt-gray-light-2': '#CFD1DC',
             'idt-indigo': '#4C4DE7',
             'idt-purple': '#7A60CA'
         },

@@ -1,3 +1,5 @@
+using System;
+
 namespace IdentityToken.Common.Models;
 
 public record ChatMessage

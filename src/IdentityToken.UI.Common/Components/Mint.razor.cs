@@ -11,7 +11,7 @@ namespace IdentityToken.UI.Common.Components
 {
     public partial class Mint
     {
-        [Inject] private CardanoWalletInterop? CardanoWalletInterop { get; set; }
+        [Inject] private CardanoWalletInteropService? CardanoWalletInteropService { get; set; }
         private List<IdentityTokenMetadatum> TokenMetadata { get; set; } = TokenMetadataInitialState;
         private string ToastMessage { get; set; } = string.Empty;
         private bool IsToastError { get; set; }
@@ -52,11 +52,8 @@ namespace IdentityToken.UI.Common.Components
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
-                if (CardanoWalletInterop != null)
-                {
-                    await CardanoWalletInterop.InjectScriptsAsync();
-                    CardanoWalletInterop.Error += CardanoWalletInteropOnError;
-                }
+                if (CardanoWalletInteropService != null)
+                    CardanoWalletInteropService.Error += CardanoWalletInteropOnError;
 
             await base.OnAfterRenderAsync(firstRender);
         }
@@ -106,18 +103,18 @@ namespace IdentityToken.UI.Common.Components
             var metadataString = JsonSerializer.Serialize(metadataDictionary);
             
             LoadingMessage = "Building Transaction...";
-            if (CardanoWalletInterop == null) return;
+            if (CardanoWalletInteropService == null) return;
 
-            var isWalletConnected = await CardanoWalletInterop.IsWalletConnectedAsync();
+            var isWalletConnected = await CardanoWalletInteropService.IsWalletConnectedAsync();
             if (!isWalletConnected)
-                isWalletConnected = await CardanoWalletInterop.ConnectWalletAsync();
+                isWalletConnected = await CardanoWalletInteropService.ConnectWalletAsync();
 
             if (!isWalletConnected) return;
             
             LoadingMessage = "Signing and Submitting Transaction...";
             await InvokeAsync(StateHasChanged);
             
-            var txHash = await CardanoWalletInterop.MintIdentityTokenAsync($"ID{username}", avatar, metadataString);
+            var txHash = await CardanoWalletInteropService.MintIdentityTokenAsync($"ID{username}", avatar, metadataString);
             if (txHash == null)
             {
                 IsLoading = false;
@@ -128,7 +125,7 @@ namespace IdentityToken.UI.Common.Components
             LoadingMessage = $"Transaction Submitted to the Blockchain! Confirming Tx: {txHash}";
             await InvokeAsync(StateHasChanged);
             
-            var tx = await CardanoWalletInterop.GetTransactionAsync(txHash);
+            var tx = await CardanoWalletInteropService.GetTransactionAsync(txHash);
             if (tx == null)
             {
                 IsLoading = false;
