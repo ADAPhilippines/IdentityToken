@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
+using IdentityToken.UI.Common.Services.JSInterop;
 
 namespace IdentityToken.UI.Common.Pages
 {
