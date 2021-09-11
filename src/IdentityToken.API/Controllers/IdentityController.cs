@@ -87,54 +87,57 @@ public class IdentityController : ControllerBase
         // Construct Identity Tokens from Assets
         foreach (var tempIdentityToken in tempIdentityTokens)
         {
-            var asset = await client.GetFromJsonAsync<CardanoAssetResponse>($"assets/{tempIdentityToken.Unit}");
+            if(tempIdentityToken is null || tempIdentityToken.Unit is null) continue;
+            
+            var assets = await client
+                .GetFromJsonAsync<IEnumerable<CardanoAssetHistoryResponse>>($"assets/{tempIdentityToken.Unit}/history");
 
-            if (asset is null || asset.AssetName is null || asset.PolicyId is null) continue;
-
-            var assetName = CardanoHelper.HexToAscii(asset.AssetName);
-            var identityToken = new CardanoIdentityToken
+            if (assets is null || !assets.Any()) continue;
+            foreach(var asset in assets)
             {
-                PolicyId = asset.PolicyId,
-                AssetName = assetName
-            };
-
-            // Query Asset Metadata
-            var metadata = await client.GetFromJsonAsync<IEnumerable<CardanoTxMetadataResponse>>($"txs/{asset.MintTxHash}/metadata");
-
-            // Check if metadata contains IdentityToken definition
-            if (metadata is null) continue;
-
-            foreach (var meta in metadata)
-            {
-                if (meta.Label == "7368")
+                var assetName = CardanoHelper.HexToAscii(tempIdentityToken.Unit[56..]);
+                var identityToken = new CardanoIdentityToken
                 {
-                    try
+                    PolicyId = tempIdentityToken.Unit[0..56],
+                    AssetName = assetName
+                };
+
+                // Query Asset Metadata
+                var metadata = await client.GetFromJsonAsync<IEnumerable<CardanoTxMetadataResponse>>($"txs/{asset.TxHash}/metadata");
+
+                // Check if metadata contains IdentityToken definition
+                if (metadata is null) continue;
+
+                foreach (var meta in metadata)
+                {
+                    if (meta.Label == "7368")
                     {
-                        identityToken.Avatar = new IdentityAvatar
+                        try
                         {
-                            Source = meta.JsonMetadata
-                                .GetProperty(asset.PolicyId)
-                                .GetProperty(assetName)
-                                .GetProperty("avatar")
-                                .GetProperty("src")
-                                .GetString(),
-                            Protocol = meta.JsonMetadata
-                                .GetProperty(asset.PolicyId)
-                                .GetProperty(assetName)
-                                .GetProperty("avatar")
-                                .GetProperty("protocol")
-                                .GetString()
-                        };
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.Log(LogLevel.Information, ex, "IdentityToken definition not found in metadata");
+                            identityToken.Avatar = new IdentityAvatar
+                            {
+                                Source = meta.JsonMetadata
+                                    .GetProperty(identityToken.PolicyId)
+                                    .GetProperty(assetName)
+                                    .GetProperty("avatar")
+                                    .GetProperty("src")
+                                    .GetString(),
+                                Protocol = meta.JsonMetadata
+                                    .GetProperty(identityToken.PolicyId)
+                                    .GetProperty(assetName)
+                                    .GetProperty("avatar")
+                                    .GetProperty("protocol")
+                                    .GetString()
+                            };
+                            identityTokens.Add(identityToken);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Log(LogLevel.Information, ex, "IdentityToken definition not found in metadata");
+                        }
                     }
                 }
             }
-
-
-            identityTokens.Add(identityToken);
         }
 
         // Get Cardano Protocol Params

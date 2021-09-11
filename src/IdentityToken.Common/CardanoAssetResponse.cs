@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 
 namespace IdentityToken.Common.Models;
 
-
 public record CardanoAssetResponse
 {
     [JsonPropertyName("policy_id")]
