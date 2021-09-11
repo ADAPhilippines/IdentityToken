@@ -52,7 +52,7 @@ namespace IdentityToken.UI.Common.Components
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
-                if (CardanoWalletInteropService != null)
+                if (CardanoWalletInteropService is not null)
                     CardanoWalletInteropService.Error += CardanoWalletInteropOnError;
 
             await base.OnAfterRenderAsync(firstRender);
@@ -103,7 +103,7 @@ namespace IdentityToken.UI.Common.Components
             var metadataString = JsonSerializer.Serialize(metadataDictionary);
             
             LoadingMessage = "Building Transaction...";
-            if (CardanoWalletInteropService == null) return;
+            if (CardanoWalletInteropService is null) return;
 
             var isWalletConnected = await CardanoWalletInteropService.IsWalletConnectedAsync();
             if (!isWalletConnected)
@@ -115,7 +115,7 @@ namespace IdentityToken.UI.Common.Components
             await InvokeAsync(StateHasChanged);
             
             var txHash = await CardanoWalletInteropService.MintIdentityTokenAsync($"ID{username}", avatar, metadataString);
-            if (txHash == null)
+            if (txHash is null)
             {
                 IsLoading = false;
                 ShowToast(true, "Transaction Submission failed!");
@@ -126,7 +126,7 @@ namespace IdentityToken.UI.Common.Components
             await InvokeAsync(StateHasChanged);
             
             var tx = await CardanoWalletInteropService.GetTransactionAsync(txHash);
-            if (tx == null)
+            if (tx is null)
             {
                 IsLoading = false;
                 ShowToast(true, "Unable to confirm transaction!");
