@@ -156,7 +156,8 @@ public class IdentityController : ControllerBase
         {
             PolicyId = firstIDToken.PolicyId,
             AssetName = firstIDToken.AssetName,
-            Avatar = firstIDToken.Avatar,
+            // Assume IPFS protocol for now
+            Avatar = firstIDToken.Avatar?.Source ?? string.Empty,
             Key = CardanoHelper.Sha265($"{firstIDToken.PolicyId}{firstIDToken.AssetName}{CardanoHelper.GenerateRandomString(128)}"),
             ExpiresIn = 60 * 60 * 24 * 365,
         };
