@@ -65,8 +65,8 @@ public class ChatHub : Hub
     public async Task GetChatHistory(ChatHistoryRequest request)
     {
         var fromDate = request.From;
-        var limit = request.Limit;
-        
+        var limit = request.Limit ?? 5;
+
         if (_identityDbContext is not null && _identityDbContext.ChatMessages is not null && _identityDbContext.ChatUsers is not null)
         {
             var chatUser = await _identityDbContext.ChatUsers
@@ -75,12 +75,18 @@ public class ChatHub : Hub
 
             if (chatUser is not null)
             {
-                var chatMessages = await _identityDbContext.ChatMessages
-                    .Include(m => m.Sender)
-                    .Where(m => m.Sent >= fromDate)
+                var chatMessagesQuery = _identityDbContext.ChatMessages
+                    .Include(m => m.Sender).AsQueryable();
+
+                if(fromDate is not null)
+                    chatMessagesQuery = chatMessagesQuery.Where(m => m.Sent < fromDate);
+                
+                var chatMessages = await chatMessagesQuery
                     .OrderByDescending(m => m.Sent)
                     .Take(limit)
                     .ToListAsync();
+                
+                chatMessages.Reverse();
 
                 await Clients.Caller.SendAsync("ReceiveChatHistory", chatMessages);
             }

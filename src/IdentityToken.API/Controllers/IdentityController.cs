@@ -76,7 +76,7 @@ public class IdentityController : ControllerBase
         // Inspect Wallet Address
         var address = await client.GetFromJsonAsync<CardanoAddressResponse>($"addresses/{userWalletAddress}");
         if (address is null) return BadRequest();
-        
+
         // Inspect Assets
         var addressAssets = await client.GetFromJsonAsync<IEnumerable<CardanoAddressAssetResponse>>($"accounts/{address.StakeAddress}/addresses/assets");
         var tempIdentityTokens = addressAssets?.Where(x => CardanoHelper.IsIdentityToken(x.Unit)).ToList() ?? new List<CardanoAddressAssetResponse>();
@@ -110,11 +110,21 @@ public class IdentityController : ControllerBase
                 {
                     try
                     {
-                        identityToken.Avatar = meta.JsonMetadata
-                            .GetProperty(asset.PolicyId)
-                            .GetProperty(assetName)
-                            .GetProperty("avatar")
-                            .GetString();
+                        identityToken.Avatar = new IdentityAvatar
+                        {
+                            Source = meta.JsonMetadata
+                                .GetProperty(asset.PolicyId)
+                                .GetProperty(assetName)
+                                .GetProperty("avatar")
+                                .GetProperty("src")
+                                .GetString(),
+                            Protocol = meta.JsonMetadata
+                                .GetProperty(asset.PolicyId)
+                                .GetProperty(assetName)
+                                .GetProperty("avatar")
+                                .GetProperty("protocol")
+                                .GetString()
+                        };
                     }
                     catch (Exception ex)
                     {
@@ -141,8 +151,9 @@ public class IdentityController : ControllerBase
 
         // Pick the first IdentityToken
         var firstIDToken = identityTokens.FirstOrDefault();
-        if(firstIDToken is null || firstIDToken.PolicyId is null || firstIDToken.AssetName is null) return StatusCode(500);
-        var authenticatedIdentity = new AuthenticatedIdentity { 
+        if (firstIDToken is null || firstIDToken.PolicyId is null || firstIDToken.AssetName is null) return StatusCode(500);
+        var authenticatedIdentity = new AuthenticatedIdentity
+        {
             PolicyId = firstIDToken.PolicyId,
             AssetName = firstIDToken.AssetName,
             Avatar = firstIDToken.Avatar,
@@ -150,14 +161,14 @@ public class IdentityController : ControllerBase
             ExpiresIn = 60 * 60 * 24 * 365,
         };
         _identityDbContext.AuthenticatedIdentities?.Add(authenticatedIdentity);
-        
+
         // Return Change ADA to Address
         var txBytes = CardanoHelper.BuildTxWithMneomnic(authWallet.Mnemonic, txHash, (uint)txIndex, userWalletAddress, (uint)getTotalLovelace, block.Slot + 1000, protocolParams);
         var byteContent = new ByteArrayContent(txBytes);
         byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/cbor");
         var txResponse = await client.PostAsync("tx/submit", byteContent);
         var txId = await txResponse.Content.ReadAsStringAsync();
-        
+
         // Make sure no one can use the same auth code again
         authWallet.IsActive = false;
         _identityDbContext.Update(authWallet);
