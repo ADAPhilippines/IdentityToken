@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 
 namespace IdentityToken.UI.Common.Pages
@@ -6,12 +8,6 @@ namespace IdentityToken.UI.Common.Pages
     partial class Index
     {
         private string ActivePanel { get; set; } = "mint";
-
-        protected override void OnInitialized()
-        {
-            ActivePanel ??= "mint";
-            base.OnInitialized();
-        }
 
         private string GetTabTextColorClass(string tabName)
         {

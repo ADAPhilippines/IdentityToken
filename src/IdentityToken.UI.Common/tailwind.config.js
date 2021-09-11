@@ -45,7 +45,12 @@ module.exports = {
             'focused': '#1E2835',
             'unfocused': '#808088'
         },
-        extend: {},
+        extend: {
+            lineHeight: {
+                'extra-loose': '2.5',
+                '12': '3rem',
+            }
+        },
     },
     variants: {},
     plugins: [],

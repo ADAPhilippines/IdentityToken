@@ -513,17 +513,13 @@ class CardanoWalletInterop {
     }
 
     public async GetTransactionAsync(hash: string): Promise<Tx | null> {
-        const limit = 20;
         let transaction: Tx | null = null;
-        let attempts = 0;
-        while (attempts < limit) {
+        while (true) {
             transaction = await this.GetFromBlockfrostAsync<Tx>(`txs/${hash}`);
-            if (transaction !== null) {
+            if (transaction !== null)
                 break;
-            } else {
+            else
                 await Helper.Delay(3000);
-                attempts++;
-            }
         }
         return transaction;
     }
