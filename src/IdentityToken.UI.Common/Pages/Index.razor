@@ -3,32 +3,32 @@
 
 <div class="flex flex-col font-sans w-full">
     <div class="flex w-full bg-center overflow-hidden bg-no-repeat" style="background-image: url('/_content/IdentityToken.UI.Common/images/demo_section_bg.png')">
-        <div class="flex flex-col justify-center container pt-24 md:pt-28 relative" >
+        <div class="flex flex-col justify-center container pt-24 md:pt-28 relative">
             <div class="w-full mb-10 h-20 flex justify-center">
-                <img class="h-full" src="/_content/IdentityToken.UI.Common/images/adaph_logo_dark.svg" alt=""/>
+                <img src="/_content/IdentityToken.UI.Common/images/adaph_logo_dark.svg" alt=""/>
             </div>
-            <div class="text-5xl sm:text-7xl md:text-8xl tracking-wide font-semibold text-primary text-center mb-6">IdentityToken</div>
+            <div class="text-4xl sm:text-7xl md:text-8xl tracking-wide font-semibold text-primary text-center mb-6">IdentityToken</div>
             <div class="text-3xl sm:text-5xl tracking-wide font-normal text-primary text-center mt-6 mb-12">On Cardano</div>
             <div class="w-full mb-6 h-20 flex justify-center">
                 <img class="h-full" src="/_content/IdentityToken.UI.Common/images/cardano_logo_dark.svg" alt=""/>
             </div>
             <div class="justify-center mt-12 mb-12">
-                <p class="w-10/12 md:w-7/12 text-lg md:text-xl tracking-wide leading-10 font-medium text-center mx-auto text-secondary">
+                <p class="w-10/12 md:w-7/12 text-lg leading-6 md:text-xl tracking-wide md:leading-12 font-medium text-center mx-auto text-secondary">
                     Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt
                     ut laoreet dolore magna aliquam erat volutpat.
                 </p>
             </div>
-            <div class="flex flex-col rounded-md w-11/12 lg:w-8/12 bg-white bg-opacity-70 mt-10 mb-48 mx-auto overflow-hidden relative z-1 demo-panel-shadow">
+            <div class="flex flex-col rounded-md w-11/12 lg:w-8/12 bg-white bg-opacity-70 mt-10 mb-32 mx-auto overflow-hidden relative z-1 demo-panel-shadow">
                 <div class="flex w-full">
                     <nav class="flex flex-grow relative z-0 shadow flex" aria-label="Tabs">
-                        <div @onclick="@(() => SwitchActivePanel("mint"))" 
-                            class="flex-grow group relative min-w-0 flex-1 overflow-hidden bg-white py-6 px-6 text-sm font-medium text-center hover:bg-gray-50 focus:z-10 hover:cursor-pointer">
+                        <div @onclick="@(() => SwitchActivePanel("mint"))"
+                             class="flex-grow group relative min-w-0 flex-1 overflow-hidden bg-white py-6 px-6 text-sm font-medium text-center hover:bg-gray-50 focus:z-10 hover:cursor-pointer">
                             <span class="@GetTabTextColorClass("mint") text-lg">Mint</span>
                             <span aria-hidden="true" class="@GetTabUnderlineColorClass("mint") absolute inset-x-0 bottom-0 h-0.5"></span>
                         </div>
 
                         <div @onclick="@(() => SwitchActivePanel("demo"))"
-                            class="flex-grow group relative min-w-0 flex-1 overflow-hidden bg-white py-6 px-6 text-sm font-medium text-center hover:bg-gray-50 focus:z-10 hover:cursor-pointer">
+                             class="flex-grow group relative min-w-0 flex-1 overflow-hidden bg-white py-6 px-6 text-sm font-medium text-center hover:bg-gray-50 focus:z-10 hover:cursor-pointer">
                             <span class="@GetTabTextColorClass("demo") text-lg">Demo</span>
                             <span aria-hidden="true" class="@GetTabUnderlineColorClass("demo") absolute inset-x-0 bottom-0 h-0.5"></span>
                         </div>
@@ -37,7 +37,7 @@
                 <div class="flex w-full">
                     @if (ActivePanel == "mint")
                     {
-                        <Mint/>
+                        <Mint MintSuccess="OnMintSuccess"/>
                     }
                     else
                     {
@@ -48,10 +48,50 @@
         </div>
     </div>
 
-    <div class="flex w-full">
-        <div class="flex flex-col bg-white justify-center container pt-48 relative overflow-hidden">
-            <div class="flex justify-center">
-                <h3 class="text-5xl tracking-wide font-semibold text-center">For Developers</h3>
+    <div class="flex w-full bg-center bg-no-repeat overflow-hidden" style="background-image: url('/_content/IdentityToken.UI.Common/images/for_dev_bg.png')">
+        <div class="flex flex-col bg-transparent justify-center container py-24 relative">
+            <div class="flex flex-col justify-center w-full">
+                <h3 class="w-full text-4xl tracking-wide font-bold text-center text-primary">For Developers</h3>
+                <div class="w-full justify-center mt-12 mb-12">
+                    <p class="w-10/12 md:w-7/12 text-lg leading-6 md:text-xl tracking-wide md:leading-12 font-medium text-center mx-auto text-idt-gray">
+                        Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt
+                        ut laoreet dolore magna aliquam erat volutpat.
+                    </p>
+                </div>
+                <div class="w-10/12 rounded-md overflow-hidden mx-auto">
+                    <pre class="w-full">
+                        <code class="language-csharp">
+using System.Windows.Forms;
+using System.Windows.Forms;
+
+namespace IdentityToken.UI.Common;
+
+public class Test
+{
+}
+                        </code>
+                    </pre>
+                </div>
+                <div class="w-full justify-center mt-12 mb-12">
+                    <p class="w-10/12 md:w-7/12 text-lg leading-6 md:text-xl tracking-wide md:leading-12 font-medium text-center mx-auto text-idt-gray">
+                        Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt
+                        ut laoreet dolore magna aliquam erat volutpat.
+                    </p>
+                </div>
+                <div class="w-10/12 rounded-md overflow-hidden mx-auto">
+                    <pre class="w-full">
+                        <code class="language-csharp">
+using System.Windows.Forms;
+using System.Windows.Forms;
+
+namespace IdentityToken.UI.Common;
+
+public class Test
+{
+}
+                        </code>
+                    </pre>
+                </div>
             </div>
         </div>
     </div>

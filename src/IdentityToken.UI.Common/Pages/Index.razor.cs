@@ -1,17 +1,13 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
+using IdentityToken.UI.Common.Services.JSInterop;
 
 namespace IdentityToken.UI.Common.Pages
 {
     partial class Index
     {
         private string ActivePanel { get; set; } = "mint";
-
-        protected override void OnInitialized()
-        {
-            ActivePanel ??= "mint";
-            base.OnInitialized();
-        }
 
         private string GetTabTextColorClass(string tabName)
         {
@@ -25,6 +21,11 @@ namespace IdentityToken.UI.Common.Pages
         private void SwitchActivePanel(string panel)
         {
             ActivePanel = panel;
+        }
+
+        private void OnMintSuccess(EventArgs args)
+        {
+            ActivePanel = "demo";
         }
     }
 }

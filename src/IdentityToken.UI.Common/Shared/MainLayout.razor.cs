@@ -8,11 +8,13 @@ namespace IdentityToken.UI.Common.Shared
     public partial class MainLayout
     {
         [Inject] private BootstrapInteropService? BootstrapInteropService { get; set; }
-
+        
+        [Inject] private HelperInteropService? HelperInteropService { get; set; }
+        private bool IsLoading { get; set; } = true;
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
-                if (BootstrapInteropService != null)
+                if (BootstrapInteropService is not null)
                 {
                     var taskList = new List<Task>
                     {
@@ -22,10 +24,20 @@ namespace IdentityToken.UI.Common.Shared
                         Task.Run(() =>
                             BootstrapInteropService.InjectStyleSheetAsync("./_content/IdentityToken.UI.Common/dist/app.css")),
                         Task.Run(() =>
+                            BootstrapInteropService.InjectStyleSheetAsync("https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css")),
+                        Task.Run(() =>
+                            BootstrapInteropService.InjectPrismJsAsync()),
+                        Task.Run(() =>
                             BootstrapInteropService.InjectApplicationScriptAsync())
                     };
 
                     await Task.WhenAll(taskList);
+                    IsLoading = false;
+                    await Task.Delay(1000);
+                    await InvokeAsync(StateHasChanged);
+                    
+                    if(HelperInteropService is not null)
+                        await HelperInteropService.HighlightAllCodeElementsAsync();
                 }
 
             await base.OnAfterRenderAsync(firstRender);

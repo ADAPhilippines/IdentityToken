@@ -15,6 +15,7 @@
   "devDependencies": {
     "@tailwindcss/forms": "^0.3.3",
     "@types/node": "^16.7.10",
+    "@types/qrcode": "^1.4.1",
     "npm-run-all": "^4.1.5",
     "tailwindcss": "^2.2.10",
     "ts-loader": "^9.2.5",
@@ -24,6 +25,7 @@
   },
   "dependencies": {
     "@emurgo/cardano-serialization-lib-browser": "^7.1.0",
-    "buffer": "^6.0.3"
+    "buffer": "^6.0.3",
+    "qrcode": "^1.4.4"
   }
 }
