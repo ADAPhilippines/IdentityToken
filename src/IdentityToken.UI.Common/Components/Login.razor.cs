@@ -33,10 +33,13 @@ namespace IdentityToken.UI.Common.Components
             if (firstRender)
                 if (AuthService is not null && HelperInteropService is not null)
                 {
-                    WalletAddress = await AuthService.RequestLoginAsync();
-                    WalletAddressQr = await HelperInteropService.GenerateQrDataUrlAsync(WalletAddress);
-                    await InvokeAsync(StateHasChanged);
-                    _ = StartAuthorizeAttemptAsync();
+                    if (LocalStorageService is not null && !await LocalStorageService.ContainKeyAsync("identity"))
+                    {
+                        WalletAddress = await AuthService.RequestLoginAsync();
+                        WalletAddressQr = await HelperInteropService.GenerateQrDataUrlAsync(WalletAddress);
+                        await InvokeAsync(StateHasChanged);
+                        _ = StartAuthorizeAttemptAsync();
+                    }
                 }
 
             await base.OnAfterRenderAsync(firstRender);

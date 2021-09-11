@@ -22,6 +22,7 @@ namespace IdentityToken.UI.Common.Components
         [Inject] private AuthService? AuthService { get; set; }
         private HubConnection? HubConnection { get; set; }
         private List<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
+        private List<ChatUser> Users { get; set; } = new List<ChatUser>();
         private string CurrentMessage { get; set; } = string.Empty;
         private AuthenticatedIdentity? CurrentUser { get; set; }
         private bool IsLoadingHistoryScroll { get; set; } = false;
@@ -39,7 +40,7 @@ namespace IdentityToken.UI.Common.Components
                 HubConnection.On<ChatMessage>("ReceiveMessage", OnReceiveMessage);
                 HubConnection.On<AuthenticatedIdentity>("Authenticated", OnAuthenticated);
                 HubConnection.On<IEnumerable<ChatMessage>>("ReceiveChatHistory", OnReceiveChatHistory);
-
+                HubConnection.On<IEnumerable<ChatUser>>("ReceiveOnlineUsers", OnReceiveChatUsers);
                 if (LocalStorageService is null) return;
                 var identity = await LocalStorageService.GetItemAsync<AuthenticatedIdentity>("identity");
                 
@@ -47,6 +48,12 @@ namespace IdentityToken.UI.Common.Components
                 await HubConnection.SendAsync("Authenticate", identity.Key);
             }
             await base.OnAfterRenderAsync(firstRender);
+        }
+
+        private void OnReceiveChatUsers(IEnumerable<ChatUser> chatUsers)
+        {
+            Users = chatUsers.ToList();
+            StateHasChanged();
         }
 
         private async void OnReceiveMessage(ChatMessage message)
@@ -127,6 +134,15 @@ namespace IdentityToken.UI.Common.Components
             {
                 From = CurrentFirstHistoryMessage?.Sent
             });
+        }
+
+        private bool IsUserOnline(AuthenticatedIdentity? user)
+        {
+            if (user is null) return false;
+            return Users.Any(u =>
+                u.Identity is not null &&
+                u.Identity.PolicyId == user.PolicyId &&
+                u.Identity.AssetName == user.AssetName);
         }
 
         public async ValueTask DisposeAsync()
