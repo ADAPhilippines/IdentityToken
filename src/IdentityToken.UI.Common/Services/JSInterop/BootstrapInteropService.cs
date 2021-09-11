@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.JSInterop;
 
 namespace IdentityToken.UI.Common.Services.JSInterop;
@@ -7,9 +8,11 @@ namespace IdentityToken.UI.Common.Services.JSInterop;
 public class BootstrapInteropService
 {
     private readonly Lazy<Task<IJSObjectReference>>? _moduleTask;
-
-    public BootstrapInteropService(IJSRuntime jsRuntime)
+    private readonly IConfiguration _configuration;
+    
+    public BootstrapInteropService(IJSRuntime jsRuntime, IConfiguration config)
     {
+        _configuration = config;
         _moduleTask = new Lazy<Task<IJSObjectReference>>(() => jsRuntime.InvokeAsync<IJSObjectReference>(
             "import", "./_content/IdentityToken.UI.Common/bootstrap.js").AsTask());
     }
@@ -29,6 +32,15 @@ public class BootstrapInteropService
         {
             var module = await _moduleTask.Value;
             await module.InvokeVoidAsync("injectGoogleFontAsync", url);
+        }
+    }
+    
+    public async ValueTask InjectApplicationScriptAsync()
+    {
+        if (_moduleTask != null)
+        {
+            var module = await _moduleTask.Value;
+            await module.InvokeVoidAsync("injectApplicationScriptAsync", _configuration["BlockfrostProjectId"]);
         }
     }
 }

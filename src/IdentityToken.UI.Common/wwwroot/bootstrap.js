@@ -1,11 +1,11 @@
-﻿export async function injectCardanoWalletInteropAsync(blockfrostProjectId, objectRef) {
+﻿export async function injectApplicationScriptAsync(blockfrostProjectId) {
     return new Promise((resolve, reject) => {
         if (!window.CardanoWalletInterop) {
             let customScript = document.createElement('script');
             customScript.setAttribute('src', './_content/IdentityToken.UI.Common/dist/app.js');
             customScript.onload = async () =>
             {
-                await window.CardanoWalletInterop.InitializeAsync(blockfrostProjectId, objectRef);
+                await window.CardanoWalletInterop.InitializeAsync(blockfrostProjectId);
                 resolve();
             }
             document.head.appendChild(customScript);

@@ -1,5 +1,4 @@
 @page "/"
-@page "/{Page}"
 
 
 <div class="flex flex-col font-sans w-full">
@@ -22,19 +21,21 @@
             <div class="flex flex-col rounded-md w-11/12 lg:w-8/12 bg-white bg-opacity-70 mt-10 mb-48 mx-auto overflow-hidden relative z-1 demo-panel-shadow">
                 <div class="flex w-full">
                     <nav class="flex flex-grow relative z-0 shadow flex" aria-label="Tabs">
-                        <NavLink href="/mint" class="flex-grow group relative min-w-0 flex-1 overflow-hidden bg-white py-6 px-6 text-sm font-medium text-center hover:bg-gray-50 focus:z-10">
+                        <div @onclick="@(() => SwitchActivePanel("mint"))" 
+                            class="flex-grow group relative min-w-0 flex-1 overflow-hidden bg-white py-6 px-6 text-sm font-medium text-center hover:bg-gray-50 focus:z-10 hover:cursor-pointer">
                             <span class="@GetTabTextColorClass("mint") text-lg">Mint</span>
                             <span aria-hidden="true" class="@GetTabUnderlineColorClass("mint") absolute inset-x-0 bottom-0 h-0.5"></span>
-                        </NavLink>
+                        </div>
 
-                        <NavLink href="/demo" class="flex-grow group relative min-w-0 flex-1 overflow-hidden bg-white py-6 px-6 text-sm font-medium text-center hover:bg-gray-50 focus:z-10">
+                        <div @onclick="@(() => SwitchActivePanel("demo"))"
+                            class="flex-grow group relative min-w-0 flex-1 overflow-hidden bg-white py-6 px-6 text-sm font-medium text-center hover:bg-gray-50 focus:z-10 hover:cursor-pointer">
                             <span class="@GetTabTextColorClass("demo") text-lg">Demo</span>
                             <span aria-hidden="true" class="@GetTabUnderlineColorClass("demo") absolute inset-x-0 bottom-0 h-0.5"></span>
-                        </NavLink>
+                        </div>
                     </nav>
                 </div>
                 <div class="flex w-full">
-                    @if (Page == "mint")
+                    @if (ActivePanel == "mint")
                     {
                         <Mint/>
                     }

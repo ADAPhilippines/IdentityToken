@@ -14,7 +14,7 @@ namespace IdentityToken.UI.Common.Components
     public partial class Chat
     {
         
-        [Inject] private CardanoWalletInterop? CardanoWalletInterop { get; set; }
+        [Inject] private HelperInteropService? HelperInteropService { get; set; }
         [Inject] private IConfiguration? Config { get; set; }
         private HubConnection? HubConnection { get; set; }
         private List<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
@@ -43,8 +43,8 @@ namespace IdentityToken.UI.Common.Components
             Messages.Add(message);
             await InvokeAsync(StateHasChanged);
             
-            if (CardanoWalletInterop is null) return;
-            await CardanoWalletInterop.ScrollToElementBottomAsync("#message-container");
+            if (HelperInteropService is null) return;
+            await HelperInteropService.ScrollToElementBottomAsync("#message-container");
         }
 
         private async void OnAuthenticated(AuthenticatedIdentity authenticatedIdentity)
@@ -63,13 +63,13 @@ namespace IdentityToken.UI.Common.Components
             Messages.InsertRange(0, messages);
             await InvokeAsync(StateHasChanged);
             
-            if (CardanoWalletInterop is null) return;
+            if (HelperInteropService is null) return;
             
             if(IsLoadingHistoryScroll is not true)
-                await CardanoWalletInterop.ScrollToElementBottomAsync("#message-container");
+                await HelperInteropService.ScrollToElementBottomAsync("#message-container");
             else if (IsLoadingHistoryScroll is true && CurrentFirstHistoryMessage is not null)
             {
-                await CardanoWalletInterop.ScrollToMessageId(CurrentFirstHistoryMessage.Id);
+                await HelperInteropService.ScrollToMessageId(CurrentFirstHistoryMessage.Id);
                 IsLoadingHistoryScroll = false;
                 await InvokeAsync(StateHasChanged);
             }
@@ -97,8 +97,8 @@ namespace IdentityToken.UI.Common.Components
 
         private async void OnMessageHistoryScroll(EventArgs e)
         {
-            if (CardanoWalletInterop is null) return;
-            var scrollTop = await CardanoWalletInterop.GetElementScrollTopAsync("#message-container");
+            if (HelperInteropService is null) return;
+            var scrollTop = await HelperInteropService.GetElementScrollTopAsync("#message-container");
             if (scrollTop > 0) return;
 
             if (HubConnection is null) return;

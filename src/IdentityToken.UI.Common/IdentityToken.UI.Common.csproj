@@ -32,6 +32,8 @@
 
   <ItemGroup>
     <Compile Remove="MSBuild_Logs\**" />
+    <Compile Remove="Services\JSInterop\CardanoWalletInterop.cs" />
+    <Compile Remove="IdentityTokenServiceCollectionExtensions.cs" />
   </ItemGroup>
 
   <ItemGroup>
