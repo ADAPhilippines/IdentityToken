@@ -30,4 +30,16 @@ public class HelperInteropService
         if (_jsRuntime is null) return;
         await _jsRuntime.InvokeVoidAsync("window.ScrollToMessageId", id);
     }
+    
+    public async Task<string> GenerateQrDataUrlAsync(string data)
+    {
+        if (_jsRuntime is null) return string.Empty;
+        return await _jsRuntime.InvokeAsync<string>("window.GenerateQRDataUrlAsync", data);
+    }
+    
+    public async Task<string> CopyToClipboardAsync(string data)
+    {
+        if (_jsRuntime is null) return string.Empty;
+        return await _jsRuntime.InvokeAsync<string>("window.CopyToClipboardAsync", data);
+    }
 }

@@ -1,8 +1,6 @@
-﻿class Helper {
-    constructor() {
+﻿import QRCode from 'qrcode';
 
-    }
-
+class Helper {
     public static async Delay(time: number): Promise<void> {
         return new Promise((resolve => {
             setTimeout(() => {
@@ -29,6 +27,14 @@
         
         if(messageContainer && targetMessageElement)
             messageContainer.scrollTop = targetMessageElement.offsetTop - 441;
+    }
+    
+    public static async GenerateQRDataUrlAsync(data: string) {
+        return await QRCode.toDataURL(data);
+    }
+    
+    public static async CopyToClipboardAsync(data: string) {
+        await navigator.clipboard.writeText(data);
     }
 }
 

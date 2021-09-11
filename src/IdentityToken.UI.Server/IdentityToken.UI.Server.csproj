@@ -9,4 +9,8 @@
     <ProjectReference Include="..\IdentityToken.UI.Common\IdentityToken.UI.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Blazored.LocalStorage" Version="4.1.5" />
+  </ItemGroup>
+
 </Project>

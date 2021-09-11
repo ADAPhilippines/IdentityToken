@@ -8,5 +8,7 @@ declare global {
         ScrollToElementBottom: (selector: string) => void;
         GetElementScrollTop: (selector: string) => void;
         ScrollToMessageId: (id: string) => void;
+        GenerateQRDataUrlAsync: (data: string) => Promise<string>;
+        CopyToClipboardAsync: (data: string) => Promise<void>;
     }
 }
