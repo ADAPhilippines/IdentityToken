@@ -2,12 +2,17 @@ using IdentityToken.API.Data;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using IdentityToken.API.Hubs;
+using Microsoft.AspNetCore.Http.Connections;
 
 var builder = WebApplication.CreateBuilder(args);
-
 // Add services to the container.
-builder.Services.AddSignalR();
-builder.Services.AddDbContext<IdentityDbContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("IdentityTokenDb")));
+builder.Services.AddSignalR(hubOptions => {
+    hubOptions.ClientTimeoutInterval = TimeSpan.FromSeconds(1);
+    hubOptions.HandshakeTimeout = TimeSpan.FromSeconds(10);
+    hubOptions.KeepAliveInterval = TimeSpan.FromSeconds(10);
+    hubOptions.EnableDetailedErrors = true;
+});
+builder.Services.AddIdentityDbContextFactory(o => o.UseNpgsql(builder.Configuration.GetConnectionString("IdentityTokenDb")));
 builder.Services.AddControllers();
 builder.Services.AddHttpClient("blockfrost", c =>
 {
@@ -38,9 +43,16 @@ if (builder.Environment.IsDevelopment())
 app.UseRouting();
 app.UseEndpoints(endpoints =>
 {
-    endpoints.MapHub<ChatHub>("/chat");
+    endpoints.MapHub<ChatHub>("/chat", o => o.Transports = HttpTransportType.WebSockets);
 });
 app.UseAuthorization();
 app.MapControllers();
+
+// Update All ChatUsers to be offline
+var optionsBuilder = new DbContextOptionsBuilder<IdentityDbContext>();
+optionsBuilder.UseNpgsql(builder.Configuration.GetConnectionString("IdentityTokenDb"));
+using var dbContext = new IdentityDbContext(optionsBuilder.Options);
+if(dbContext is not null)
+    await dbContext.Database.ExecuteSqlRawAsync("update \"ChatUsers\" set \"IsOnline\" = false");
 
 app.Run();

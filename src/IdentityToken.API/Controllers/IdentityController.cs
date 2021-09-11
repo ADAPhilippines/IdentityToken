@@ -15,11 +15,11 @@ public class IdentityController : ControllerBase
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IdentityDbContext _identityDbContext;
 
-    public IdentityController(ILogger<IdentityController> logger, IHttpClientFactory httpClientFactory, IdentityDbContext identityDbContext)
+    public IdentityController(ILogger<IdentityController> logger, IHttpClientFactory httpClientFactory, IdentityDbContextFactory identityDbContextFactory)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
-        _identityDbContext = identityDbContext;
+        _identityDbContext = identityDbContextFactory.CreateDbContext();
     }
 
     [HttpGet("auth")]
