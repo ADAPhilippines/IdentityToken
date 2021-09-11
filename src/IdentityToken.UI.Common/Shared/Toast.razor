@@ -1,5 +1,5 @@
-﻿<div class="bg-@ColorClassPrefix rounded-full p-4 fixed z-40 left-1/2 transform -translate-x-1/2 transition transition-duration-1000 -bottom-32 @ToastPosition">
-    <div class="flex items-center">
+﻿<div class="bg-@ColorClassPrefix w-10/12 md:w-auto rounded-full p-4 fixed z-40 left-1/2 transform -translate-x-1/2 transition transition-duration-1000 -bottom-44 @ToastPosition">
+    <div class="flex justify-center items-center">
         <div class="flex-shrink-0">
             <svg class="h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 @if (IsError)
@@ -12,8 +12,8 @@
                 }
             </svg>
         </div>
-        <div class="ml-3">
-            <p class="text-sm font-medium text-white">
+        <div class="flex-grow ml-3">
+            <p class="text-sm font-medium text-white text-center">
                 @Message
             </p>
         </div>

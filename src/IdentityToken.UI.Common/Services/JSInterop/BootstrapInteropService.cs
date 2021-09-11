@@ -35,6 +35,15 @@ public class BootstrapInteropService
         }
     }
     
+    public async ValueTask InjectPrismJsAsync()
+    {
+        if (_moduleTask != null)
+        {
+            var module = await _moduleTask.Value;
+            await module.InvokeVoidAsync("injectPrismJSAsync");
+        }
+    }
+    
     public async ValueTask InjectApplicationScriptAsync()
     {
         if (_moduleTask != null)

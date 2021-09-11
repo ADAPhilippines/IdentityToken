@@ -27,7 +27,7 @@ namespace IdentityToken.UI.Common.Shared
             }
         }
         private string ColorClassPrefix => IsError ? "idt-danger" : "idt-success";
-        private string ToastPosition => ShouldShow ? "transform -translate-y-60" : "";
+        private string ToastPosition => ShouldShow ? "transform -translate-y-48" : "";
         private Timer? _countdown;
 
         private void StartCountdown()

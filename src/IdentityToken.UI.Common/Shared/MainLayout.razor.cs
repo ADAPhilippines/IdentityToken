@@ -22,6 +22,10 @@ namespace IdentityToken.UI.Common.Shared
                         Task.Run(() =>
                             BootstrapInteropService.InjectStyleSheetAsync("./_content/IdentityToken.UI.Common/dist/app.css")),
                         Task.Run(() =>
+                            BootstrapInteropService.InjectStyleSheetAsync("https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css")),
+                        Task.Run(() =>
+                            BootstrapInteropService.InjectPrismJsAsync()),
+                        Task.Run(() =>
                             BootstrapInteropService.InjectApplicationScriptAsync())
                     };
 
