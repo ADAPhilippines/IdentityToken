@@ -19,7 +19,7 @@ public class BootstrapInteropService
 
     public async ValueTask InjectStyleSheetAsync(string path)
     {
-        if (_moduleTask != null)
+        if (_moduleTask is not null)
         {
             var module = await _moduleTask.Value;
             await module.InvokeVoidAsync("injectStyleSheetAsync", path);
@@ -28,7 +28,7 @@ public class BootstrapInteropService
 
     public async ValueTask InjectGoogleFontAsync(string url)
     {
-        if (_moduleTask != null)
+        if (_moduleTask is not null)
         {
             var module = await _moduleTask.Value;
             await module.InvokeVoidAsync("injectGoogleFontAsync", url);
@@ -37,7 +37,7 @@ public class BootstrapInteropService
     
     public async ValueTask InjectPrismJsAsync()
     {
-        if (_moduleTask != null)
+        if (_moduleTask is not null)
         {
             var module = await _moduleTask.Value;
             await module.InvokeVoidAsync("injectPrismJSAsync");
@@ -46,7 +46,7 @@ public class BootstrapInteropService
     
     public async ValueTask InjectApplicationScriptAsync()
     {
-        if (_moduleTask != null)
+        if (_moduleTask is not null)
         {
             var module = await _moduleTask.Value;
             await module.InvokeVoidAsync("injectApplicationScriptAsync", _configuration["BlockfrostProjectId"]);
