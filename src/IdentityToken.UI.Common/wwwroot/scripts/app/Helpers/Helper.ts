@@ -13,18 +13,22 @@
     
     public static ScrollToElementBottom(selector: string) {
         const element = document.querySelector(selector) as HTMLElement;
-        element.scrollTop = element.scrollHeight;
+        
+        if(element)
+            element.scrollTop = element.scrollHeight;
     }
     
     public static GetElementScrollTop(selector: string) {
         const element = document.querySelector(selector) as HTMLElement;
-        return element.scrollTop;
+        return element?.scrollTop ?? 0;
     }
     
     public static ScrollToMessageId(id: string) {
         const messageContainer = document.querySelector('#message-container') as HTMLElement;
         const targetMessageElement = document.querySelector(`[data-id="${id}"]`) as HTMLElement;
-        messageContainer.scrollTop = targetMessageElement.offsetTop - 441;
+        
+        if(messageContainer && targetMessageElement)
+            messageContainer.scrollTop = targetMessageElement.offsetTop - 441;
     }
 }
 
