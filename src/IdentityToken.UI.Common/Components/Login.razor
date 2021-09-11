@@ -4,7 +4,10 @@
     <div class="flex w-[650px] h-[350px] max-auto bg-gradient-to-r from-[#7A60C9] to-[#4C4CE8] mx-auto rounded-md shadow">
         <div class="flex flex-1 p-10 flex-wrap content-center">
             <div class="w-[260px] h-[260px] bg-white mx-auto rounded-md overflow">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1024px-QR_code_for_mobile_English_Wikipedia.svg.png" alt="qr_code"/>
+                @if (!string.IsNullOrEmpty(WalletAddressQr))
+                {
+                    <img class="w-[260px] h-[260px]" src="@WalletAddressQr" alt="qr_code"/>
+                }
             </div>
         </div>
         <div class="flex flex-1 p-5 flex-wrap content-center">
@@ -19,9 +22,9 @@
                 <div class="flex flex-col mt-10 mb-5 p-5 bg-white bg-opacity-30 rounded-md">
                     <div class="text-white text-lg">Wallet Address</div>
                     <div class="flex text-white text-lg">
-                        <div class="flex-1 overflow-hidden truncate w-2 text-xs overflow-hidden opacity-70 mr-2">addr1qy29mexuywzsvcptf2uq905xksh97s4u75055d8lhyaq460h4fdmk4dfdthfanlz28x5z3gn2udh94alk7em43c6dn5qjl32r0</div>
+                        <div class="flex-1 overflow-hidden truncate w-2 text-xs overflow-hidden opacity-70 mr-2">@WalletAddress</div>
                         <div>
-                            <button class="w-[20px] h-[20px]">
+                            <button class="w-[20px] h-[20px]" @onclick="OnBtnCopyAddressClicked">
                                 <img src="/_content/IdentityToken.UI.Common/images/copy_icon.svg" alt="copy" />
                             </button>
                         </div>
@@ -32,9 +35,22 @@
     </div>
     <div class="m-10 text-lg text-idt-gray text-center"><i>OR</i></div>
     <div class="flex w-full">
-        <button class="select-none mx-auto h-[48px] w-[250px] text-sm rounded-full bg-gradient-to-r from-[#7A60C9] to-[#4C4CE8] text-white">
+        <button @onclick="OnBtnConnectWithCardanoClicked" class="select-none mx-auto h-[48px] w-[250px] text-sm rounded-full bg-gradient-to-r from-[#7A60C9] to-[#4C4CE8] text-white">
             <img class="w-[30px] h-[30px] inline-block mr-2" src="/_content/IdentityToken.UI.Common/images/cardano_btn_icon.svg" alt="copy" />
             <span>Connect with Cardano</span>
         </button>
     </div>
+    @if (IsLoading)
+    {
+        <div class="w-full h-full absolute bg-white bg-opacity-90 left-[0px]">
+            <div class="flex flex-col w-full h-full justify-center items-center">
+                <div style="border-top-color:transparent"
+                     class="w-32 h-32 border-8 border-idt-purple border-solid rounded-full animate-spin"></div>
+                <div class="w-full mt-6 text-center text-lg text-idt-purple tracking-wide font-normal">@LoadingMessage</div>   
+            </div>
+        </div>
+    }
 </div>
+
+<Toast Message="Wallet Address copied to clipboard." IsError="@false" @bind-ShouldShow="@HasJustCopied"/>
+<Toast Message="Transaction Submission failed!" IsError="@true" @bind-ShouldShow="@IsTxFailed"/>

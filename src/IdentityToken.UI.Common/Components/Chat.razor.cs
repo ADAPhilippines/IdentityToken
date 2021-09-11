@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using IdentityToken.Common.Models;
+using IdentityToken.UI.Common.Services;
 using IdentityToken.UI.Common.Services.JSInterop;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.Configuration;
@@ -16,6 +18,8 @@ namespace IdentityToken.UI.Common.Components
         
         [Inject] private HelperInteropService? HelperInteropService { get; set; }
         [Inject] private IConfiguration? Config { get; set; }
+        [Inject] private ILocalStorageService? LocalStorageService { get; set; }
+        [Inject] private AuthService? AuthService { get; set; }
         private HubConnection? HubConnection { get; set; }
         private List<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
         private string CurrentMessage { get; set; } = string.Empty;
@@ -23,19 +27,25 @@ namespace IdentityToken.UI.Common.Components
         private bool IsLoadingHistoryScroll { get; set; } = false;
         private ChatMessage? CurrentFirstHistoryMessage { get; set; }
 
-        protected override async Task OnInitializedAsync()
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            HubConnection = new HubConnectionBuilder()
-                .WithUrl($"{Config.GetValue<string>("APIUrl")}/chat")
-                .Build();
+            if (firstRender)
+            {
+                HubConnection = new HubConnectionBuilder()
+                    .WithUrl($"{Config.GetValue<string>("APIUrl")}/chat")
+                    .Build();
 
-            HubConnection.On<ChatMessage>("ReceiveMessage", OnReceiveMessage);
-            HubConnection.On<AuthenticatedIdentity>("Authenticated", OnAuthenticated);
-            HubConnection.On<IEnumerable<ChatMessage>>("ReceiveChatHistory", OnReceiveChatHistory);
-            
-            await HubConnection.StartAsync();
-            await HubConnection.SendAsync("Authenticate",
-                "2845ea4b4b0f388a60b92d25f14fab95c5677ee09837de9a14650f1872942075");
+                HubConnection.On<ChatMessage>("ReceiveMessage", OnReceiveMessage);
+                HubConnection.On<AuthenticatedIdentity>("Authenticated", OnAuthenticated);
+                HubConnection.On<IEnumerable<ChatMessage>>("ReceiveChatHistory", OnReceiveChatHistory);
+
+                if (LocalStorageService is null) return;
+                var identity = await LocalStorageService.GetItemAsync<AuthenticatedIdentity>("identity");
+                
+                await HubConnection.StartAsync();
+                await HubConnection.SendAsync("Authenticate", identity.Key);
+            }
+            await base.OnAfterRenderAsync(firstRender);
         }
 
         private async void OnReceiveMessage(ChatMessage message)
@@ -83,6 +93,11 @@ namespace IdentityToken.UI.Common.Components
                 CurrentMessage = string.Empty;
             }
             StateHasChanged();
+        }
+
+        private void OnBtnLogoutClicked()
+        {
+            AuthService?.Logout();
         }
 
         private async void OnCurrentMessageKeyup(KeyboardEventArgs e)

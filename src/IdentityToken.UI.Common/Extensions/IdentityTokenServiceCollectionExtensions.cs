@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Blazored.LocalStorage;
 using IdentityToken.UI.Common.Services.JSInterop;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
+using IdentityToken.UI.Common.Services;
 
 namespace IdentityToken.UI.Common.Extensions;
 
@@ -17,6 +19,8 @@ public static class IdentityTokenServiceCollectionExtensions
         services.AddScoped<BootstrapInteropService>();
         services.AddScoped<CardanoWalletInteropService>();
         services.AddScoped<HelperInteropService>();
+        services.AddScoped<AuthService>();
+        services.AddBlazoredLocalStorage();
         AddApiHttpClient(services, builder.Configuration.GetValue<string>("APIUrl"));
         return services;
     }
@@ -33,6 +37,8 @@ public static class IdentityTokenServiceCollectionExtensions
         services.AddScoped<BootstrapInteropService>();
         services.AddScoped<CardanoWalletInteropService>();
         services.AddScoped<HelperInteropService>();
+        services.AddScoped<AuthService>();
+        services.AddBlazoredLocalStorage();
         AddApiHttpClient(services, builder.Configuration.GetValue<string>("APIUrl"));
         return services;
     }
@@ -43,6 +49,6 @@ public static class IdentityTokenServiceCollectionExtensions
         {
             BaseAddress = new Uri(apiUrl)
         };
-        services.AddScoped(sp => httpClient);
+        services.AddSingleton(sp => httpClient);
     }
 }

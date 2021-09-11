@@ -15,9 +15,9 @@
                 <span class="inline-block align-text-middle text-idt-gray">@($"@{CurrentUser?.Username}")</span>
             </div>
             <div class="flex flex-row flex-grow w-full flex-wrap content-center">
-                <span class="text-right w-full">
+                <span class="text-right w-full hover:cursor-pointer" @onclick="OnBtnLogoutClicked">
                     <img class="w-[28px] h-[28px] inline-block align-text-right mr-2" src="/_content/IdentityToken.UI.Common/images/logout_icon.svg" alt="logout_icon"/>
-                    <span class="inline-block align-text-right text-idt-gray">logout</span>
+                    <span class="inline-block align-text-right text-idt-gray hover:underline">logout</span>
                 </span>
             </div>
         }
@@ -33,7 +33,7 @@
                                 <li class="py-2 bg-white rounded-md shadow mt-5" data-id="@m.Id">
                                     <div class="flex space-x-3 p-2">
                                         <span class="inline-block relative">
-                                            <img class="h-12 w-12 rounded-full border-solid border-4 border-idt-gray-2" src="https://ipfs.blockfrost.dev/ipfs/@(CurrentUser?.Avatar?.Replace("ipfs://", string.Empty))" alt="avatar">
+                                            <img class="h-12 w-12 rounded-full border-solid border-4 border-idt-gray-2" src="https://ipfs.blockfrost.dev/ipfs/@(m.Sender?.Avatar?.Replace("ipfs://", string.Empty))" alt="avatar">
                                             <span class="absolute top-[2px] right-[4px] block h-2 w-2 rounded-full ring-2 ring-white bg-green-400"></span>
                                         </span>
                                         <div class="flex-1 space-y-1">
