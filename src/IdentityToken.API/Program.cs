@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http.Connections;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
-builder.Services.AddSignalR(hubOptions);
+builder.Services.AddSignalR();
 builder.Services.AddIdentityDbContextFactory(o => o.UseNpgsql(builder.Configuration.GetConnectionString("IdentityTokenDb")));
 builder.Services.AddControllers();
 builder.Services.AddHttpClient("blockfrost", c =>
