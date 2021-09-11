@@ -7,7 +7,7 @@
         {
             <div class="flex flex-wrap content-center mr-3 w-[86px] h-[64px]">
                 <span class="inline-block relative">
-                    <img class="h-[64px] w-[64px] rounded-full border-solid border-4 border-white" src="https://ipfs.blockfrost.dev/ipfs/@(CurrentUser?.Avatar?.Replace("ipfs://", string.Empty))" alt="avatar">
+                    <img class="h-[64px] w-[64px] rounded-full border-solid border-4 border-white" src="https://cloudflare-ipfs.com/ipfs/@(CurrentUser?.Avatar?.Replace("ipfs://", string.Empty))" alt="avatar">
                     <span class="absolute top-[3px] right-[5px] block h-3 w-3 rounded-full ring-2 ring-white bg-green-400"></span>
                 </span>
             </div>
@@ -33,8 +33,8 @@
                                 <li class="py-2 bg-white rounded-md shadow mt-5" data-id="@m.Id">
                                     <div class="flex space-x-3 p-2">
                                         <span class="inline-block relative">
-                                            <img class="h-12 w-12 rounded-full border-solid border-4 border-idt-gray-2" src="https://ipfs.blockfrost.dev/ipfs/@(m.Sender?.Avatar?.Replace("ipfs://", string.Empty))" alt="avatar">
-                                            <span class="absolute top-[2px] right-[4px] block h-2 w-2 rounded-full ring-2 ring-white bg-green-400"></span>
+                                            <img class="h-12 w-12 rounded-full border-solid border-4 border-idt-gray-2" src="https://cloudflare-ipfs.com/ipfs/@(m.Sender?.Avatar?.Replace("ipfs://", string.Empty))" alt="avatar">
+                                            <span class="absolute top-[2px] right-[4px] block h-2 w-2 rounded-full ring-2 ring-white @(IsUserOnline(m.Sender) ? "bg-green-400":"bg-gray-400")"></span>
                                         </span>
                                         <div class="flex-1 space-y-1">
                                             <div class="flex items-center justify-between">
@@ -69,123 +69,22 @@
         </div>
         <div class="col-span-3 bg-white shadow h-[610px] overflow-auto">
             <ul role="list" class="divide-y divide-gray-200 w-full">
-                <li class="py-1 mb-1">
-                    <div class="flex space-x-3 p-2">
-                        <span class="inline-block relative">
-                            <img class="h-12 w-12 rounded-full border-solid border-4 border-idt-gray-2" src="https://ipfs.blockfrost.dev/ipfs/@(CurrentUser?.Avatar?.Replace("ipfs://", string.Empty))" alt="avatar">
-                            <span class="absolute top-[2px] right-[4px] block h-2 w-2 rounded-full ring-2 ring-white bg-green-400"></span>
-                        </span>
-                        <div class="flex flex-1 space-y-1 content-center">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-sm font-medium text-idt-gray">@@ClarkAlesna</h3>
+                @foreach (var user in Users)
+                {
+                    <li class="py-1 mb-1">
+                        <div class="flex space-x-3 p-2">
+                            <span class="inline-block relative">
+                                <img class="h-12 w-12 rounded-full border-solid border-4 border-idt-gray-2" src="https://cloudflare-ipfs.com/ipfs/@(user.Identity?.Avatar?.Replace("ipfs://", string.Empty))" alt="avatar">
+                                <span class="absolute top-[2px] right-[4px] block h-2 w-2 rounded-full ring-2 ring-white bg-green-400"></span>
+                            </span>
+                            <div class="flex flex-1 space-y-1 content-center">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-sm font-medium text-idt-gray">@@@user?.Identity?.Username</h3>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </li>
-                <li class="py-1 mb-1">
-                    <div class="flex space-x-3 p-2">
-                        <span class="inline-block relative">
-                            <img class="h-12 w-12 rounded-full border-solid border-4 border-idt-gray-2" src="https://ipfs.blockfrost.dev/ipfs/@(CurrentUser?.Avatar?.Replace("ipfs://", string.Empty))" alt="avatar">
-                            <span class="absolute top-[2px] right-[4px] block h-2 w-2 rounded-full ring-2 ring-white bg-green-400"></span>
-                        </span>
-                        <div class="flex flex-1 space-y-1 content-center">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-sm font-medium text-idt-gray">@@ClarkAlesna</h3>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li class="py-1 mb-1">
-                    <div class="flex space-x-3 p-2">
-                        <span class="inline-block relative">
-                            <img class="h-12 w-12 rounded-full border-solid border-4 border-idt-gray-2" src="https://ipfs.blockfrost.dev/ipfs/@(CurrentUser?.Avatar?.Replace("ipfs://", string.Empty))" alt="avatar">
-                            <span class="absolute top-[2px] right-[4px] block h-2 w-2 rounded-full ring-2 ring-white bg-green-400"></span>
-                        </span>
-                        <div class="flex flex-1 space-y-1 content-center">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-sm font-medium text-idt-gray">@@ClarkAlesna</h3>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li class="py-1 mb-1">
-                    <div class="flex space-x-3 p-2">
-                        <span class="inline-block relative">
-                            <img class="h-12 w-12 rounded-full border-solid border-4 border-idt-gray-2" src="https://ipfs.blockfrost.dev/ipfs/@(CurrentUser?.Avatar?.Replace("ipfs://", string.Empty))" alt="avatar">
-                            <span class="absolute top-[2px] right-[4px] block h-2 w-2 rounded-full ring-2 ring-white bg-green-400"></span>
-                        </span>
-                        <div class="flex flex-1 space-y-1 content-center">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-sm font-medium text-idt-gray">@@ClarkAlesna</h3>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li class="py-1 mb-1">
-                    <div class="flex space-x-3 p-2">
-                        <span class="inline-block relative">
-                            <img class="h-12 w-12 rounded-full border-solid border-4 border-idt-gray-2" src="https://ipfs.blockfrost.dev/ipfs/@(CurrentUser?.Avatar?.Replace("ipfs://", string.Empty))" alt="avatar">
-                            <span class="absolute top-[2px] right-[4px] block h-2 w-2 rounded-full ring-2 ring-white bg-green-400"></span>
-                        </span>
-                        <div class="flex flex-1 space-y-1 content-center">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-sm font-medium text-idt-gray">@@ClarkAlesna</h3>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li class="py-1 mb-1">
-                    <div class="flex space-x-3 p-2">
-                        <span class="inline-block relative">
-                            <img class="h-12 w-12 rounded-full border-solid border-4 border-idt-gray-2" src="https://ipfs.blockfrost.dev/ipfs/@(CurrentUser?.Avatar?.Replace("ipfs://", string.Empty))" alt="avatar">
-                            <span class="absolute top-[2px] right-[4px] block h-2 w-2 rounded-full ring-2 ring-white bg-green-400"></span>
-                        </span>
-                        <div class="flex flex-1 space-y-1 content-center">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-sm font-medium text-idt-gray">@@ClarkAlesna</h3>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li class="py-1 mb-1">
-                    <div class="flex space-x-3 p-2">
-                        <span class="inline-block relative">
-                            <img class="h-12 w-12 rounded-full border-solid border-4 border-idt-gray-2" src="https://ipfs.blockfrost.dev/ipfs/@(CurrentUser?.Avatar?.Replace("ipfs://", string.Empty))" alt="avatar">
-                            <span class="absolute top-[2px] right-[4px] block h-2 w-2 rounded-full ring-2 ring-white bg-green-400"></span>
-                        </span>
-                        <div class="flex flex-1 space-y-1 content-center">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-sm font-medium text-idt-gray">@@ClarkAlesna</h3>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li class="py-1 mb-1">
-                    <div class="flex space-x-3 p-2">
-                        <span class="inline-block relative">
-                            <img class="h-12 w-12 rounded-full border-solid border-4 border-idt-gray-2" src="https://ipfs.blockfrost.dev/ipfs/@(CurrentUser?.Avatar?.Replace("ipfs://", string.Empty))" alt="avatar">
-                            <span class="absolute top-[2px] right-[4px] block h-2 w-2 rounded-full ring-2 ring-white bg-green-400"></span>
-                        </span>
-                        <div class="flex flex-1 space-y-1 content-center">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-sm font-medium text-idt-gray">@@ClarkAlesna</h3>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li class="py-1 mb-1">
-                    <div class="flex space-x-3 p-2">
-                        <span class="inline-block relative">
-                            <img class="h-12 w-12 rounded-full border-solid border-4 border-idt-gray-2" src="https://ipfs.blockfrost.dev/ipfs/@(CurrentUser?.Avatar?.Replace("ipfs://", string.Empty))" alt="avatar">
-                            <span class="absolute top-[2px] right-[4px] block h-2 w-2 rounded-full ring-2 ring-white bg-green-400"></span>
-                        </span>
-                        <div class="flex flex-1 space-y-1 content-center">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-sm font-medium text-idt-gray">@@ClarkAlesna</h3>
-                            </div>
-                        </div>
-                    </div>
-                </li>
+                    </li>
+                }
             </ul>
         </div>
     </div>
