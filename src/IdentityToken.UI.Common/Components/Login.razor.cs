@@ -57,6 +57,7 @@ namespace IdentityToken.UI.Common.Components
             IsLoading = true;
             LoadingMessage = "Signing and Submitting Transaction...";
             await InvokeAsync(StateHasChanged);
+            
             var txHash = await CardanoWalletInteropService.SendAdaAsync(new[]
             {
                 new TxOutput()
@@ -68,8 +69,9 @@ namespace IdentityToken.UI.Common.Components
 
             if (txHash is not null && AuthService is not null && LocalStorageService is not null)
             {
-                LoadingMessage = $"Transaction Submitted to the Blockchain! Confirming Tx: {txHash}";
+                LoadingMessage = $"Transaction Submitted to the Blockchain! Waiting for Confirmation. TxID: {txHash}";
                 await InvokeAsync(StateHasChanged);
+                
                 await CardanoWalletInteropService.GetTransactionAsync(txHash);
                 var identity = await AuthService.Authorize(WalletAddress);
                 
@@ -77,6 +79,8 @@ namespace IdentityToken.UI.Common.Components
                 await InvokeAsync(StateHasChanged);
                 
                 await LocalStorageService.SetItemAsync("identity", identity);
+                
+                await Task.Delay(1000);
                 AuthService.Authorized();
             }
             else

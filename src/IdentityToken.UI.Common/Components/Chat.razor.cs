@@ -26,6 +26,7 @@ namespace IdentityToken.UI.Common.Components
         private AuthenticatedIdentity? CurrentUser { get; set; }
         private bool IsLoadingHistoryScroll { get; set; } = false;
         private ChatMessage? CurrentFirstHistoryMessage { get; set; }
+        private bool IsLoading { get; set; } = true;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -71,6 +72,7 @@ namespace IdentityToken.UI.Common.Components
         private async void OnReceiveChatHistory(IEnumerable<ChatMessage> messages)
         {
             Messages.InsertRange(0, messages);
+            IsLoading = false;
             await InvokeAsync(StateHasChanged);
             
             if (HelperInteropService is null) return;
@@ -83,6 +85,7 @@ namespace IdentityToken.UI.Common.Components
                 IsLoadingHistoryScroll = false;
                 await InvokeAsync(StateHasChanged);
             }
+            
         }
 
         private async void OnBtnSendClicked()
