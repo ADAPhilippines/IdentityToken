@@ -1,26 +1,26 @@
 
-<div class="flex flex-col w-full h-full justify-center mx-auto p-10 pb-20">
+<div class="flex flex-col w-full h-full justify-center mx-auto p-5 pb-10 xl:p-10 lg:pb-20">
     <div class="text-2xl tracking-wide text-idt-purple w-full text-center mt-10 mb-10">Login</div>
-    <div class="flex w-[650px] h-[350px] max-auto bg-gradient-to-r from-[#7A60C9] to-[#4C4CE8] mx-auto rounded-md shadow">
-        <div class="flex flex-1 p-10 flex-wrap content-center">
-            <div class="w-[260px] h-[260px] bg-white mx-auto rounded-md overflow">
+    <div class="flex flex-col w-11/12 md:flex-row xl:w-[650px] xl:h-[350px] max-auto bg-gradient-to-r from-[#7A60C9] to-[#4C4CE8] mx-auto rounded-md shadow">
+        <div class="flex flex-1 p-10 pb-3 md:pb-10 flex-wrap content-center">
+            <div class="w-9/12 max-w-[260px] xl:w-[260px] bg-white mx-auto rounded-md overflow">
                 @if (!string.IsNullOrEmpty(WalletAddressQr))
                 {
-                    <img class="w-[260px] h-[260px]" src="@WalletAddressQr" alt="qr_code"/>
+                    <img class="w-full h-full" src="@WalletAddressQr" alt="qr_code"/>
                 }
             </div>
         </div>
-        <div class="flex flex-1 p-5 flex-wrap content-center">
-            <div class="flex flex-col p-2 w-full">
-                <div class="mt-2 mb-2 text-white text-lg pl-5 r-5">Send 1.2 ADA to login*</div>
-                <div class="text-xs text-idt-gray-light-2 pl-5 r-5">
+        <div class="flex flex-1 w-full pt-0 pb-5 mx-auto md:mx-0 md:w-auto md:p-5 flex-wrap justify-center content-center">
+            <div class="flex flex-col p-0 xl:p-2 w-full">
+                <div class="mt-0 md:mt-2 mb-2 text-white text-lg px-5 r-5 text-center md:text-left">Send 1.2 ADA to login*</div>
+                <div class="text-xs text-idt-gray-light-2 px-5 r-5 text-center md:text-left">
                     <span>*1 ADA will be returned, only </span>
                     <b>0.2 processing fee</b>
                     <span>is required.</span>
                 </div>
                 
-                <div class="flex flex-col mt-10 mb-5 p-5 bg-white bg-opacity-30 rounded-md">
-                    <div class="text-white text-lg">Wallet Address</div>
+                <div class="flex flex-col mx-5 md:mx-0 mt-5 lg:mt-10 mb-5 p-5 bg-white bg-opacity-30 rounded-md">
+                    <div class="text-white text-lg text-center md:text-left">Wallet Address</div>
                     <div class="flex text-white text-lg">
                         <div class="flex-1 overflow-hidden truncate w-2 text-xs overflow-hidden opacity-70 mr-2">@WalletAddress</div>
                         <div>
