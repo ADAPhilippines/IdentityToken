@@ -1,35 +1,46 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.JSInterop;
 
-namespace IdentityToken.UI.Common.Services.JSInterop
+namespace IdentityToken.UI.Common.Services.JSInterop;
+
+public class BootstrapInteropService
 {
-    public class BootstrapInteropService
+    private readonly Lazy<Task<IJSObjectReference>>? _moduleTask;
+    private readonly IConfiguration _configuration;
+    
+    public BootstrapInteropService(IJSRuntime jsRuntime, IConfiguration config)
     {
-        private readonly Lazy<Task<IJSObjectReference>>? _moduleTask;
+        _configuration = config;
+        _moduleTask = new Lazy<Task<IJSObjectReference>>(() => jsRuntime.InvokeAsync<IJSObjectReference>(
+            "import", "./_content/IdentityToken.UI.Common/bootstrap.js").AsTask());
+    }
 
-        public BootstrapInteropService(IJSRuntime jsRuntime)
+    public async ValueTask InjectStyleSheetAsync(string path)
+    {
+        if (_moduleTask != null)
         {
-            _moduleTask = new Lazy<Task<IJSObjectReference>>(() => jsRuntime.InvokeAsync<IJSObjectReference>(
-                "import", "./_content/IdentityToken.UI.Common/bootstrap.js").AsTask());
+            var module = await _moduleTask.Value;
+            await module.InvokeVoidAsync("injectStyleSheetAsync", path);
         }
+    }
 
-        public async ValueTask InjectStyleSheetAsync(string path)
+    public async ValueTask InjectGoogleFontAsync(string url)
+    {
+        if (_moduleTask != null)
         {
-            if (_moduleTask != null)
-            {
-                var module = await _moduleTask.Value;
-                await module.InvokeVoidAsync("injectStyleSheetAsync", path);
-            }
+            var module = await _moduleTask.Value;
+            await module.InvokeVoidAsync("injectGoogleFontAsync", url);
         }
-
-        public async ValueTask InjectGoogleFontAsync(string url)
+    }
+    
+    public async ValueTask InjectApplicationScriptAsync()
+    {
+        if (_moduleTask != null)
         {
-            if (_moduleTask != null)
-            {
-                var module = await _moduleTask.Value;
-                await module.InvokeVoidAsync("injectGoogleFontAsync", url);
-            }
+            var module = await _moduleTask.Value;
+            await module.InvokeVoidAsync("injectApplicationScriptAsync", _configuration["BlockfrostProjectId"]);
         }
     }
 }

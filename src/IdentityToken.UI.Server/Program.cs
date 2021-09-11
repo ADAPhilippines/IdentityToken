@@ -1,7 +1,7 @@
-using IdentityToken.UI.Common;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using IdentityToken.UI.Common.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
