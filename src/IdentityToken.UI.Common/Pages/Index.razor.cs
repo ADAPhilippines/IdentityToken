@@ -22,5 +22,10 @@ namespace IdentityToken.UI.Common.Pages
         {
             ActivePanel = panel;
         }
+
+        private void OnMintSuccess(EventArgs args)
+        {
+            ActivePanel = "demo";
+        }
     }
 }

@@ -8,7 +8,7 @@ namespace IdentityToken.UI.Common.Shared
     public partial class MainLayout
     {
         [Inject] private BootstrapInteropService? BootstrapInteropService { get; set; }
-
+        private bool IsLoading { get; set; } = true;
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
@@ -30,6 +30,9 @@ namespace IdentityToken.UI.Common.Shared
                     };
 
                     await Task.WhenAll(taskList);
+                    IsLoading = false;
+                    await Task.Delay(50);
+                    await InvokeAsync(StateHasChanged);
                 }
 
             await base.OnAfterRenderAsync(firstRender);

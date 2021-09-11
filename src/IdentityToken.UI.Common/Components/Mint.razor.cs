@@ -48,6 +48,8 @@ namespace IdentityToken.UI.Common.Components
 
         private bool IsLoading { get; set; }
         private string LoadingMessage { get; set; } = string.Empty;
+        
+        [Parameter]public EventCallback<EventArgs> MintSuccess { get; set; }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -75,7 +77,7 @@ namespace IdentityToken.UI.Common.Components
                 ShowToast(true, "Username and Avatar fields are required.");
                 return;
             }
-
+            
             if (TokenMetadata.Where(m => m.Key.Length > 0).GroupBy(m => m.Key.Trim())
                 .Any(c => c.Key.Length > 0 && c.Count() > 1))
             {
@@ -83,7 +85,7 @@ namespace IdentityToken.UI.Common.Components
                 ShowToast(true, "Duplicate Keys Detected!");
                 return;
             }
-
+            
             var username = TokenMetadata[0].Value;
             var avatar = TokenMetadata[1].Value;
             
@@ -92,23 +94,23 @@ namespace IdentityToken.UI.Common.Components
             {
                 var key = metadata.Key.Trim();
                 var value = metadata.Value.Trim();
-
+            
                 if (key.Length > 0 
                     && value.Length > 0 
                     && !key.Contains("username") 
                     && !key.Contains("avatar"))
                     metadataDictionary.Add(key, value);
             }
-
+            
             var metadataString = JsonSerializer.Serialize(metadataDictionary);
             
             LoadingMessage = "Building Transaction...";
             if (CardanoWalletInteropService is null) return;
-
+            
             var isWalletConnected = await CardanoWalletInteropService.IsWalletConnectedAsync();
             if (!isWalletConnected)
                 isWalletConnected = await CardanoWalletInteropService.ConnectWalletAsync();
-
+            
             if (!isWalletConnected) return;
             
             LoadingMessage = "Signing and Submitting Transaction...";
@@ -122,7 +124,7 @@ namespace IdentityToken.UI.Common.Components
                 return;
             }
             
-            LoadingMessage = $"Transaction Submitted to the Blockchain! Confirming Tx: {txHash}";
+            LoadingMessage = $"Transaction Submitted to the Blockchain! Waiting for Confirmation. TxID: {txHash}";
             await InvokeAsync(StateHasChanged);
             
             var tx = await CardanoWalletInteropService.GetTransactionAsync(txHash);
@@ -137,6 +139,9 @@ namespace IdentityToken.UI.Common.Components
             TokenMetadata = TokenMetadataInitialState;
             ShowToast(false, $"Minting Transaction Successful!");
             await InvokeAsync(StateHasChanged);
+
+            await Task.Delay(2000);
+            await MintSuccess.InvokeAsync();
         }
 
         private void OnAddNewMetadataBtnClicked()
