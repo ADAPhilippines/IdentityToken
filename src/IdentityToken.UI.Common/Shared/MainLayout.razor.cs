@@ -8,11 +8,12 @@ namespace IdentityToken.UI.Common.Shared
     public partial class MainLayout
     {
         [Inject] private BootstrapInteropService? BootstrapInteropService { get; set; }
+        [Inject] private HelperInteropService? HelperInteropService { get; set; }
         private bool IsLoading { get; set; } = true;
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
-                if (BootstrapInteropService != null)
+                if (BootstrapInteropService is not null)
                 {
                     var taskList = new List<Task>
                     {
@@ -31,7 +32,9 @@ namespace IdentityToken.UI.Common.Shared
 
                     await Task.WhenAll(taskList);
                     IsLoading = false;
-                    await Task.Delay(50);
+                    await Task.Delay(1000);
+                    if(HelperInteropService is not null)
+                        await HelperInteropService.HighlightAllCodeElementsAsync();
                     await InvokeAsync(StateHasChanged);
                 }
 

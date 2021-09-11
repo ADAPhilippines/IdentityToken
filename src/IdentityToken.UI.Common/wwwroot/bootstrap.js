@@ -54,11 +54,9 @@ export async function injectPrismJSAsync() {
             let prismJsAutoloader = document.createElement('script');
             prismJsAutoloader.setAttribute('src', 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/plugins/autoloader/prism-autoloader.min.js');
             prismJsAutoloader.onload = () => {
-                window.Prism.highlightAll();
                 resolve();
             };
             document.head.appendChild(prismJsAutoloader);
-            resolve();
         };
         document.head.appendChild(prismJs);
     });

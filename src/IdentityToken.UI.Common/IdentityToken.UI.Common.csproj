@@ -15,6 +15,7 @@
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.0-preview.7.21378.6" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.0-preview.7.21378.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0-preview.7.21377.19" />
+    <PackageReference Include="Blazored.LocalStorage" Version="4.1.5" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,9 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Blazored.LocalStorage, Version=1.0.0.0, Culture=neutral, PublicKeyToken=3c577f5cf869402a">
-      <HintPath>..\..\..\..\..\..\..\Users\rawriclark\.nuget\packages\blazored.localstorage\4.1.5\lib\net5.0\Blazored.LocalStorage.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.AspNetCore, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' ">
       <HintPath>/usr/local/share/dotnet/shared/Microsoft.AspNetCore.App/6.0.0-preview.7.21378.6/Microsoft.AspNetCore.dll</HintPath>
     </Reference>

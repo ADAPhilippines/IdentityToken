@@ -42,4 +42,10 @@ public class HelperInteropService
         if (_jsRuntime is null) return string.Empty;
         return await _jsRuntime.InvokeAsync<string>("window.CopyToClipboardAsync", data);
     }
+    
+    public async Task HighlightAllCodeElementsAsync()
+    {
+        if (_jsRuntime is null) return;
+        await _jsRuntime.InvokeVoidAsync("Prism.highlightAll");
+    }
 }
