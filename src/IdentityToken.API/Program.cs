@@ -6,12 +6,7 @@ using Microsoft.AspNetCore.Http.Connections;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
-builder.Services.AddSignalR(hubOptions => {
-    hubOptions.ClientTimeoutInterval = TimeSpan.FromSeconds(1);
-    hubOptions.HandshakeTimeout = TimeSpan.FromSeconds(10);
-    hubOptions.KeepAliveInterval = TimeSpan.FromSeconds(10);
-    hubOptions.EnableDetailedErrors = true;
-});
+builder.Services.AddSignalR(hubOptions);
 builder.Services.AddIdentityDbContextFactory(o => o.UseNpgsql(builder.Configuration.GetConnectionString("IdentityTokenDb")));
 builder.Services.AddControllers();
 builder.Services.AddHttpClient("blockfrost", c =>
