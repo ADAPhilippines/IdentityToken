@@ -77,6 +77,7 @@ public class ChatHub : Hub
             {
                 var userLastActivity = chatUser.LastActivity;
                 chatUser.LastActivity = DateTime.UtcNow;
+                chatUser.IsOnline = true;
                 var chatMessage = new ChatMessage
                 {
                     Sender = chatUser.Identity,
@@ -89,8 +90,6 @@ public class ChatHub : Hub
 
                 if(userLastActivity < DateTime.UtcNow.AddMinutes(-5))
                 {
-                    chatUser.IsOnline = true;
-                    await _identityDbContext.SaveChangesAsync();
                     await Clients.All.SendAsync("ReceiveOnlineUsers",  await GetOnlineUsersAsync());
                 }
             }
