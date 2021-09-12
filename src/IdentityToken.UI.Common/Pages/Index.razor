@@ -14,11 +14,42 @@
             </div>
             <div class="justify-center mt-12 mb-12">
                 <p class="w-10/12 md:w-7/12 text-lg leading-6 md:text-xl tracking-wide md:leading-12 font-medium text-center mx-auto text-secondary">
-                    Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt
-                    ut laoreet dolore magna aliquam erat volutpat.
+                    Welcome to <b>IdentityToken</b>! But wait, what is it? Is it a token sale? an ICO? an NFT? <br />
+                    <br />
+                    <b>NO</b>, we are not selling anything!
+                    <br />
+                    <br />
+                    <b>IdentityToken</b> is an idea, the idea of owning your identity and bringing it with you. Eliminating the need for custodians and middlemen for managing your identity. Eliminating passwords and centralized databases for authentication.
+                    <br />
+                    <br />
+                    Using the <b>Cardano</b> Blockchain and its Native Asset feature. We are proud to present our proof of concept of the <b>IdentityToken</b> as a means of authentication.
+                    <br />
+                    <br />
+                    In this page, you will be able to mint your own <b>IdentityToken</b> right in your browser. Without centralized servers and you will be able to receive it directly in your wallet as a <b>Cardano</b> native asset. 
+                    <br />
+                    <br />
+                    Once minted, you will be able to prove your identity to services that will support the protocol. We provide a demo chat-service to show an example on how it could be used. But <b>IdentityToken</b> could be utilized for so much more use-cases.
+                    <br />
+                    <br />
+                    Potential Applications: 
+                        <b>NFT Ownership Tracking</b>,
+                        <b>Cardano Social Media Profile</b>,
+                        <b>Linking third-party service (Discord, Twitter) to your Cardano Wallet</b>,
+                    the possibilities are endless!
+                    <br />
+                    <br />
+                    We will provide a technical white-paper in the future (coming soon™), detailing the rules of the <b>IdentityToken</b> as a protocol and how to use it.
+                    In the meantime you can explore out <a href="https://github.com/ADAPhilippines/IdentityToken" target="_blank"><b class="underline">GitHub</b></a> page.
+                    We think it could compliment other authentication protocols like the <a href="https://oauth.net/2/" target="_blank"><b class="underline">OAuth2</u></b></a> protocol.
+                    <br />
+                    <br />
+                    Finally, We don't expect <b>IdentityToken</b> to suddenly be the standard of authentication, we are simply sharing an idea. A glimpse of a decentralized future. A showcase of what <b>Cardano</b> can do, even without smart-contracts!
+                    <br/>
+                    <br/>
+                    If you would like to know more, please <a href="mailto:dev.adaph.io@outlook.com"><b class="underline">contact us</b></a>.
                 </p>
             </div>
-            <div class="flex flex-col rounded-md w-11/12 xl:w-8/12 bg-white bg-opacity-70 mt-10 mb-32 mx-auto overflow-hidden relative z-1 demo-panel-shadow">
+            <div id="demo" class="flex flex-col rounded-md w-11/12 xl:w-8/12 bg-white bg-opacity-70 mt-10 mb-32 mx-auto overflow-hidden relative z-1 demo-panel-shadow">
                 <div class="flex w-full">
                     <nav class="flex flex-grow relative z-0 shadow flex" aria-label="Tabs">
                         <div @onclick="@(() => SwitchActivePanel("mint"))"
@@ -54,42 +85,77 @@
                 <h3 class="w-full text-4xl tracking-wide font-bold text-center text-primary">For Developers</h3>
                 <div class="w-full justify-center mt-12 mb-12">
                     <p class="w-10/12 md:w-7/12 text-lg leading-6 md:text-xl tracking-wide md:leading-12 font-medium text-center mx-auto text-idt-gray">
-                        Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt
-                        ut laoreet dolore magna aliquam erat volutpat.
+                        Assuming you have a backend-server utilizing <b>IdentityToken</b> for authentication. Here is how the authentication flow would look like:
                     </p>
                 </div>
                 <div class="w-10/12 rounded-md overflow-hidden mx-auto">
                     <pre class="w-full">
-                        <code class="language-csharp">
-using System.Windows.Forms;
-using System.Windows.Forms;
+                        <code class="language-csharp">// Request wallet address from the backend https://api.identity.adaph.io/identity/auth
+// In OAuth2 this would be where you ask for the auth_code and specify the scope of the authentication
+var WalletAddress = await AuthService.RequestLoginAsync();
 
-namespace IdentityToken.UI.Common;
-
-public class Test
-{
-}
-                        </code>
+// Generate QR Code DataURL
+var WalletAddressQr = await HelperInteropService.GenerateQrDataUrlAsync(WalletAddress);</code>
                     </pre>
                 </div>
                 <div class="w-full justify-center mt-12 mb-12">
                     <p class="w-10/12 md:w-7/12 text-lg leading-6 md:text-xl tracking-wide md:leading-12 font-medium text-center mx-auto text-idt-gray">
-                        Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt
-                        ut laoreet dolore magna aliquam erat volutpat.
+                        We can only prove that the user owns a wallet with <b>IdentityTokens</b> when the user sends some ADA to the presented wallet address. 
+                        This will be equivalent to a user approving consent of the authentication or submitting his username and password to the system.
                     </p>
                 </div>
                 <div class="w-10/12 rounded-md overflow-hidden mx-auto">
                     <pre class="w-full">
-                        <code class="language-csharp">
-using System.Windows.Forms;
-using System.Windows.Forms;
-
-namespace IdentityToken.UI.Common;
-
-public class Test
-{
-}
-                        </code>
+                        <code class="language-csharp">//Check with the backend if the user sent some ADA and has proven to have an <b>IdentityToken</b>
+// If true, the identity is returned and can be saved into some form storage for later use.
+// https://api.identity.adaph.io/identity/token/[Cardano Wallet Address]
+var identity = await AuthService.Authorize(WalletAddress);
+await LocalStorageService.SetItemAsync("identity", identity);</code>
+                    </pre>
+                </div>
+                <div class="w-full justify-center mt-12 mb-12">
+                    <p class="w-10/12 md:w-7/12 text-lg leading-6 md:text-xl tracking-wide md:leading-12 font-medium text-center mx-auto text-idt-gray">
+                        The response would be similar shape to an OAuth2 response with "Key" property value passed to sub-sequent API requests to prove access.
+                    </p>
+                </div>
+                <div class="w-10/12 rounded-md overflow-hidden mx-auto">
+                    <pre class="w-full">
+                        <code class="language-json">{
+    "Id": "4ec816a1-43c4-4da6-82ce-5e2fe28ca8fa",
+    "Key": "1c6e772d2eb772d2eb772d2eb772d2eb06439eb",
+    "ExpiresIn": 31536000,
+    "DateCreated": "2021-09-12T08:42:34.9883618Z",
+    "Avatar": "QmTobJML2HhDJvKu3HhDJvKu3HhDJvKu3HhDJvKu3u3zKH",
+    "PolicyId": "6f15ae31bc04bde79adda0ccc8aface1bc04bde79a899fa",
+    "AssetName": "IDMyName",
+    "Username": "MyName"
+}</code>
+                    </pre>
+                </div>
+                <div class="w-full justify-center mt-12 mb-12">
+                    <p class="w-10/12 md:w-7/12 text-lg leading-6 md:text-xl tracking-wide md:leading-12 font-medium text-center mx-auto text-idt-gray">
+                        One could mint an <b>IdentityToken</b> in the <b>Cardano</b> blockchain with this proposed metadata:
+                    </p>
+                </div>
+                <div class="w-10/12 rounded-md overflow-hidden mx-auto">
+                    <pre class="w-full">
+                        <code class="language-json">{
+ // 7368 is ASCII decimal value for the string ID (I = 73, D = 68)
+  "7368": {
+    // PolicyId
+    "6f15ae31bda0ccc853dc8268c04bde79ada0ccc8afacea675899fa": {
+      // IdentityToken AssetNames must have ID string as a prefix
+      "IDMyName": {
+        "avatar": {
+          // Avatar file used protocol
+          "protocol": "ipfs",
+          // Resource Locator
+          "src": "QmTobJML2HhDJvKu3HhDJvKu3HhDJvKu3HhDJvKu3u3zKH"
+        }
+      }
+    }
+  }
+}</code>
                     </pre>
                 </div>
             </div>
