@@ -22,6 +22,7 @@ namespace IdentityToken.UI.Common.Components
         private bool IsLoading { get; set; }
         private bool IsTxFailed { get; set; }
         private bool IsLoginSuccess { get; set; }
+        private bool IsNoWalletError { get; set; } = false;
         
         public void Dispose()
         {
@@ -56,6 +57,18 @@ namespace IdentityToken.UI.Common.Components
         private async void OnBtnConnectWithCardanoClicked()
         {
             if (CardanoWalletInteropService is null) return;
+            
+            var isWalletConnected = await CardanoWalletInteropService.IsWalletConnectedAsync();
+            if (!isWalletConnected)
+                isWalletConnected = await CardanoWalletInteropService.ConnectWalletAsync();
+
+            if (!isWalletConnected)
+            {
+                IsNoWalletError = true;
+                await InvokeAsync(StateHasChanged);
+                return;
+            }
+            
             ShouldAuthorizeAttempt = false;
             IsLoading = true;
             LoadingMessage = "Signing and Submitting Transaction...";

@@ -5,7 +5,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-
   <ItemGroup>
     <SupportedPlatform Include="browser" />
   </ItemGroup>
@@ -20,15 +19,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\IdentityToken.Common\IdentityToken.Common.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Microsoft.AspNetCore, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' ">
-      <HintPath>/usr/local/share/dotnet/shared/Microsoft.AspNetCore.App/6.0.0-preview.7.21378.6/Microsoft.AspNetCore.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNetCore, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60" Condition=" '$(OS)' == 'Windows_NT' ">
-      <HintPath>C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\6.0.0-preview.7.21378.6\Microsoft.AspNetCore.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
   <ItemGroup>
