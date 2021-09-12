@@ -106,7 +106,8 @@ var WalletAddressQr = await HelperInteropService.GenerateQrDataUrlAsync(WalletAd
                 </div>
                 <div class="w-10/12 rounded-md overflow-hidden mx-auto">
                     <pre class="w-full">
-                        <code class="language-csharp">//Check with the backend if the user sent some ADA and has proven to have an <b>IdentityToken</b>
+                        <code class="language-csharp">// Check with the backend if the user sent some ADA and has proven to have an <b>IdentityToken</b>
+// The backend would need access to the cardano blockchain and query the required data
 // If true, the identity is returned and can be saved into some form storage for later use.
 // https://api.identity.adaph.io/identity/token/[Cardano Wallet Address]
 var identity = await AuthService.Authorize(WalletAddress);
