@@ -9,7 +9,7 @@ using IdentityToken.UI.Common.Services.JSInterop;
 
 namespace IdentityToken.UI.Common.Components
 {
-    public partial class Mint
+    public partial class Mint : IDisposable
     {
         [Inject] private CardanoWalletInteropService? CardanoWalletInteropService { get; set; }
         private List<IdentityTokenMetadatum> TokenMetadata { get; set; } = TokenMetadataInitialState;
@@ -161,6 +161,12 @@ namespace IdentityToken.UI.Common.Components
             IsToastError = isError;
             ToastMessage = message;
             ShouldShowToast = true;
+        }
+
+        public void Dispose()
+        {
+            if (CardanoWalletInteropService is not null)
+                CardanoWalletInteropService.Error -= CardanoWalletInteropOnError;
         }
     }
 }

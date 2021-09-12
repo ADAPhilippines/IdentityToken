@@ -9,4 +9,20 @@
     <ProjectReference Include="..\IdentityToken.UI.Common\IdentityToken.UI.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="MSBuild_Logs\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="MSBuild_Logs\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="MSBuild_Logs\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="MSBuild_Logs\**" />
+  </ItemGroup>
+
 </Project>
