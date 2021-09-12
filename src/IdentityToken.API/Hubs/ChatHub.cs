@@ -77,6 +77,7 @@ public class ChatHub : Hub
             {
                 var userLastActivity = chatUser.LastActivity;
                 chatUser.LastActivity = DateTime.UtcNow;
+                chatUser.IsOnline = true;
                 var chatMessage = new ChatMessage
                 {
                     Sender = chatUser.Identity,
