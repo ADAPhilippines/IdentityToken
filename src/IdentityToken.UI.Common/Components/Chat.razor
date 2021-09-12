@@ -1,5 +1,4 @@
 @using IdentityToken.UI.Common.Extensions;
-
 <div class="flex flex-col w-full h-full justify-center mx-auto p-10">
     <div class="text-2xl tracking-wide text-idt-purple w-full text-center mt-10 mb-10">Sample IdentityToken Chat Room</div>
     <div class="flex w-full">
@@ -24,7 +23,7 @@
     </div>
     <div class="grid grid-cols-12 w-full bg-idt-gray-2 mt-5 mb-5 rounded-md min-h-[600px] shadow overflow-hidden">
         <div class="flex col-span-9 p-5">
-            <div class="flex flex-grow flex-col">
+            <div class="flex flex-grow flex-col relative">
                 <div id="message-container" class="h-[500px] overflow-auto mb-5" style="scroll-behavior: smooth;" @onscroll="OnMessageHistoryScroll">
                     <div class="flex items-end min-h-[600px]">
                         <ul role="list" class="divide-y divide-gray-200 w-full">
@@ -53,7 +52,7 @@
                 <div class="relative flex">
                     <input @bind-value="@CurrentMessage" @onkeyup="OnCurrentMessageKeyup" type="text" placeholder="say something nice..." class="w-full focus:outline-none focus:placeholder-idt-gray text-idt-gray placeholder-idt-gray pl-12 bg-white rounded-full py-3">
                     <div class="absolute right-0 items-center inset-y-0 sm:flex">
-                        <button type="button" class="inline-flex items-center justify-center rounded-full h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none">
+                        <button @onclick="OnBtnEmojiClicked" type="button" class="inline-flex items-center justify-center rounded-full h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6 text-gray-600">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
@@ -64,6 +63,9 @@
                             </svg>
                         </button>
                     </div>
+                </div>
+                <div class="absolute bottom-[60px] right-[0px] @(IsEmojiOpen ? string.Empty:"hidden")">        
+                    <emoji-picker class="light"></emoji-picker>
                 </div>
             </div>
         </div>

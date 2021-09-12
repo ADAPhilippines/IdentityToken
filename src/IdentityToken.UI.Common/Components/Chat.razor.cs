@@ -10,6 +10,7 @@ using IdentityToken.UI.Common.Services;
 using IdentityToken.UI.Common.Services.JSInterop;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.Configuration;
+using Microsoft.JSInterop;
 
 namespace IdentityToken.UI.Common.Components
 {
@@ -28,6 +29,7 @@ namespace IdentityToken.UI.Common.Components
         private bool IsLoadingHistoryScroll { get; set; } = false;
         private ChatMessage? CurrentFirstHistoryMessage { get; set; }
         private bool IsLoading { get; set; } = true;
+        private bool IsEmojiOpen { get; set; } = false;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -46,8 +48,19 @@ namespace IdentityToken.UI.Common.Components
                 
                 await HubConnection.StartAsync();
                 await HubConnection.SendAsync("Authenticate", identity.Key);
+
+                if (HelperInteropService is null) return;
+                await HelperInteropService.AttachEmojiHandler(DotNetObjectReference.Create(this), "OnEmojiClicked");
+
             }
             await base.OnAfterRenderAsync(firstRender);
+        }
+
+        [JSInvokable]
+        public void OnEmojiClicked(string emoji)
+        {
+            CurrentMessage += emoji;
+            StateHasChanged();
         }
 
         private void OnReceiveChatUsers(IEnumerable<ChatUser> chatUsers)
@@ -108,6 +121,12 @@ namespace IdentityToken.UI.Common.Components
         private void OnBtnLogoutClicked()
         {
             AuthService?.Logout();
+        }
+
+        private void OnBtnEmojiClicked()
+        {
+            IsEmojiOpen = !IsEmojiOpen;
+            StateHasChanged();
         }
 
         private async void OnCurrentMessageKeyup(KeyboardEventArgs e)

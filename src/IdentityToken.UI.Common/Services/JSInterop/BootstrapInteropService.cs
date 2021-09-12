@@ -17,12 +17,21 @@ public class BootstrapInteropService
             "import", "./_content/IdentityToken.UI.Common/bootstrap.js").AsTask());
     }
 
-    public async ValueTask InjectStyleSheetAsync(string path)
+    public async ValueTask InjectScriptAsync(string url, bool isModule = false)
     {
         if (_moduleTask is not null)
         {
             var module = await _moduleTask.Value;
-            await module.InvokeVoidAsync("injectStyleSheetAsync", path);
+            await module.InvokeVoidAsync("injectScriptAsync", url, isModule);
+        }
+    }
+
+    public async ValueTask InjectStyleSheetAsync(string url)
+    {
+        if (_moduleTask is not null)
+        {
+            var module = await _moduleTask.Value;
+            await module.InvokeVoidAsync("injectStyleSheetAsync", url);
         }
     }
 

@@ -1,5 +1,6 @@
 ﻿import CardanoWalletInterop from "./CardanoWalletInterop";
 import ICardanoDAPPConnector from "./Interfaces/ICardanoDAPPConnector";
+import IDotNetObjectRef from "./Interfaces/IDotNetObjectRef";
 
 declare global {
     interface Window {
@@ -10,5 +11,6 @@ declare global {
         ScrollToMessageId: (id: string) => void;
         GenerateQRDataUrlAsync: (data: string) => Promise<string>;
         CopyToClipboardAsync: (data: string) => Promise<void>;
+        AttachEmojiHandler: (objRef: IDotNetObjectRef, handlerName: string) => void;
     }
 }

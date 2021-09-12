@@ -16,7 +16,7 @@ import {
     Value
 } from "@emurgo/cardano-serialization-lib-browser";
 import {Buffer} from "Buffer";
-import ICardanoWalletInteropObjectRef from "./Interfaces/ICardanoWalletInteropObjectRef";
+import IDotNetObjectRef from "./Interfaces/IDotNetObjectRef";
 import CardanoWalletInteropErrorType from "./Enums/CardanoWalletInteropErrorType";
 import CardanoWalletInteropError from "./Types/CardanoWalletInteropError";
 import TxOutput from "./Types/TxOutput";
@@ -25,7 +25,7 @@ import Tx from "./Types/Tx";
 class CardanoWalletInterop {
     private blockfrostProjectId: string = "";
     private isMainnet: boolean = true;
-    private objectRef: ICardanoWalletInteropObjectRef | null = null;
+    private objectRef: IDotNetObjectRef | null = null;
     private errorCallbackName: string = "OnError";
 
     constructor() {
@@ -125,7 +125,7 @@ class CardanoWalletInterop {
         return CardanoWasmLoader.Cardano.Value.new(minFee);
     }
     
-    public SetErrorHandlerCallback(objectRef: ICardanoWalletInteropObjectRef, callbackName: string) {
+    public SetErrorHandlerCallback(objectRef: IDotNetObjectRef, callbackName: string) {
         this.objectRef = objectRef;
         this.errorCallbackName = callbackName;
     }

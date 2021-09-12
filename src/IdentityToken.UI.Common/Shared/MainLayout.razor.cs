@@ -19,10 +19,12 @@ namespace IdentityToken.UI.Common.Shared
                     var taskList = new List<Task>
                     {
                         Task.Run(() =>
+                            BootstrapInteropService.InjectScriptAsync("https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js", true)),
+                        Task.Run(() =>
                             BootstrapInteropService.InjectGoogleFontAsync(
                                 "https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap")),
                         Task.Run(() =>
-                            BootstrapInteropService.InjectStyleSheetAsync("./_content/IdentityToken.UI.Common/dist/app.css")),
+                            BootstrapInteropService.InjectStyleSheetAsync("/_content/IdentityToken.UI.Common/dist/app.css")),
                         Task.Run(() =>
                             BootstrapInteropService.InjectStyleSheetAsync("https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css")),
                         Task.Run(() =>
