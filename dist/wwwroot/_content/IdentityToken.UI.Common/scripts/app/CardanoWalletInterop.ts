@@ -276,7 +276,7 @@ class CardanoWalletInterop {
                 CardanoWasmLoader.Cardano.BigNum.from_str(protocolParams.pool_deposit.toString()),
                 CardanoWasmLoader.Cardano.BigNum.from_str(protocolParams.key_deposit.toString()));
 
-            const utxos = await CardanoWalletInterop.SelectUtxosAsync(2000000);
+            const utxos = await CardanoWalletInterop.SelectUtxosAsync(4000000);
             utxos.forEach(utxo => {
                 txBuilder.add_input(
                     utxo.output().address(),
@@ -339,7 +339,7 @@ class CardanoWalletInterop {
             const mintValue = CardanoWalletInterop.CalculateMintValue(assetName, script);
             outputValue = outputValue.checked_add(mintValue);
 
-            const utxos = await CardanoWalletInterop.SelectUtxosAsync(2000000);
+            const utxos = await CardanoWalletInterop.SelectUtxosAsync(4000000);
             const inputs = CardanoWasmLoader.Cardano.TransactionInputs.new();
             utxos.forEach(utxo => {
                 inputs.add(
