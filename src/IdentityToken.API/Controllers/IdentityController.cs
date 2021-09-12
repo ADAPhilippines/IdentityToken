@@ -78,8 +78,21 @@ public class IdentityController : ControllerBase
         if (address is null) return BadRequest();
 
         // Inspect Assets
-        var addressAssets = await client.GetFromJsonAsync<IEnumerable<CardanoAddressAssetResponse>>($"accounts/{address.StakeAddress}/addresses/assets");
-        var tempIdentityTokens = addressAssets?.Where(x => CardanoHelper.IsIdentityToken(x.Unit)).ToList() ?? new List<CardanoAddressAssetResponse>();
+        var tempIdentityTokens = new List<CardanoAddressAssetResponse>();
+        var accountAssetsPage = 1;
+        
+        while(true) 
+        {
+            var addressAssets = await client.GetFromJsonAsync<IEnumerable<CardanoAddressAssetResponse>>($"accounts/{address.StakeAddress}/addresses/assets?order=desc&page={accountAssetsPage++}");
+            var responseIdentityToken = addressAssets?.Where(x => CardanoHelper.IsIdentityToken(x.Unit)).ToList() ?? new List<CardanoAddressAssetResponse>();
+            
+            // For now we only support one identity token per address
+            if(responseIdentityToken.Count > 0)
+            {
+                tempIdentityTokens.AddRange(responseIdentityToken);
+                break;
+            }
+        }
 
         // Initialize Identity Tokens
         var identityTokens = new List<CardanoIdentityToken>();
