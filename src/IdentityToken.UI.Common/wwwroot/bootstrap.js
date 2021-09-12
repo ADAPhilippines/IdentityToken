@@ -12,10 +12,20 @@
     });
 }
 
-export async function injectStyleSheetAsync(path) {
+export async function injectScriptAsync(url, isModule = false) {
+    return new Promise((resolve, reject) => {
+        let script = document.createElement('script');
+        script.setAttribute('src', url);
+        script.setAttribute('type', isModule ? 'module' : 'text/javascript');
+        script.onload = () => resolve();
+        document.head.appendChild(script);
+    });
+}
+
+export async function injectStyleSheetAsync(url) {
     return new Promise((resolve, reject) => {
         let styleSheet = document.createElement('link');
-        styleSheet.setAttribute('href', path);
+        styleSheet.setAttribute('href', url);
         styleSheet.setAttribute('rel', 'stylesheet');
         styleSheet.onload = () => resolve();
         document.head.appendChild(styleSheet);

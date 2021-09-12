@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using IdentityToken.UI.Common.Models;
-using IdentityToken.UI.Common.Services.JSInterop;
 using Microsoft.AspNetCore.Components;
+using IdentityToken.UI.Common.Services.JSInterop;
 
 namespace IdentityToken.UI.Common.Components
 {
@@ -16,6 +16,7 @@ namespace IdentityToken.UI.Common.Components
         private string ToastMessage { get; set; } = string.Empty;
         private bool IsToastError { get; set; }
         private bool ShouldShowToast { get; set; }
+
         private static List<IdentityTokenMetadatum> TokenMetadataInitialState =>
             new()
             {
@@ -48,8 +49,8 @@ namespace IdentityToken.UI.Common.Components
 
         private bool IsLoading { get; set; }
         private string LoadingMessage { get; set; } = string.Empty;
-        
-        [Parameter]public EventCallback<EventArgs> MintSuccess { get; set; }
+
+        [Parameter] public EventCallback<EventArgs> MintSuccess { get; set; }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -77,7 +78,7 @@ namespace IdentityToken.UI.Common.Components
                 ShowToast(true, "Username and Avatar fields are required.");
                 return;
             }
-            
+
             if (TokenMetadata.Where(m => m.Key.Length > 0).GroupBy(m => m.Key.Trim())
                 .Any(c => c.Key.Length > 0 && c.Count() > 1))
             {
@@ -85,48 +86,49 @@ namespace IdentityToken.UI.Common.Components
                 ShowToast(true, "Duplicate Keys Detected!");
                 return;
             }
-            
+
             var username = TokenMetadata[0].Value;
             var avatar = TokenMetadata[1].Value;
-            
+
             var metadataDictionary = new Dictionary<string, string>();
             foreach (var metadata in TokenMetadata)
             {
                 var key = metadata.Key.Trim();
                 var value = metadata.Value.Trim();
-            
-                if (key.Length > 0 
-                    && value.Length > 0 
-                    && !key.Contains("username") 
+
+                if (key.Length > 0
+                    && value.Length > 0
+                    && !key.Contains("username")
                     && !key.Contains("avatar"))
                     metadataDictionary.Add(key, value);
             }
-            
+
             var metadataString = JsonSerializer.Serialize(metadataDictionary);
-            
+
             LoadingMessage = "Building Transaction...";
             if (CardanoWalletInteropService is null) return;
-            
+
             var isWalletConnected = await CardanoWalletInteropService.IsWalletConnectedAsync();
             if (!isWalletConnected)
                 isWalletConnected = await CardanoWalletInteropService.ConnectWalletAsync();
-            
+
             if (!isWalletConnected) return;
-            
+
             LoadingMessage = "Signing and Submitting Transaction...";
             await InvokeAsync(StateHasChanged);
-            
-            var txHash = await CardanoWalletInteropService.MintIdentityTokenAsync($"ID{username}", avatar, metadataString);
+
+            var txHash =
+                await CardanoWalletInteropService.MintIdentityTokenAsync($"ID{username}", avatar, metadataString);
             if (txHash is null)
             {
                 IsLoading = false;
                 ShowToast(true, "Transaction Submission failed!");
                 return;
             }
-            
+
             LoadingMessage = $"Transaction Submitted to the Blockchain! Waiting for Confirmation. TxID: {txHash}";
             await InvokeAsync(StateHasChanged);
-            
+
             var tx = await CardanoWalletInteropService.GetTransactionAsync(txHash);
             if (tx is null)
             {
@@ -134,10 +136,10 @@ namespace IdentityToken.UI.Common.Components
                 ShowToast(true, "Unable to confirm transaction!");
                 return;
             }
-            
+
             IsLoading = false;
             TokenMetadata = TokenMetadataInitialState;
-            ShowToast(false, $"Minting Transaction Successful!");
+            ShowToast(false, "Minting Transaction Successful!");
             await InvokeAsync(StateHasChanged);
 
             await Task.Delay(2000);

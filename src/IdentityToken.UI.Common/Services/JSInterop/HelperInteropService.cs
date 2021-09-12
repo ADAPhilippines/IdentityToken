@@ -42,6 +42,12 @@ public class HelperInteropService
         if (_jsRuntime is null) return string.Empty;
         return await _jsRuntime.InvokeAsync<string>("window.CopyToClipboardAsync", data);
     }
+
+    public async Task AttachEmojiHandler(object objRef, string handlerName)
+    {
+        if (_jsRuntime is null) return;
+        await _jsRuntime.InvokeVoidAsync("window.AttachEmojiHandler", objRef, handlerName);
+    }
     
     public async Task HighlightAllCodeElementsAsync()
     {

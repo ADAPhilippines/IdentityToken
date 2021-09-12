@@ -1,4 +1,6 @@
 ﻿import QRCode from 'qrcode';
+import IDotNetObjectRef from "../Interfaces/IDotNetObjectRef";
+import {IEmojiEvent} from "../Interfaces/IEmojiEvent";
 
 class Helper {
     public static async Delay(time: number): Promise<void> {
@@ -36,6 +38,20 @@ class Helper {
     public static async CopyToClipboardAsync(data: string) {
         await navigator.clipboard.writeText(data);
     }
+    
+    public static AttachEmojiHandler(objRef: IDotNetObjectRef, handlerName: string)
+    {
+        const emojiPicker = document.querySelector('emoji-picker');
+        if(emojiPicker != null) {
+            emojiPicker.addEventListener('emoji-click', 
+    async event => {
+                await objRef.invokeMethodAsync(
+                    handlerName,
+                    (event as IEmojiEvent).detail.unicode);
+            });
+        }
+    }
+    
 }
 
 export default Helper;
