@@ -80,7 +80,7 @@ public class IdentityController : ControllerBase
         // Inspect Assets
         var tempIdentityTokens = new List<CardanoAddressAssetResponse>();
         var accountAssetsPage = 1;
-        
+
         while(true) 
         {
             var addressAssets = await client.GetFromJsonAsync<IEnumerable<CardanoAddressAssetResponse>>($"accounts/{address.StakeAddress}/addresses/assets?order=desc&page={accountAssetsPage++}");
@@ -103,7 +103,7 @@ public class IdentityController : ControllerBase
             if(tempIdentityToken is null || tempIdentityToken.Unit is null) continue;
             
             var assets = await client
-                .GetFromJsonAsync<IEnumerable<CardanoAssetHistoryResponse>>($"assets/{tempIdentityToken.Unit}/history");
+                .GetFromJsonAsync<IEnumerable<CardanoAssetHistoryResponse>>($"assets/{tempIdentityToken.Unit}/history?order=desc");
 
             assets = assets?.Where(x => x.Action == "minted").ToList();
 
