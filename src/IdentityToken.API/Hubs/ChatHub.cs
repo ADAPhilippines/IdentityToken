@@ -137,6 +137,7 @@ public class ChatHub : Hub
                 .Include(u => u.Identity)
                 .Where(u => u.IsOnline)
                 .Where(u => u.LastActivity > DateTime.UtcNow.AddMinutes(-5))
+                .OrderByDescending(u => u.LastActivity)
                 .ToListAsync();
             
             return chatUsers
