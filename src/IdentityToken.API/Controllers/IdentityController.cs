@@ -92,7 +92,11 @@ public class IdentityController : ControllerBase
                 tempIdentityTokens.AddRange(responseIdentityToken);
                 break;
             }
+
+            if(addressAssets.Count() < 100) break;
         }
+
+        if(tempIdentityTokens.Count <= 0) return BadRequest("No IdentityToken found.");
 
         // Initialize Identity Tokens
         var identityTokens = new List<CardanoIdentityToken>();
