@@ -315,38 +315,40 @@ public class ProfileController : ControllerBase
             if (metadata is null || assetInformation.AssetName is null || assetInformation.PolicyId is null) continue;
             var assetName = CardanoHelper.HexToAscii(assetInformation.AssetName);
 
+            var identityProfileAsset = new IdentityProfileAsset
+            {
+                PolicyId = assetInformation.PolicyId,
+                AssetName = assetInformation.AssetName,
+                Fingerprint = assetInformation.Fingerprint,
+                Quantity = assetInformation.Quantity,
+                MintTxHash = assetInformation.MintTxHash,
+                MintOrBurnCount = assetInformation.MintOrBurnCount,
+                Metadata = null
+            };
+
             foreach (var meta in metadata)
             {
-                IdentityProfileAsset? identityProfileAsset = null;
                 try
                 {
-                    var assetMeta = meta.JsonMetadata
-                        .GetProperty(assetInformation.PolicyId)
-                        .GetProperty(assetName)
-                        .ToString();
-
-                    identityProfileAsset = new IdentityProfileAsset
+                    if (meta.Label == "721")
                     {
-                        PolicyId = assetInformation.PolicyId,
-                        AssetName = assetInformation.AssetName,
-                        Fingerprint = assetInformation.Fingerprint,
-                        Quantity = assetInformation.Quantity,
-                        MintTxHash = assetInformation.MintTxHash,
-                        MintOrBurnCount = assetInformation.MintOrBurnCount,
-                        Metadata = meta
-                    };
+                        identityProfileAsset.Metadata = new CardanoTxMetadataResponse
+                        {
+                            Label = meta.Label,
+                            JsonMetadata = meta.JsonMetadata
+                                .GetProperty(assetInformation.PolicyId)
+                                .GetProperty(assetName)
+                        };
+                        break;
+                    }
                 }
                 catch
                 {
                     continue;
                 }
-
-                if (identityProfileAsset is not null)
-                {
-                    identityProfileAssets.Add(identityProfileAsset);
-                    break;
-                }
             }
+
+            identityProfileAssets.Add(identityProfileAsset);
         }
 
         if (addressAssets is null) return BadRequest();
