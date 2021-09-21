@@ -134,6 +134,6 @@ public class CardanoHelper
 
     public static string GetShortHash(string str)
     {
-        return String.Format("{0:X}", str.GetHashCode());
+        return ((int)str.Select(a => Math.Pow((int)a,3)).Sum()).ToString("X");
     }
 }
