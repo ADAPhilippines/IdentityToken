@@ -131,4 +131,9 @@ public class CardanoHelper
         const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         return new string(Enumerable.Repeat(chars, length).Select(s => s[random.Next(s.Length)]).ToArray());
     }
+
+    public static string GetShortHash(string str)
+    {
+        return String.Format("{0:X}", str.GetHashCode());
+    }
 }
