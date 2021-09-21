@@ -10,6 +10,15 @@ public record CardanoAssetResponse
     [JsonPropertyName("asset_name")]
     public string? AssetName { get; set; }
 
+    [JsonPropertyName("fingerprint")]
+    public string? Fingerprint { get; set; }
+
+    [JsonPropertyName("quantity")]
+    public string? Quantity { get; set; }
+
     [JsonPropertyName("initial_mint_tx_hash")]
     public string? MintTxHash { get; set; }
+
+    [JsonPropertyName("mint_or_burn_count")]
+    public int MintOrBurnCount { get; set; }
 }
