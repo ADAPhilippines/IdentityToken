@@ -279,7 +279,7 @@ public class ProfileController : ControllerBase
         if (addressAssets is null) return BadRequest();
 
         var txMetadataCache = new Dictionary<string, IEnumerable<CardanoTxMetadataResponse>?>();
-        var identityProfileAssets = new List<IdentityProfileAsset>();
+        var identityProfileAssets = new List<CardanoAssetResponse>();
         foreach (var asset in addressAssets)
         {
             if (asset is null) continue;
@@ -289,76 +289,7 @@ public class ProfileController : ControllerBase
 
             if (assetInformation?.MintTxHash is null || assetInformation.MintOrBurnCount == 0) continue;
 
-            IEnumerable<CardanoTxMetadataResponse>? metadata = null;
-            if (assetInformation.MintOrBurnCount == 1)
-            {
-                if (!txMetadataCache.ContainsKey(assetInformation.MintTxHash))
-                {
-                    metadata = await client.GetFromJsonAsync<IEnumerable<CardanoTxMetadataResponse>>($"txs/{assetInformation.MintTxHash}/metadata");
-                    txMetadataCache.Add(assetInformation.MintTxHash, metadata);
-                }
-                else
-                {
-                    metadata = txMetadataCache[assetInformation.MintTxHash];
-                }
-            }
-            else
-            {
-                //follow history path
-                var assetHistory = await client
-                        .GetFromJsonAsync<IEnumerable<CardanoAssetHistoryResponse>>($"assets/{asset.Unit}/history?order=desc");
-                var latestHistory = assetHistory?.Where(x => x.Action == "minted").FirstOrDefault();
-
-                if (latestHistory?.TxHash is null) continue;
-
-                if (!txMetadataCache.ContainsKey(latestHistory.TxHash))
-                {
-                    metadata = await client.GetFromJsonAsync<IEnumerable<CardanoTxMetadataResponse>>($"txs/{latestHistory.TxHash}/metadata");
-                    txMetadataCache.Add(latestHistory.TxHash, metadata);
-                }
-                else
-                {
-                    metadata = txMetadataCache[latestHistory.TxHash];
-                }
-            }
-
-            if (metadata is null || assetInformation.AssetName is null || assetInformation.PolicyId is null) continue;
-            var assetName = CardanoHelper.HexToAscii(assetInformation.AssetName);
-
-            var identityProfileAsset = new IdentityProfileAsset
-            {
-                PolicyId = assetInformation.PolicyId,
-                AssetName = assetInformation.AssetName,
-                Fingerprint = assetInformation.Fingerprint,
-                Quantity = assetInformation.Quantity,
-                MintTxHash = assetInformation.MintTxHash,
-                MintOrBurnCount = assetInformation.MintOrBurnCount,
-                Metadata = null
-            };
-
-            foreach (var meta in metadata)
-            {
-                try
-                {
-                    if (meta.Label == "721")
-                    {
-                        identityProfileAsset.Metadata = new CardanoTxMetadataResponse
-                        {
-                            Label = meta.Label,
-                            JsonMetadata = meta.JsonMetadata
-                                .GetProperty(assetInformation.PolicyId)
-                                .GetProperty(assetName)
-                        };
-                        break;
-                    }
-                }
-                catch
-                {
-                    continue;
-                }
-            }
-
-            identityProfileAssets.Add(identityProfileAsset);
+            identityProfileAssets.Add(assetInformation);
         }
 
         if (addressAssets is null) return BadRequest();

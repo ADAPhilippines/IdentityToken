@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace IdentityToken.Common.Models;
@@ -21,4 +22,10 @@ public record CardanoAssetResponse
 
     [JsonPropertyName("mint_or_burn_count")]
     public int MintOrBurnCount { get; set; }
+
+    [JsonPropertyName("metadata")]
+    public JsonElement Metadata { get; set; }
+
+    [JsonPropertyName("onchain_metadata")]
+    public JsonElement OnChainMetadata { get; set; }
 }
