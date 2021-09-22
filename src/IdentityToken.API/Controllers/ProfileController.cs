@@ -81,6 +81,13 @@ public class ProfileController : ControllerBase
                                                 .GetProperty("avatar")
                                                 .GetProperty("src")
                                                 .ToString();
+                                        
+                                        identityTokenMeta = meta.JsonMetadata
+                                                .GetProperty(identityToken.Unit[..56])
+                                                .GetProperty(assetName)
+                                                .GetProperty("avatar")
+                                                .GetProperty("protocol")
+                                                .ToString();
 
                                         isMetadataValid = true;
                                     }
@@ -198,8 +205,12 @@ public class ProfileController : ControllerBase
                                                 .GetProperty("avatar")
                                                 .GetProperty("protocol")
                                                 .ToString(),
-                                        }
+                                        },
+                                        Metadata = meta.JsonMetadata
+                                            .GetProperty(responseIdentityToken.Unit[..56])
+                                            .GetProperty(assetName)
                                     };
+                                    
                                     IsIdentityTokenFound = true;
                                 }
                                 catch (Exception ex)
