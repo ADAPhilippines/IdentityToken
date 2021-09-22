@@ -146,154 +146,168 @@ public class ProfileController : ControllerBase
     [HttpGet("{username}")]
     public async Task<IActionResult> GetProfileAsync(string username)
     {
-        if (_identityDbContext.Profiles is null) return StatusCode(500);
-        var profile = await _identityDbContext.Profiles.FirstOrDefaultAsync(p => p.Username == username);
-
-        if (profile is null) return NotFound();
-
-        // Create HttpClient
-        using var client = _httpClientFactory.CreateClient("blockfrost");
-
-        var accountAssetsPage = 1;
-        var IsIdentityTokenFound = false;
-        CardanoIdentityToken? identityToken = null;
-        while (!IsIdentityTokenFound)
+        try
         {
-            var addressAssets = await client
-                .GetFromJsonAsync<IEnumerable<CardanoAddressAssetResponse>>($"accounts/{profile.StakeAddress}/addresses/assets?order=desc&page={accountAssetsPage++}");
+            if (_identityDbContext.Profiles is null) return StatusCode(500);
+            var profile = await _identityDbContext.Profiles.FirstOrDefaultAsync(p => p.Username == username);
 
-            if (addressAssets is null) return BadRequest();
+            if (profile is null) return NotFound();
 
-            var responseIdentityTokens = addressAssets?.Where(x => CardanoHelper.IsIdentityToken(x.Unit)).ToList();
+            // Create HttpClient
+            using var client = _httpClientFactory.CreateClient("blockfrost");
 
-            if (responseIdentityTokens is not null)
+            var accountAssetsPage = 1;
+            var IsIdentityTokenFound = false;
+            CardanoIdentityToken? identityToken = null;
+            while (!IsIdentityTokenFound)
             {
-                foreach (var responseIdentityToken in responseIdentityTokens)
+                var addressAssets = await client
+                    .GetFromJsonAsync<IEnumerable<CardanoAddressAssetResponse>>($"accounts/{profile.StakeAddress}/addresses/assets?order=desc&page={accountAssetsPage++}");
+
+                if (addressAssets is null) return BadRequest();
+
+                var responseIdentityTokens = addressAssets?.Where(x => CardanoHelper.IsIdentityToken(x.Unit)).ToList();
+
+                if (responseIdentityTokens is not null)
                 {
-                    if (responseIdentityToken?.Unit is null) continue;
-
-                    //Search through asset history to find the latest valid IdentityToken metadata
-                    var assetHistoryPage = 1;
-                    while (true)
+                    foreach (var responseIdentityToken in responseIdentityTokens)
                     {
-                        var assetHistory = await client
-                        .GetFromJsonAsync<IEnumerable<CardanoAssetHistoryResponse>>($"assets/{responseIdentityToken.Unit}/history?order=desc&page={assetHistoryPage++}");
+                        if (responseIdentityToken?.Unit is null) continue;
 
-                        if (assetHistory is null || !assetHistory.Any()) continue;
-
-                        foreach (var entry in assetHistory.Where(x => x.Action == "minted").ToList())
+                        //Search through asset history to find the latest valid IdentityToken metadata
+                        var assetHistoryPage = 1;
+                        while (true)
                         {
-                            if (entry is null) continue;
+                            var assetHistory = await client
+                            .GetFromJsonAsync<IEnumerable<CardanoAssetHistoryResponse>>($"assets/{responseIdentityToken.Unit}/history?order=desc&page={assetHistoryPage++}");
 
-                            var metadata = await client.GetFromJsonAsync<IEnumerable<CardanoTxMetadataResponse>>($"txs/{entry.TxHash}/metadata");
-                            if (metadata is null) continue;
+                            if (assetHistory is null || !assetHistory.Any()) continue;
 
-                            foreach (var meta in metadata)
+                            foreach (var entry in assetHistory.Where(x => x.Action == "minted").ToList())
                             {
-                                if (meta.Label == "7368")
-                                {
-                                    var assetName = CardanoHelper.HexToAscii(responseIdentityToken.Unit[56..]);
-                                    try
-                                    {
-                                        identityToken = new()
-                                        {
-                                            PolicyId = responseIdentityToken.Unit[..56],
-                                            AssetName = assetName,
-                                            Avatar = new()
-                                            {
-                                                Source = meta.JsonMetadata
-                                                    .GetProperty(responseIdentityToken.Unit[..56])
-                                                    .GetProperty(assetName)
-                                                    .GetProperty("avatar")
-                                                    .GetProperty("src")
-                                                    .ToString(),
-                                                Protocol = meta.JsonMetadata
-                                                    .GetProperty(responseIdentityToken.Unit[..56])
-                                                    .GetProperty(assetName)
-                                                    .GetProperty("avatar")
-                                                    .GetProperty("protocol")
-                                                    .ToString(),
-                                            },
-                                            Metadata = meta.JsonMetadata
-                                                .GetProperty(responseIdentityToken.Unit[..56])
-                                                .GetProperty(assetName)
-                                        };
+                                if (entry is null) continue;
 
-                                        IsIdentityTokenFound = true;
-                                    }
-                                    catch (Exception ex)
+                                var metadata = await client.GetFromJsonAsync<IEnumerable<CardanoTxMetadataResponse>>($"txs/{entry.TxHash}/metadata");
+                                if (metadata is null) continue;
+
+                                foreach (var meta in metadata)
+                                {
+                                    if (meta.Label == "7368")
                                     {
-                                        _logger.Log(LogLevel.Information, ex, "IdentityToken definition not found in metadata");
+                                        var assetName = CardanoHelper.HexToAscii(responseIdentityToken.Unit[56..]);
+                                        try
+                                        {
+                                            identityToken = new()
+                                            {
+                                                PolicyId = responseIdentityToken.Unit[..56],
+                                                AssetName = assetName,
+                                                Avatar = new()
+                                                {
+                                                    Source = meta.JsonMetadata
+                                                        .GetProperty(responseIdentityToken.Unit[..56])
+                                                        .GetProperty(assetName)
+                                                        .GetProperty("avatar")
+                                                        .GetProperty("src")
+                                                        .ToString(),
+                                                    Protocol = meta.JsonMetadata
+                                                        .GetProperty(responseIdentityToken.Unit[..56])
+                                                        .GetProperty(assetName)
+                                                        .GetProperty("avatar")
+                                                        .GetProperty("protocol")
+                                                        .ToString(),
+                                                },
+                                                Metadata = meta.JsonMetadata
+                                                    .GetProperty(responseIdentityToken.Unit[..56])
+                                                    .GetProperty(assetName)
+                                            };
+
+                                            IsIdentityTokenFound = true;
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            _logger.Log(LogLevel.Information, ex, "IdentityToken definition not found in metadata");
+                                        }
                                     }
+                                    if (IsIdentityTokenFound) break;
                                 }
                                 if (IsIdentityTokenFound) break;
                             }
-                            if (IsIdentityTokenFound) break;
+                            if (assetHistory.Count() < 100 || IsIdentityTokenFound) break;
                         }
-                        if (assetHistory.Count() < 100 || IsIdentityTokenFound) break;
+                        if (IsIdentityTokenFound) break;
                     }
-                    if (IsIdentityTokenFound) break;
                 }
+                if (addressAssets is not null && addressAssets.Count() < 100) break;
             }
-            if (addressAssets is not null && addressAssets.Count() < 100) break;
+
+            if (identityToken is null) return BadRequest("No IdentityToken found.");
+
+
+            var accountAddressResponse = await client.GetFromJsonAsync<CardanoAccountAddressResponse>($"accounts/{profile.StakeAddress}");
+            if (accountAddressResponse is null) return BadRequest("No Account Found.");
+
+            CardanoPoolMetadataResponse? pool = null;
+            if (accountAddressResponse.PoolId is not null)
+            {
+                pool = await client.GetFromJsonAsync<CardanoPoolMetadataResponse>($"pools/{accountAddressResponse.PoolId}/metadata");
+            }
+
+            return Ok(new IdentityProfile
+            {
+                IdentityToken = identityToken,
+                StakeAddress = profile.StakeAddress,
+                PaymentAddress = profile.PaymentAddress,
+                Balance = accountAddressResponse.ControlledAmount,
+                Pool = pool
+            });
         }
-
-        if (identityToken is null) return BadRequest("No IdentityToken found.");
-
-
-        var accountAddressResponse = await client.GetFromJsonAsync<CardanoAccountAddressResponse>($"accounts/{profile.StakeAddress}");
-        if (accountAddressResponse is null) return BadRequest("No Account Found.");
-
-        CardanoPoolMetadataResponse? pool = null;
-        if (accountAddressResponse.PoolId is not null)
+        catch (Exception)
         {
-            pool = await client.GetFromJsonAsync<CardanoPoolMetadataResponse>($"pools/{accountAddressResponse.PoolId}/metadata");
+            return BadRequest();
         }
-
-        return Ok(new IdentityProfile
-        {
-            IdentityToken = identityToken,
-            StakeAddress = profile.StakeAddress,
-            PaymentAddress = profile.PaymentAddress,
-            Balance = accountAddressResponse.ControlledAmount,
-            Pool = pool
-        });
     }
 
     [HttpGet("{username}/assets")]
     public async Task<IActionResult> GetProfileAssetsAsync(string username, [FromQuery] int page = 1, [FromQuery] int limit = 20)
     {
-        if (limit > 100 || page < 1) return BadRequest("Limit must be between 1-100 and page must be greater than 0.");
-
-        if (_identityDbContext.Profiles is null) return StatusCode(500);
-        var profile = await _identityDbContext.Profiles.FirstOrDefaultAsync(p => p.Username == username);
-
-        if (profile is null) return NotFound();
-
-        // Create HttpClient
-        using var client = _httpClientFactory.CreateClient("blockfrost");
-
-        var addressAssets = await client
-               .GetFromJsonAsync<IEnumerable<CardanoAddressAssetResponse>>($"accounts/{profile.StakeAddress}/addresses/assets?order=desc&count={limit}&page={page}");
-
-        if (addressAssets is null) return BadRequest();
-
-        var txMetadataCache = new Dictionary<string, IEnumerable<CardanoTxMetadataResponse>?>();
-        var identityProfileAssets = new List<CardanoAssetResponse>();
-        foreach (var asset in addressAssets)
+        try
         {
-            if (asset is null) continue;
+            if (limit > 100 || page < 1) return BadRequest("Limit must be between 1-100 and page must be greater than 0.");
 
-            var assetInformation = await client
-                .GetFromJsonAsync<CardanoAssetResponse>($"assets/{asset.Unit}");
+            if (_identityDbContext.Profiles is null) return StatusCode(500);
+            var profile = await _identityDbContext.Profiles.FirstOrDefaultAsync(p => p.Username == username);
 
-            if (assetInformation?.MintTxHash is null || assetInformation.MintOrBurnCount == 0) continue;
+            if (profile is null) return NotFound();
 
-            identityProfileAssets.Add(assetInformation);
+            // Create HttpClient
+            using var client = _httpClientFactory.CreateClient("blockfrost");
+
+            var addressAssets = await client
+                   .GetFromJsonAsync<IEnumerable<CardanoAddressAssetResponse>>($"accounts/{profile.StakeAddress}/addresses/assets?order=desc&count={limit}&page={page}");
+
+            if (addressAssets is null) return BadRequest();
+
+            var txMetadataCache = new Dictionary<string, IEnumerable<CardanoTxMetadataResponse>?>();
+            var identityProfileAssets = new List<CardanoAssetResponse>();
+            foreach (var asset in addressAssets)
+            {
+                if (asset is null) continue;
+
+                var assetInformation = await client
+                    .GetFromJsonAsync<CardanoAssetResponse>($"assets/{asset.Unit}");
+
+                if (assetInformation?.MintTxHash is null || assetInformation.MintOrBurnCount == 0) continue;
+
+                identityProfileAssets.Add(assetInformation);
+            }
+
+            if (addressAssets is null) return BadRequest();
+
+            return Ok(identityProfileAssets);
         }
-
-        if (addressAssets is null) return BadRequest();
-
-        return Ok(identityProfileAssets);
+        catch (Exception)
+        {
+            return BadRequest();
+        }
     }
 }
