@@ -263,11 +263,10 @@ public class ProfileController : ControllerBase
     [HttpGet("{username}/assets")]
     public async Task<IActionResult> GetProfileAssetsAsync(string username, [FromQuery] int page = 1, [FromQuery] int limit = 20)
     {
-        if (limit > 100) return BadRequest("Limit can only be below 100");
+        if (limit > 100 || page < 1) return BadRequest("Limit must be between 1-100 and page must be greater than 0.");
 
         if (_identityDbContext.Profiles is null) return StatusCode(500);
         var profile = await _identityDbContext.Profiles.FirstOrDefaultAsync(p => p.Username == username);
-
 
         if (profile is null) return NotFound();
 
@@ -279,7 +278,7 @@ public class ProfileController : ControllerBase
 
         if (addressAssets is null) return BadRequest();
 
-        var txMetadataCache = new Dictionary<string, IEnumerable<CardanoTxMetadataResponse>>();
+        var txMetadataCache = new Dictionary<string, IEnumerable<CardanoTxMetadataResponse>?>();
         var identityProfileAssets = new List<IdentityProfileAsset>();
         foreach (var asset in addressAssets)
         {
@@ -293,18 +292,13 @@ public class ProfileController : ControllerBase
             IEnumerable<CardanoTxMetadataResponse>? metadata = null;
             if (assetInformation.MintOrBurnCount == 1)
             {
-                if (assetInformation.MintTxHash is not null && !txMetadataCache.ContainsKey(assetInformation.MintTxHash))
+                if (!txMetadataCache.ContainsKey(assetInformation.MintTxHash))
                 {
                     metadata = await client.GetFromJsonAsync<IEnumerable<CardanoTxMetadataResponse>>($"txs/{assetInformation.MintTxHash}/metadata");
-
-                    if (metadata is null) continue;
-
                     txMetadataCache.Add(assetInformation.MintTxHash, metadata);
                 }
                 else
                 {
-                    if (assetInformation?.MintTxHash is null) continue;
-
                     metadata = txMetadataCache[assetInformation.MintTxHash];
                 }
             }
@@ -315,21 +309,16 @@ public class ProfileController : ControllerBase
                         .GetFromJsonAsync<IEnumerable<CardanoAssetHistoryResponse>>($"assets/{asset.Unit}/history?order=desc");
                 var latestHistory = assetHistory?.Where(x => x.Action == "minted").FirstOrDefault();
 
-                if (latestHistory is null) continue;
+                if (latestHistory?.TxHash is null) continue;
 
-                if (latestHistory.TxHash is not null && !txMetadataCache.ContainsKey(latestHistory.TxHash))
+                if (!txMetadataCache.ContainsKey(latestHistory.TxHash))
                 {
                     metadata = await client.GetFromJsonAsync<IEnumerable<CardanoTxMetadataResponse>>($"txs/{latestHistory.TxHash}/metadata");
-
-                    if (metadata is null) continue;
-
                     txMetadataCache.Add(latestHistory.TxHash, metadata);
                 }
                 else
                 {
-                    if (assetInformation?.MintTxHash is null) continue;
-
-                    metadata = txMetadataCache[assetInformation.MintTxHash];
+                    metadata = txMetadataCache[latestHistory.TxHash];
                 }
             }
 
