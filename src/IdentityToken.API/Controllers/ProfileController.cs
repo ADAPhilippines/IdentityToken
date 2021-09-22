@@ -54,73 +54,78 @@ public class ProfileController : ControllerBase
                     {
                         if (identityToken?.Unit is null) continue;
 
-                        var assetHistory = await client
-                            .GetFromJsonAsync<IEnumerable<CardanoAssetHistoryResponse>>($"assets/{identityToken.Unit}/history?order=desc");
-                        assetHistory = assetHistory?.Where(x => x.Action == "minted").ToList();
-
-                        if (assetHistory is null || !assetHistory.Any()) continue;
-
-                        foreach (var entry in assetHistory)
+                        //Search through asset history to find the latest valid IdentityToken metadata
+                        var assetHistoryPage = 1;
+                        while (true)
                         {
-                            if (entry is null) continue;
+                            var assetHistory = await client
+                                .GetFromJsonAsync<IEnumerable<CardanoAssetHistoryResponse>>($"assets/{identityToken.Unit}/history?order=desc&page={assetHistoryPage++}");
 
-                            var metadata = await client.GetFromJsonAsync<IEnumerable<CardanoTxMetadataResponse>>($"txs/{entry.TxHash}/metadata");
-                            if (metadata is null) continue;
+                            if (assetHistory is null) continue;
 
-                            foreach (var meta in metadata)
+                            foreach (var entry in assetHistory.Where(x => x.Action == "minted").ToList())
                             {
-                                if (meta.Label == "7368")
+                                if (entry is null) continue;
+
+                                var metadata = await client.GetFromJsonAsync<IEnumerable<CardanoTxMetadataResponse>>($"txs/{entry.TxHash}/metadata");
+                                if (metadata is null) continue;
+
+                                foreach (var meta in metadata)
                                 {
-                                    var assetName = CardanoHelper.HexToAscii(identityToken.Unit[56..]);
-                                    var isMetadataValid = false;
-                                    try
+                                    if (meta.Label == "7368")
                                     {
-                                        var identityTokenMeta = meta.JsonMetadata
-                                                .GetProperty(identityToken.Unit[..56])
-                                                .GetProperty(assetName)
-                                                .GetProperty("avatar")
-                                                .GetProperty("src")
-                                                .ToString();
-                                        
-                                        identityTokenMeta = meta.JsonMetadata
-                                                .GetProperty(identityToken.Unit[..56])
-                                                .GetProperty(assetName)
-                                                .GetProperty("avatar")
-                                                .GetProperty("protocol")
-                                                .ToString();
-
-                                        isMetadataValid = true;
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        _logger.Log(LogLevel.Information, ex, "IdentityToken definition not found in metadata");
-                                    }
-
-                                    if (isMetadataValid)
-                                    {
-                                        assetName = assetName[2..];
-                                        var checkSum = CardanoHelper.GetShortHash($"{address.StakeAddress}{assetName}");
-                                        var username = $"{assetName}-{checkSum.ToLower()}";
-
-                                        if (_identityDbContext.Profiles is null) return StatusCode(500);
-                                        profile = await _identityDbContext.Profiles.FirstOrDefaultAsync(p => p.Username == username);
-                                        if (profile is null)
+                                        var assetName = CardanoHelper.HexToAscii(identityToken.Unit[56..]);
+                                        var isMetadataValid = false;
+                                        try
                                         {
-                                            profile = new()
-                                            {
-                                                Username = username,
-                                                PaymentAddress = paymentAddress,
-                                                StakeAddress = address.StakeAddress
-                                            };
-                                            _identityDbContext.Profiles?.Add(profile);
-                                            await _identityDbContext.SaveChangesAsync();
+                                            var identityTokenMeta = meta.JsonMetadata
+                                                    .GetProperty(identityToken.Unit[..56])
+                                                    .GetProperty(assetName)
+                                                    .GetProperty("avatar")
+                                                    .GetProperty("src")
+                                                    .ToString();
+
+                                            identityTokenMeta = meta.JsonMetadata
+                                                    .GetProperty(identityToken.Unit[..56])
+                                                    .GetProperty(assetName)
+                                                    .GetProperty("avatar")
+                                                    .GetProperty("protocol")
+                                                    .ToString();
+
+                                            isMetadataValid = true;
                                         }
-                                        IsIdentityTokenFound = true;
+                                        catch (Exception ex)
+                                        {
+                                            _logger.Log(LogLevel.Information, ex, "IdentityToken definition not found in metadata");
+                                        }
+
+                                        if (isMetadataValid)
+                                        {
+                                            assetName = assetName[2..];
+                                            var checkSum = CardanoHelper.GetShortHash($"{address.StakeAddress}{assetName}");
+                                            var username = $"{assetName}-{checkSum.ToLower()}";
+
+                                            if (_identityDbContext.Profiles is null) return StatusCode(500);
+                                            profile = await _identityDbContext.Profiles.FirstOrDefaultAsync(p => p.Username == username);
+                                            if (profile is null)
+                                            {
+                                                profile = new()
+                                                {
+                                                    Username = username,
+                                                    PaymentAddress = paymentAddress,
+                                                    StakeAddress = address.StakeAddress
+                                                };
+                                                _identityDbContext.Profiles?.Add(profile);
+                                                await _identityDbContext.SaveChangesAsync();
+                                            }
+                                            IsIdentityTokenFound = true;
+                                        }
                                     }
+                                    if (IsIdentityTokenFound) break;
                                 }
                                 if (IsIdentityTokenFound) break;
                             }
-                            if (IsIdentityTokenFound) break;
+                            if (assetHistory.Count() < 100 || IsIdentityTokenFound) break;
                         }
                         if (IsIdentityTokenFound) break;
                     }
@@ -167,60 +172,65 @@ public class ProfileController : ControllerBase
                 {
                     if (responseIdentityToken?.Unit is null) continue;
 
-                    var assetHistory = await client
-                        .GetFromJsonAsync<IEnumerable<CardanoAssetHistoryResponse>>($"assets/{responseIdentityToken.Unit}/history?order=desc");
-                    assetHistory = assetHistory?.Where(x => x.Action == "minted").ToList();
-
-                    if (assetHistory is null || !assetHistory.Any()) continue;
-
-                    foreach (var entry in assetHistory)
+                    //Search through asset history to find the latest valid IdentityToken metadata
+                    var assetHistoryPage = 1;
+                    while (true)
                     {
-                        if (entry is null) continue;
+                        var assetHistory = await client
+                        .GetFromJsonAsync<IEnumerable<CardanoAssetHistoryResponse>>($"assets/{responseIdentityToken.Unit}/history?order=desc&page={assetHistoryPage++}");
 
-                        var metadata = await client.GetFromJsonAsync<IEnumerable<CardanoTxMetadataResponse>>($"txs/{entry.TxHash}/metadata");
-                        if (metadata is null) continue;
+                        if (assetHistory is null || !assetHistory.Any()) continue;
 
-                        foreach (var meta in metadata)
+                        foreach (var entry in assetHistory.Where(x => x.Action == "minted").ToList())
                         {
-                            if (meta.Label == "7368")
+                            if (entry is null) continue;
+
+                            var metadata = await client.GetFromJsonAsync<IEnumerable<CardanoTxMetadataResponse>>($"txs/{entry.TxHash}/metadata");
+                            if (metadata is null) continue;
+
+                            foreach (var meta in metadata)
                             {
-                                var assetName = CardanoHelper.HexToAscii(responseIdentityToken.Unit[56..]);
-                                try
+                                if (meta.Label == "7368")
                                 {
-                                    identityToken = new()
+                                    var assetName = CardanoHelper.HexToAscii(responseIdentityToken.Unit[56..]);
+                                    try
                                     {
-                                        PolicyId = responseIdentityToken.Unit[..56],
-                                        AssetName = assetName,
-                                        Avatar = new()
+                                        identityToken = new()
                                         {
-                                            Source = meta.JsonMetadata
+                                            PolicyId = responseIdentityToken.Unit[..56],
+                                            AssetName = assetName,
+                                            Avatar = new()
+                                            {
+                                                Source = meta.JsonMetadata
+                                                    .GetProperty(responseIdentityToken.Unit[..56])
+                                                    .GetProperty(assetName)
+                                                    .GetProperty("avatar")
+                                                    .GetProperty("src")
+                                                    .ToString(),
+                                                Protocol = meta.JsonMetadata
+                                                    .GetProperty(responseIdentityToken.Unit[..56])
+                                                    .GetProperty(assetName)
+                                                    .GetProperty("avatar")
+                                                    .GetProperty("protocol")
+                                                    .ToString(),
+                                            },
+                                            Metadata = meta.JsonMetadata
                                                 .GetProperty(responseIdentityToken.Unit[..56])
                                                 .GetProperty(assetName)
-                                                .GetProperty("avatar")
-                                                .GetProperty("src")
-                                                .ToString(),
-                                            Protocol = meta.JsonMetadata
-                                                .GetProperty(responseIdentityToken.Unit[..56])
-                                                .GetProperty(assetName)
-                                                .GetProperty("avatar")
-                                                .GetProperty("protocol")
-                                                .ToString(),
-                                        },
-                                        Metadata = meta.JsonMetadata
-                                            .GetProperty(responseIdentityToken.Unit[..56])
-                                            .GetProperty(assetName)
-                                    };
-                                    
-                                    IsIdentityTokenFound = true;
+                                        };
+
+                                        IsIdentityTokenFound = true;
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        _logger.Log(LogLevel.Information, ex, "IdentityToken definition not found in metadata");
+                                    }
                                 }
-                                catch (Exception ex)
-                                {
-                                    _logger.Log(LogLevel.Information, ex, "IdentityToken definition not found in metadata");
-                                }
+                                if (IsIdentityTokenFound) break;
                             }
                             if (IsIdentityTokenFound) break;
                         }
-                        if (IsIdentityTokenFound) break;
+                        if (assetHistory.Count() < 100 || IsIdentityTokenFound) break;
                     }
                     if (IsIdentityTokenFound) break;
                 }
