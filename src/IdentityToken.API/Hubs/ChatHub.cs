@@ -139,11 +139,13 @@ public class ChatHub : Hub
                 .Where(u => u.LastActivity > DateTime.UtcNow.AddMinutes(-5))
                 .OrderByDescending(u => u.LastActivity)
                 .ToListAsync();
-            
-            return chatUsers
-                   .GroupBy(u => u.Identity.PolicyId + u.Identity.AssetName, u => u)
-                   .Select(g => g.FirstOrDefault())
+
+            var uniqueChatUsers = chatUsers
+                   .GroupBy(u => u?.Identity?.PolicyId + u?.Identity?.AssetName, u => u)
+                   .Select(g => g.First())
                    .ToList();
+
+            return uniqueChatUsers;
         }
         throw new Exception("Could not get online users");
     }

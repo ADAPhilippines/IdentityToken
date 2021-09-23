@@ -93,7 +93,7 @@ public class IdentityController : ControllerBase
                 break;
             }
 
-            if(addressAssets.Count() < 100) break;
+            if(addressAssets is not null && addressAssets.Count() < 100) break;
         }
 
         if(tempIdentityTokens.Count <= 0) return BadRequest("No IdentityToken found.");
