@@ -55,12 +55,12 @@
                     <div class="box-border mx-auto md:masonry before:box-inherit after:box-inherit">
                         @foreach (var asset in Assets)
                         {
-                            <div class="px-2 py-2 my-4 bg-gray-200 rounded-lg break-inside shadow text-center bg-opacity-70 transition-all hover:-translate-y-1 hover:scale-110 cursor-pointer">
+                            <div class="px-2 py-2 my-4 bg-gray-200 rounded-lg break-inside shadow text-center bg-opacity-70 transition-all cursor-pointer">
                                 @if (IsNFT(asset))
                                 {
                                     @if (IsVideoNFT(asset))
                                     {
-                                        <video class="block w-full" autoplay muted="muted" loop src="https://ipfs.blockfrost.dev/ipfs/@GetNFTVideoHash(asset)"></video>
+                                        <video class="block w-full" playsinline controls loop src="https://ipfs.blockfrost.dev/ipfs/@GetNFTVideoHash(asset)"></video>
                                     }
                                     else
                                     {
