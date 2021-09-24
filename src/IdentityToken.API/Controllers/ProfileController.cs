@@ -1,3 +1,4 @@
+using System.Text.Json;
 using IdentityToken.API.Data;
 using IdentityToken.Common.Helpers;
 using IdentityToken.Common.Models;
@@ -30,18 +31,17 @@ public class ProfileController : ControllerBase
         using var client = _httpClientFactory.CreateClient("blockfrost");
 
         // Inspect Wallet Address
-        CardanoAddressResponse? address = null;
-
+        var stakeAddress = string.Empty;
         try
         {
-            address = await client.GetFromJsonAsync<CardanoAddressResponse>($"addresses/{paymentAddress}");
+            using var poolPmWalletClient = _httpClientFactory.CreateClient();
+            var poolPmWalletResponse = await poolPmWalletClient.GetFromJsonAsync<JsonElement>($"https://api.pool.pm/wallet/{paymentAddress}");
+            stakeAddress = poolPmWalletResponse.GetProperty("addr").GetString();
         }
         catch
         {
             return BadRequest("Address may be invalid.");
         }
-
-        if (address?.StakeAddress is null) return BadRequest();
 
         // Inspect Assets
         Profile? profile = null;
@@ -50,7 +50,7 @@ public class ProfileController : ControllerBase
         while (!IsIdentityTokenFound)
         {
             var addressAssets = await client
-                .GetFromJsonAsync<IEnumerable<CardanoAddressAssetResponse>>($"accounts/{address.StakeAddress}/addresses/assets?order=desc&page={accountAssetsPage++}");
+                .GetFromJsonAsync<IEnumerable<CardanoAddressAssetResponse>>($"accounts/{stakeAddress}/addresses/assets?order=desc&page={accountAssetsPage++}");
 
             if (addressAssets is null) return BadRequest();
 
@@ -110,7 +110,7 @@ public class ProfileController : ControllerBase
                                     if (isMetadataValid)
                                     {
                                         assetName = assetName[2..];
-                                        var checkSum = CardanoHelper.GetShortHash($"{address.StakeAddress}{assetName}");
+                                        var checkSum = CardanoHelper.GetShortHash($"{stakeAddress}{assetName}");
                                         var username = $"{assetName}-{checkSum.ToLower()}";
 
                                         if (_identityDbContext.Profiles is null) return StatusCode(500);
@@ -121,7 +121,7 @@ public class ProfileController : ControllerBase
                                             {
                                                 Username = username,
                                                 PaymentAddress = paymentAddress,
-                                                StakeAddress = address.StakeAddress
+                                                StakeAddress = stakeAddress ?? string.Empty,
                                             };
                                             _identityDbContext.Profiles?.Add(profile);
                                             await _identityDbContext.SaveChangesAsync();
