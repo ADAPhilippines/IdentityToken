@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using CardanoSharp.Wallet;
 using CardanoSharp.Wallet.Enums;
@@ -8,8 +12,9 @@ using CardanoSharp.Wallet.Extensions.Models.Transactions;
 using IdentityToken.Common.Models;
 using CardanoSharp.Wallet.TransactionBuilding;
 using CardanoSharp.Wallet.Extensions;
+using PublicKey = CardanoSharp.Wallet.Models.Keys.PublicKey;
 
-namespace IdentityToken.API.Helpers;
+namespace IdentityToken.Common.Helpers;
 
 public class CardanoHelper
 {

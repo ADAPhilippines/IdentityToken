@@ -1,5 +1,5 @@
 @page "/{username}"
-
+@using IdentityToken.Common.Helpers;
 
 <div class="flex flex-col font-sans w-full h-full bg-center overflow-x-hidden bg-no-repeat bg-cover"
      style="background-image: url('/_content/IdentityToken.UI.Common/images/demo_section_bg.png')">
@@ -40,27 +40,27 @@
                 </a>
             </div>
             <div class="flex flex-col rounded-md w-11/12 xl:w-8/12 bg-white bg-opacity-70 mt-10 mb-32 mx-auto overflow-hidden relative z-1 demo-panel-shadow">
+               @if (IsInitialAssetsLoading)
+               {
+                   <div class="w-full h-full absolute bg-white bg-opacity-70">
+                       <div class="flex flex-col w-full h-full justify-center items-center">
+                           <div style="border-top-color:transparent"
+                                class="w-32 h-32 border-8 border-idt-purple border-solid rounded-full animate-spin"></div>
+                           <div class="w-full mt-6 text-center text-lg text-idt-purple tracking-wide font-normal">Loading, Please Wait...</div>   
+                       </div>
+                   </div>
+               }
                 <div class="text-2xl tracking-wide text-idt-purple w-full text-center mt-10 mb-10">Assets</div>
                 <div class="min-h-screen pr-[1.5em] pl-[1.5em] pb-[1.5em]">
                     <div class="box-border mx-auto md:masonry before:box-inherit after:box-inherit">
-                        <div class="px-2 py-2 my-4 bg-gray-200 rounded-lg break-inside shadow">
-                            <img src="https://cloudflare-ipfs.com/ipfs/QmUp1B7wf1i736S6qHxgrzJCJQwPxWKqv9uhRBR3ehCmsq" />
-                        </div>
-                        <div class="px-2 py-2 my-6 bg-gray-200 rounded-lg break-inside shadow">
-                            <img src="https://cloudflare-ipfs.com/ipfs/QmaBgwq2qfiV6HeurzuGSNJ3x9wFUZ41rNnhLKsZA9kHij" />
-                        </div>
-                        <div class="px-2 py-2 my-6 bg-gray-200 rounded-lg break-inside shadow">
-                            <img src="https://cloudflare-ipfs.com/ipfs/QmaSXbNakCfj3Yo4qSVJ1h9HfGS9pX7dU7znLVqm8ngaGu" />
-                        </div>
-                        <div class="px-2 py-2 my-4 bg-gray-200 rounded-lg break-inside shadow">
-                            <img src="https://cloudflare-ipfs.com/ipfs/QmUp1B7wf1i736S6qHxgrzJCJQwPxWKqv9uhRBR3ehCmsq" />
-                        </div>
-                        <div class="px-2 py-2 my-6 bg-gray-200 rounded-lg break-inside shadow">
-                            <img src="https://cloudflare-ipfs.com/ipfs/QmaBgwq2qfiV6HeurzuGSNJ3x9wFUZ41rNnhLKsZA9kHij" />
-                        </div>
-                        <div class="px-2 py-2 my-6 bg-gray-200 rounded-lg break-inside shadow">
-                            <img src="https://cloudflare-ipfs.com/ipfs/QmaSXbNakCfj3Yo4qSVJ1h9HfGS9pX7dU7znLVqm8ngaGu" />
-                        </div>
+                        @foreach (var asset in Assets)
+                        {
+                            <div class="px-2 py-2 my-4 bg-gray-200 rounded-lg break-inside shadow text-center">
+                                <img class="block" src="https://cloudflare-ipfs.com/ipfs/QmUp1B7wf1i736S6qHxgrzJCJQwPxWKqv9uhRBR3ehCmsq" />
+                                <span class="block text-8md sm:text-12md tracking-wide font-normal text-primary text-center mt-2 break-all">@(CardanoHelper.HexToAscii(asset.AssetName ?? ""))</span>
+                                <span class="block text-xs text-idt-gray tracking-wide font-normal text-center mt-1 break-all">@asset.Fingerprint</span>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>

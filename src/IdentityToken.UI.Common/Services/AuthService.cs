@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
@@ -42,6 +43,11 @@ public class AuthService
     public async Task<IdentityProfile?> GetProfileAsync(string username)
     {
         return await _apiClient.GetFromJsonAsync<IdentityProfile>($"profile/{username}");
+    }
+
+    public async Task<IEnumerable<CardanoAssetResponse>?> GetProfileAssetsAsync(string username, int limit = 20, int page = 1)
+    {
+        return await _apiClient.GetFromJsonAsync<IEnumerable<CardanoAssetResponse>>($"profile/{username}/assets?limit={limit}&page={page}");
     }
 
     public async void Logout()

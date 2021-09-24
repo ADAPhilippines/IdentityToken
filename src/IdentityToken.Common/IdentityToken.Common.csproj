@@ -5,4 +5,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="CardanoSharp.Wallet" Version="0.2.6" />
+  </ItemGroup>
+
 </Project>

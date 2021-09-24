@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
@@ -14,6 +16,11 @@ namespace IdentityToken.UI.Common.Pages
 
         private IdentityProfile? CurrentProfile { get; set; }
 
+        private List<CardanoAssetResponse> Assets { get; set; } =
+            new List<CardanoAssetResponse>();
+
+        private bool IsInitialAssetsLoading { get; set; } = true;
+
         private string FormattedTotalAda
         {
             get
@@ -28,9 +35,20 @@ namespace IdentityToken.UI.Common.Pages
         {
             if (firstRender)
             {
-                if(AuthService is not null)
+                if (AuthService is not null)
+                {
                     CurrentProfile = await AuthService.GetProfileAsync(Username);
-                await InvokeAsync(StateHasChanged);
+                    await InvokeAsync(StateHasChanged);
+                    
+                    var assetsResult = await AuthService.GetProfileAssetsAsync(Username);
+                    if (assetsResult is not null)
+                    {
+                        Assets.AddRange(assetsResult);
+                    }
+
+                    IsInitialAssetsLoading = false;
+                    await InvokeAsync(StateHasChanged);
+                }
             }
             await base.OnAfterRenderAsync(firstRender);
         }
