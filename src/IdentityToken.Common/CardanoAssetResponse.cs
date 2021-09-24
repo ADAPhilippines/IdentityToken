@@ -24,8 +24,8 @@ public record CardanoAssetResponse
     public int MintOrBurnCount { get; set; }
 
     [JsonPropertyName("metadata")]
-    public JsonElement Metadata { get; set; }
+    public JsonElement? Metadata { get; set; }
 
     [JsonPropertyName("onchain_metadata")]
-    public JsonElement OnChainMetadata { get; set; }
+    public JsonElement? OnChainMetadata { get; set; }
 }

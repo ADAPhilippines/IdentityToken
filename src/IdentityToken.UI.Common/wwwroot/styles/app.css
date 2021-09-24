@@ -20,7 +20,7 @@ pre
     @variants responsive {
         .masonry {
             column-gap: 1.5em;
-            column-count: 3;
+            column-count: 5;
         }
         .break-inside {
             break-inside: avoid;
