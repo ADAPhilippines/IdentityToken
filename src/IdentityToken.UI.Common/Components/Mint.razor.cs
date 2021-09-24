@@ -32,17 +32,42 @@ namespace IdentityToken.UI.Common.Components
                 },
                 new IdentityTokenMetadatum
                 {
-                    Key = "facebook_profile",
+                    Key = "facebook",
                     Value = string.Empty
                 },
                 new IdentityTokenMetadatum
                 {
-                    Key = "twitter_profile",
+                    Key = "twitter",
                     Value = string.Empty
                 },
                 new IdentityTokenMetadatum
                 {
-                    Key = "instagram_profile",
+                    Key = "instagram",
+                    Value = string.Empty
+                },
+                new IdentityTokenMetadatum
+                {
+                    Key = "github",
+                    Value = string.Empty
+                },
+                new IdentityTokenMetadatum
+                {
+                    Key = "tiktok",
+                    Value = string.Empty
+                },
+                new IdentityTokenMetadatum
+                {
+                    Key = "twitch",
+                    Value = string.Empty
+                },
+                new IdentityTokenMetadatum
+                {
+                    Key = "youtube",
+                    Value = string.Empty
+                },
+                new IdentityTokenMetadatum
+                {
+                    Key = "snapchat",
                     Value = string.Empty
                 }
             };
@@ -104,7 +129,7 @@ namespace IdentityToken.UI.Common.Components
             }
 
             var metadataString = JsonSerializer.Serialize(metadataDictionary);
-
+            
             LoadingMessage = "Building Transaction...";
             if (CardanoWalletInteropService is null) return;
 
