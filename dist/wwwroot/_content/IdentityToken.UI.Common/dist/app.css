@@ -2137,6 +2137,10 @@ pre
     width: 25%;
   }
 
+  .sm\:w-11\/12 {
+    width: 91.666667%;
+  }
+
   .sm\:flex-grow {
     flex-grow: 1;
   }
@@ -2286,12 +2290,20 @@ pre
     width: 75%;
   }
 
+  .lg\:w-\[600px\] {
+    width: 600px;
+  }
+
   .lg\:flex-grow-0 {
     flex-grow: 0;
   }
 
   .lg\:flex-grow {
     flex-grow: 1;
+  }
+
+  .lg\:justify-center {
+    justify-content: center;
   }
 
   .lg\:p-10 {

@@ -8,11 +8,9 @@
         </div>
         <div class="text-2xl sm:text-3xl tracking-wide font-normal text-primary text-center mt-6 mb-12">Create your profile!</div>
         <div class="flex justify-center">
-            <div class="flex flex-col">
-                <div class="w-[600px]">
+            <div class="flex flex-col w-11/12 lg:w-[600px]">
                     <MintRequiredField Label="Wallet Address" Placeholder="Paste your wallet address that contains IdentityToken!" @bind-value="WalletAddress"/>
-                </div>
-                <button @onclick="OnBtnCreateClicked" class="select-none mx-auto h-[48px] w-8/12 sm:w-4/12 text-sm rounded-full mt-4 mb-12 bg-gradient-to-r from-[#7A60C9] to-[#4C4CE8] text-white hover:to-transparent hover:from-transparent hover:border hover:border-idt-purple hover:text-black hover:bg-transparent">
+                    <button @onclick="OnBtnCreateClicked" class="select-none mx-auto h-[48px] w-8/12 sm:w-4/12 text-sm rounded-full mt-4 mb-12 bg-gradient-to-r from-[#7A60C9] to-[#4C4CE8] text-white hover:to-transparent hover:from-transparent hover:border hover:border-idt-purple hover:text-black hover:bg-transparent">
                     CREATE PROFILE!
                 </button>
             </div>
