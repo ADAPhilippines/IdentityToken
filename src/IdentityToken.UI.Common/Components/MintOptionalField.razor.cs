@@ -10,7 +10,8 @@ namespace IdentityToken.UI.Common.Components
         [Parameter] public string KeyPlaceholder { get; set; } = string.Empty;
         [Parameter] public string ValuePlaceholder { get; set; } = string.Empty;
         [Parameter] public bool IsDefault { get; set; }
-        [Parameter] public string? Icon { get; set; }
+        [Parameter]
+        public RenderFragment? ChildContent { get; set; }
         [Parameter]public EventCallback<string> ValueChanged { get; set; }
         private string _value = string.Empty;
         [Parameter] public string Value

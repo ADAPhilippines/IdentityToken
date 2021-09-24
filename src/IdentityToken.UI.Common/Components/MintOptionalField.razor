@@ -1,8 +1,8 @@
 ﻿<div class="@Class @GetBorderColorClass() @GetRightPaddingClass() flex border h-[48px] rounded-full mb-8 pl-5">
-    @if (Icon != null)
+    @if (ChildContent != null)
     {
         <div class="@GetIconBgColorClass() flex select-none rounded-full justify-center min-w-[48px] w-[48px] h-[48px] mt-[-1px] -ml-6 mr-5 text-center items-center">
-            <img class="h-2/6" src="/_content/IdentityToken.UI.Common/images/@(Icon)" alt=""/>
+            @ChildContent
         </div>
     }
     @if (!IsDefault)

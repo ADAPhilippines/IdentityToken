@@ -17,6 +17,16 @@ pre
 }
 
 @layer utilities {
+    @variants responsive {
+        .masonry {
+            column-gap: 1.5em;
+            column-count: 3;
+        }
+        .break-inside {
+            break-inside: avoid;
+        }
+    }
+    
     .demo-panel-shadow {
         box-shadow: -15px -15px 30px 0 rgba(255,255,255,0.5);
         -webkit-box-shadow: -15px -15px 30px 0 rgba(255,255,255,0.5);

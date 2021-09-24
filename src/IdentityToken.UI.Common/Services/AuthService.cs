@@ -39,6 +39,11 @@ public class AuthService
         Authenticated?.Invoke(this, EventArgs.Empty);
     }
 
+    public async Task<IdentityProfile?> GetProfileAsync(string username)
+    {
+        return await _apiClient.GetFromJsonAsync<IdentityProfile>($"profile/{username}");
+    }
+
     public async void Logout()
     {
         await _localStorageService.RemoveItemAsync("identity");
