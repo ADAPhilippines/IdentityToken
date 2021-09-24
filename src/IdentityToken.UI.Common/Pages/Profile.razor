@@ -1,11 +1,11 @@
 @page "/{username}"
 @using IdentityToken.Common.Helpers;
 
-<div class="flex flex-col font-sans w-full h-full bg-center overflow-x-hidden bg-no-repeat bg-cover"
-     style="background-image: url('/_content/IdentityToken.UI.Common/images/demo_section_bg.png')">
+<div class="flex flex-col font-sans w-full h-full overflow-x-hidden">
+    <div class="w-[100vw] h-[100vh] fixed top-0 left-0 z-0 bg-center bg-no-repeat bg-cover" style="background-image: url('/_content/IdentityToken.UI.Common/images/demo_section_bg.webp')"></div>
     @if (CurrentProfile is not null)
     {
-        <div class="flex flex-col">
+        <div class="flex flex-col relative z-10">
             <div class="w-full mt-10 mb-1 h-20 flex justify-center">
                 <span class="inline-block relative">
                     <img class="w-[100px] h-[100px] rounded-full border-solid border-4 border-idt-gray-2" src="https://cloudflare-ipfs.com/ipfs/@CurrentProfile?.IdentityToken?.Avatar?.Source" alt="avatar">

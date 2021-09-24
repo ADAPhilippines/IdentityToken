@@ -1,7 +1,8 @@
 @page "/"
 
 <div class="flex flex-col font-sans w-full">
-    <div class="flex w-full bg-center overflow-hidden bg-no-repeat bg-cover" style="background-image: url('/_content/IdentityToken.UI.Common/images/demo_section_bg.png')">
+    <div class="flex w-full bg-center overflow-hidden bg-no-repeat bg-cover relative">
+        <div class="w-[100vw] h-[100vh] fixed top-0 left-0 z-0 bg-center bg-no-repeat bg-cover" style="background-image: url('/_content/IdentityToken.UI.Common/images/demo_section_bg.webp')"></div>
         <div class="flex flex-col justify-center container pt-24 md:pt-28 relative">
             <div class="w-full mb-10 h-20 flex justify-center">
                 <img src="/_content/IdentityToken.UI.Common/images/adaph_logo_dark.svg" alt=""/>
@@ -89,7 +90,7 @@
         </div>
     </div>
 
-    <div class="flex w-full bg-center bg-no-repeat overflow-hidden bg-cover" style="background-image: url('/_content/IdentityToken.UI.Common/images/for_dev_bg.png')">
+    <div class="flex relative z-10 w-full bg-center bg-no-repeat overflow-hidden bg-cover" style="background: url('/_content/IdentityToken.UI.Common/images/for_dev_bg.webp') white;background-size: cover;background-repeat: no-repeat;">
         <div class="flex flex-col bg-transparent justify-center container py-24 relative">
             <div class="flex flex-col justify-center w-full">
                 <h3 class="w-full text-4xl tracking-wide font-bold text-center text-primary">For Developers</h3>
@@ -172,7 +173,7 @@ await LocalStorageService.SetItemAsync("identity", identity);</code>
             </div>
         </div>
     </div>
-    <div class="flex w-full bg-idt-green-darkest">
+    <div class="flex z-10 relative w-full bg-idt-green-darkest">
         <div class="flex flex-col justify-center container pt-8 md:py-8 relative overflow-hidden">
             <div class="flex h-20 md:h-24">
                 <div class="flex w-6/12 sm:w-3/12 sm:flex-grow lg:flex-grow-0 h-full lg:pr-10 sm:border-r sm:border-r-[#2A3849] justify-center">

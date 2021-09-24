@@ -1,27 +1,25 @@
 @page "/profile/create"
 
-<div class="flex flex-col font-sans w-full h-full bg-center overflow-x-hidden bg-no-repeat bg-cover"
-     style="background-image: url('/_content/IdentityToken.UI.Common/images/demo_section_bg.png')">
-    <div class="flex flex-col">
+<div class="flex flex-col font-sans w-full h-full bg-center overflow-x-hidden bg-no-repeat bg-cover">
+    <div class="w-[100vw] h-[100vh] fixed top-0 left-0 z-0 bg-center bg-no-repeat bg-cover" style="background-image: url('/_content/IdentityToken.UI.Common/images/demo_section_bg.webp')"></div>
+    <div class="flex flex-col relative">
         <div class="w-full mt-10 mb-10 h-20 flex justify-center">
             <img src="/_content/IdentityToken.UI.Common/images/adaph_logo_dark.svg" alt=""/>
         </div>
         <div class="text-2xl sm:text-3xl tracking-wide font-normal text-primary text-center mt-6 mb-12">Create your profile!</div>
         <div class="flex justify-center">
-            <div class="flex flex-col">
-                <div class="w-[600px]">
-                    <MintRequiredField Label="Wallet Address" Placeholder="Paste your wallet address that contains IdentityToken!" @bind-value="WalletAddress"/>
-                </div>
+            <div class="flex flex-col w-11/12 lg:w-[600px]">
+                <MintRequiredField Label="Wallet Address" Placeholder="Paste your wallet address that contains IdentityToken!" @bind-value="WalletAddress"/>
                 <button @onclick="OnBtnCreateClicked" class="select-none mx-auto h-[48px] w-8/12 sm:w-4/12 text-sm rounded-full mt-4 mb-12 bg-gradient-to-r from-[#7A60C9] to-[#4C4CE8] text-white hover:to-transparent hover:from-transparent hover:border hover:border-idt-purple hover:text-black hover:bg-transparent">
                     CREATE PROFILE!
                 </button>
             </div>
         </div>
-        
+
         <div class="text-2xl sm:text-3xl tracking-wide font-normal text-primary text-center mt-6 mb-12">OR</div>
         <div class="text-2xl sm:text-3xl tracking-wide font-normal text-primary text-center mt-6 mb-12">Don't have an IdentityToken yet?</div>
         <div class="flex flex-col rounded-md w-11/12 xl:w-8/12 bg-white bg-opacity-70 mt-10 mb-32 mx-auto overflow-hidden relative z-1 shadow">
-            <Mint />
+            <Mint/>
         </div>
     </div>
 </div>
