@@ -1,5 +1,5 @@
 using IdentityToken.API.Data;
-using IdentityToken.API.Helpers;
+using IdentityToken.Common.Helpers;
 using IdentityToken.Common.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -292,8 +292,6 @@ public class ProfileController : ControllerBase
 
             if (assetInformation?.MintTxHash is null || assetInformation.MintOrBurnCount == 0) continue;
 
-            assetInformation.Quantity = asset.Quantity;
-            
             identityProfileAssets.Add(assetInformation);
         }
 

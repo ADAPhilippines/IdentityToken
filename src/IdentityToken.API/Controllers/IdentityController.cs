@@ -1,4 +1,4 @@
-using IdentityToken.API.Helpers;
+using IdentityToken.Common.Helpers;
 using IdentityToken.Common.Models;
 using Microsoft.AspNetCore.Mvc;
 using IdentityToken.API.Data;
