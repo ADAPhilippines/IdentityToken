@@ -7,8 +7,8 @@
     "watch:scripts": "webpack watch --mode=development",
     "watch:css": "tailwindcss -i ./wwwroot/styles/app.css -o ./wwwroot/dist/app.css --watch",
     "watch": "npm-run-all --parallel watch:**",
-    "build:dev": "webpack --mode=development && tailwindcss -o ./wwwroot/dist/app.css",
-    "build": "webpack --mode=production && tailwindcss -o ./wwwroot/dist/app.css",
+    "build:dev": "webpack --mode=development && tailwindcss -i ./wwwroot/styles/app.css -o ./wwwroot/dist/app.css",
+    "build": "webpack --mode=production && tailwindcss -i ./wwwroot/styles/app.css -o ./wwwroot/dist/app.css",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
