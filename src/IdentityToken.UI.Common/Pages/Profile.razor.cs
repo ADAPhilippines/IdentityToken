@@ -135,5 +135,24 @@ namespace IdentityToken.UI.Common.Pages
             var quantity = ulong.Parse(quantityString);
             return quantity.ToString("N");
         }
+
+        private bool IsIdentityKeyExist(string key)
+        {
+            var metadata = CurrentProfile?.IdentityToken?.Metadata;
+            return metadata is not null && metadata.Value.TryGetProperty(key, out _);
+        }
+
+        private string GetIdentityKeyValue(string key)
+        {
+            var noResult = $"/{Username}";
+            var metadata = CurrentProfile?.IdentityToken?.Metadata;
+            if (metadata is null) return noResult;
+            var success = metadata.Value.TryGetProperty(key, out var keyProperty);
+
+            if (success)
+                return keyProperty.GetString() ?? noResult;
+            
+            return noResult;
+        }
     }
 }

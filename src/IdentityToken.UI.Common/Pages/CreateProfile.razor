@@ -10,9 +10,9 @@
         <div class="flex justify-center">
             <div class="flex flex-col">
                 <div class="w-[600px]">
-                    <MintRequiredField Label="Wallet Address" Placeholder="Paste your wallet address that contains IdentityToken!"/>
+                    <MintRequiredField Label="Wallet Address" Placeholder="Paste your wallet address that contains IdentityToken!" @bind-value="WalletAddress"/>
                 </div>
-                <button class="select-none mx-auto h-[48px] w-8/12 sm:w-4/12 text-sm rounded-full mt-4 mb-12 bg-gradient-to-r from-[#7A60C9] to-[#4C4CE8] text-white hover:to-transparent hover:from-transparent hover:border hover:border-idt-purple hover:text-black hover:bg-transparent">
+                <button @onclick="OnBtnCreateClicked" class="select-none mx-auto h-[48px] w-8/12 sm:w-4/12 text-sm rounded-full mt-4 mb-12 bg-gradient-to-r from-[#7A60C9] to-[#4C4CE8] text-white hover:to-transparent hover:from-transparent hover:border hover:border-idt-purple hover:text-black hover:bg-transparent">
                     CREATE PROFILE!
                 </button>
             </div>
@@ -25,3 +25,4 @@
         </div>
     </div>
 </div>
+<Toast Message="Invalid Address, You might not have an IdentityToken!" IsError="@true" @bind-ShouldShow="@IsError"/>

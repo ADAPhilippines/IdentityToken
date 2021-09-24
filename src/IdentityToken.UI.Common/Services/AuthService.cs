@@ -50,6 +50,17 @@ public class AuthService
         return await _apiClient.GetFromJsonAsync<IEnumerable<CardanoAssetResponse>>($"profile/{username}/assets?limit={limit}&page={page}");
     }
 
+    public async Task<Profile?> CreateProfileAsync(string walletAddress)
+    {
+        var body = new CreateProfileRequestBody
+        {
+            PaymentAddress = walletAddress
+        };
+
+        var result = await _apiClient.PostAsJsonAsync("/profile", body);
+        return await result.Content.ReadFromJsonAsync<Profile>();
+    }
+
     public async void Logout()
     {
         await _localStorageService.RemoveItemAsync("identity");
