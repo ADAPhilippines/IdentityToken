@@ -292,6 +292,8 @@ public class ProfileController : ControllerBase
 
             if (assetInformation?.MintTxHash is null || assetInformation.MintOrBurnCount == 0) continue;
 
+            assetInformation.Quantity = asset.Quantity;
+            
             identityProfileAssets.Add(assetInformation);
         }
 
