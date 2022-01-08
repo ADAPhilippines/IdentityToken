@@ -44,7 +44,7 @@ public class CardanoHelper
 
     public static (string, string) GenerateAuthWalletAddress()
     {
-        var keyService = new KeyService();
+        var keyService = new MnemonicService();
         var mnemonic = keyService.Generate(24, WordLists.English);
         var (address, _, _) = GetWalletWithMneomnic(mnemonic.Words);
         return (mnemonic.Words, address.ToString());
@@ -52,7 +52,7 @@ public class CardanoHelper
 
     public static (Address, PrivateKey, PublicKey) GetWalletWithMneomnic(string mnemonic, string paymentPath = "m/1852'/1815'/0'/0/0", string stakePath = "m/1852'/1815'/0'/2/0")
     {
-        var keyService = new KeyService();
+        var keyService = new MnemonicService();
         var addressService = new AddressService();
 
         var mnemonicObj = keyService.Restore(mnemonic, WordLists.English);

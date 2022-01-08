@@ -3,6 +3,12 @@ using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using IdentityToken.API.Hubs;
 using Microsoft.AspNetCore.Http.Connections;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Linq;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -54,7 +60,6 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapHub<ChatHub>("/chat", o => o.Transports = HttpTransportType.WebSockets);
 });
-app.UseAuthorization();
 app.MapControllers();
 
 // Update All ChatUsers to be offline

@@ -3,6 +3,13 @@ using IdentityToken.Common.Models;
 using Microsoft.AspNetCore.Mvc;
 using IdentityToken.API.Data;
 using System.Net.Http.Headers;
+using Microsoft.Extensions.Logging;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Linq;
+using System.Net.Http.Json;
+using System.Collections.Generic;
+using System;
 
 namespace IdentityToken.API.Controllers;
 
@@ -22,7 +29,9 @@ public class IdentityController : ControllerBase
         _identityDbContext = identityDbContextFactory.CreateDbContext();
     }
 
-    [HttpGet("auth")]
+  public ILogger<IdentityController> Logger => _logger;
+
+  [HttpGet("auth")]
     public async Task<IActionResult> AuthAsync()
     {
         // NOT THE BEST SECURITY PRACTICE ONLY FOR DEMO
@@ -152,7 +161,7 @@ public class IdentityController : ControllerBase
                         }
                         catch (Exception ex)
                         {
-                            _logger.Log(LogLevel.Information, ex, "IdentityToken definition not found in metadata");
+                            Logger.Log(LogLevel.Information, ex, "IdentityToken definition not found in metadata");
                         }
                     }
                 }
