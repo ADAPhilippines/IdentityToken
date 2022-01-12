@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="Blockfrost.Api" Version="1.0.0" />
-    <PackageReference Include="CardanoSharp.Wallet" Version="1.0.1" />
+    <PackageReference Include="CardanoSharp.Wallet" Version="1.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.1">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
