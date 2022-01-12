@@ -15,5 +15,5 @@ public record CardanoTxOutput
     public string? TxHash { get; set; }
 
     [JsonPropertyName("output_index")]
-    public uint? Index { get; set; }
+    public ulong? Index { get; set; }
 }

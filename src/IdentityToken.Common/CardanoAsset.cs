@@ -8,5 +8,5 @@ public record CardanoAsset
     public string? Unit { get; set; }
 
     [JsonPropertyName("quantity")]
-    public uint Quantity { get; set; }
+    public ulong Quantity { get; set; }
 }
