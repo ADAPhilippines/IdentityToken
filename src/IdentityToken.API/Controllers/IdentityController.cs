@@ -74,9 +74,13 @@ public class IdentityController : ControllerBase
     var txHash = utxos.Hash;
     var txIndex = utxos.Outputs.ToList().IndexOf(txOutput);
 
-    var getTotalLovelace = (uint?)txOutput?.Amount?.Where(y => y.Unit == "lovelace").Sum(y => y.Quantity);
+    var getTotalLovelace = 0UL;
+    txOutput?.Amount?.Where(y => y.Unit == "lovelace").ToList().ForEach((y) =>
+    {
+      getTotalLovelace += y.Quantity;
+    });
 
-    if (getTotalLovelace is null || getTotalLovelace < 1200000) return Unauthorized();
+    if (getTotalLovelace < 1200000) return Unauthorized();
 
     var txInput = utxos.Inputs.FirstOrDefault();
     var userWalletAddress = txInput?.Address;
