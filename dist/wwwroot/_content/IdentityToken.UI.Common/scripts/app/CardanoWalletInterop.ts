@@ -3,16 +3,14 @@ import ProtocolParameters from "./Types/ProtocolParameters";
 import Block from "./Types/Block";
 import Helper from "./Helpers/Helper";
 import {
-    Address,
+    Address, AuxiliaryData, AuxiliaryDataHash,
     BaseAddress,
     Ed25519KeyHash,
-    MetadataHash,
     Mint,
     NativeScript,
     NativeScripts,
     Transaction,
     TransactionBody,
-    TransactionMetadata,
     TransactionUnspentOutput,
     Value
 } from "@emurgo/cardano-serialization-lib-browser";
@@ -22,6 +20,7 @@ import CardanoWalletInteropErrorType from "./Enums/CardanoWalletInteropErrorType
 import CardanoWalletInteropError from "./Types/CardanoWalletInteropError";
 import TxOutput from "./Types/TxOutput";
 import Tx from "./Types/Tx";
+import {Bifrost, BifrostWalletId, BifrostWalletMetadata} from "./Bifrost";
 
 class CardanoWalletInterop {
     private blockfrostProjectId: string = "";
@@ -93,7 +92,7 @@ class CardanoWalletInterop {
         txBody: TransactionBody,
         numWitness: number,
         protocolParams: ProtocolParameters,
-        txMetadata: TransactionMetadata | undefined = undefined,
+        txMetadata: AuxiliaryData | undefined = undefined,
         nativeScripts: NativeScripts | null = null): Promise<Value> {
         const dummyVkeyWitness =
             "8258208814c250f40bfc74d6c64f02fc75a54e68a9a8b3736e408d9820a6093d5e38b95840f04a036fa56b180af6537b2bba79cec75191dc47419e1fd8a4a892e7d84b7195348b3989c15f1e7b895c5ccee65a1931615b4bdb8bbbd01e6170db7a6831310c";
@@ -110,7 +109,7 @@ class CardanoWalletInterop {
         const dummyWitnesses = CardanoWasmLoader.Cardano.TransactionWitnessSet.new();
         dummyWitnesses.set_vkeys(vkeys);
         if (nativeScripts !== null)
-            dummyWitnesses.set_scripts(nativeScripts);
+            dummyWitnesses.set_native_scripts(nativeScripts);
 
         const rawTx = CardanoWasmLoader.Cardano.Transaction.new(
             txBody,
@@ -133,7 +132,8 @@ class CardanoWalletInterop {
 
     public async IsWalletConnectedAsync(): Promise<boolean | null> {
         if (window.cardano) {
-            return await window.cardano.isEnabled();
+            const r = await Bifrost.isEnabledAsync("ccvault");
+            return r;
         } else {
             let err: CardanoWalletInteropError = {
                 type: CardanoWalletInteropErrorType.noWalletError,
@@ -144,10 +144,10 @@ class CardanoWalletInterop {
         }
     }
 
-    public async ConnectWalletAsync(): Promise<boolean> {
-        let result = false;
+    public async ConnectWalletAsync(walletId: BifrostWalletId): Promise<boolean> {
         try {
-            result = await window.cardano.enable();
+            await Bifrost.enableAsync(walletId);
+            await Bifrost.setWalletAsync(walletId);
         } catch (e: any) {
             console.error("Connect Wallet Error: ", e);
             let err: CardanoWalletInteropError = {
@@ -156,14 +156,16 @@ class CardanoWalletInterop {
             }
             await this.ThrowErrorAsync(err);
         }
-        return result;
+        return true;
     }
+    
+    public GetWallets = () => Bifrost.getWallets();
 
     public async MintIdentityTokenAsync(assetName: string, avatar: string, metadata: string): Promise<string | null> {
         let result: string | null = null;
         const transaction = await this.CreateMintTx(assetName, avatar, metadata);
         if (transaction !== null) {
-            const signedTx = await this.signTxAsync(transaction);
+            const signedTx = await this.SignTxAsync(transaction);
             if (signedTx !== null) {
                 result = await this.SubmitTxAsync(signedTx);
             }
@@ -175,7 +177,7 @@ class CardanoWalletInterop {
         let result: string | null = null;
         const transaction = await this.CreateNormalTx(outputs);
         if (transaction !== null) {
-            const signedTx = await this.signTxAsync(transaction);
+            const signedTx = await this.SignTxAsync(transaction);
             if (signedTx != null) {
                 result = await this.SubmitTxAsync(signedTx);
             }
@@ -202,22 +204,22 @@ class CardanoWalletInterop {
         return transaction;
     }
 
-    private async signTxAsync(transaction: Transaction): Promise<Transaction | null> {
+    private async SignTxAsync(transaction: Transaction): Promise<Transaction | null> {
         let result: Transaction | null = null;
         try {
             const transactionHex = Buffer.from(transaction.to_bytes()).toString("hex");
-            const witnesses = await window.cardano.signTx(transactionHex);
+            const witnesses = await Bifrost.signTxRawAsync(transactionHex);
 
             const txWitnesses = transaction.witness_set();
             const txVkeys = txWitnesses.vkeys();
-            const txScripts = txWitnesses.scripts();
+            const txScripts = txWitnesses.native_scripts();
 
             const addWitnesses = CardanoWasmLoader.Cardano.TransactionWitnessSet.from_bytes(
                 Buffer.from(witnesses, "hex")
             );
 
             const addVkeys = addWitnesses.vkeys();
-            const addScripts = addWitnesses.scripts();
+            const addScripts = addWitnesses.native_scripts();
 
             const totalVkeys = CardanoWasmLoader.Cardano.Vkeywitnesses.new();
             const totalScripts = CardanoWasmLoader.Cardano.NativeScripts.new();
@@ -245,12 +247,12 @@ class CardanoWalletInterop {
 
             const totalWitnesses = CardanoWasmLoader.Cardano.TransactionWitnessSet.new();
             totalWitnesses.set_vkeys(totalVkeys);
-            totalWitnesses.set_scripts(totalScripts);
+            totalWitnesses.set_native_scripts(totalScripts);
 
             result = CardanoWasmLoader.Cardano.Transaction.new(
                 transaction.body(),
                 totalWitnesses,
-                transaction.metadata()
+                transaction.auxiliary_data()
             );
         } catch (e: any) {
             console.error("Error in signing Tx:", e)
@@ -271,10 +273,14 @@ class CardanoWalletInterop {
             const txBuilder = CardanoWasmLoader.Cardano.TransactionBuilder.new(
                 CardanoWasmLoader.Cardano.LinearFee.new(
                     CardanoWasmLoader.Cardano.BigNum.from_str(protocolParams.min_fee_a.toString()),
-                    CardanoWasmLoader.Cardano.BigNum.from_str(protocolParams.min_fee_b.toString())),
+                    CardanoWasmLoader.Cardano.BigNum.from_str(protocolParams.min_fee_b.toString())
+                ),
                 CardanoWasmLoader.Cardano.BigNum.from_str(protocolParams.min_utxo.toString()),
                 CardanoWasmLoader.Cardano.BigNum.from_str(protocolParams.pool_deposit.toString()),
-                CardanoWasmLoader.Cardano.BigNum.from_str(protocolParams.key_deposit.toString()));
+                CardanoWasmLoader.Cardano.BigNum.from_str(protocolParams.key_deposit.toString()),
+                protocolParams.max_val_size,
+                protocolParams.max_tx_size
+            );
 
             const utxos = await CardanoWalletInterop.SelectUtxosAsync(4000000);
             utxos.forEach(utxo => {
@@ -295,7 +301,7 @@ class CardanoWalletInterop {
 
             txBuilder.set_ttl(latestBlock.slot + 1000);
 
-            const addressHex = (await window.cardano.getUsedAddresses())[0];
+            const addressHex = (await Bifrost.getUsedAddressesRawAsync())[0];
             const addressBuffer = Buffer.from(addressHex, "hex");
             const address = CardanoWasmLoader.Cardano.Address.from_bytes(addressBuffer);
             txBuilder.add_change_if_needed(address);
@@ -325,8 +331,7 @@ class CardanoWalletInterop {
 
     private async CreateMintTx(assetName: string, avatar: string, metadata: string): Promise<Transaction | null> {
         try {
-            const MAX_INPUTS = 20;
-            const addressHex = (await window.cardano.getUsedAddresses())[0];
+            const addressHex = (await Bifrost.getUsedAddressesRawAsync())[0];
             const addressBuffer = Buffer.from(addressHex, "hex");
             const address = CardanoWasmLoader.Cardano.Address.from_bytes(addressBuffer);
 
@@ -363,8 +368,7 @@ class CardanoWalletInterop {
             const rawTxBody = CardanoWasmLoader.Cardano.TransactionBody.new(
                 inputs,
                 rawOutputs,
-                CardanoWasmLoader.Cardano.BigNum.from_str("0"),
-                latestBlock.slot + 1000
+                CardanoWasmLoader.Cardano.BigNum.from_str("0")
             );
 
             const mint = CardanoWalletInterop.CreateTxMint(assetName, script);
@@ -389,8 +393,9 @@ class CardanoWalletInterop {
                 CardanoWasmLoader.Cardano.encode_json_str_to_metadatum(metadata, 0)
             );
 
-            let _metadata = CardanoWasmLoader.Cardano.TransactionMetadata.new(generalMetadata);
-            rawTxBody.set_metadata_hash(CardanoWasmLoader.Cardano.hash_metadata(_metadata));
+            let _metadata = CardanoWasmLoader.Cardano.AuxiliaryData.new();
+            _metadata.set_metadata(generalMetadata)
+            rawTxBody.set_auxiliary_data_hash(CardanoWasmLoader.Cardano.hash_auxiliary_data(_metadata));
 
             let protocolParams = await this.GetProtocolParametersAsync(latestBlock.epoch);
             let fee = await CardanoWalletInterop.CalculateTxFeeAsync(rawTxBody, 2, protocolParams, _metadata, nativeScripts);
@@ -407,17 +412,17 @@ class CardanoWalletInterop {
             const finalTxBody = CardanoWasmLoader.Cardano.TransactionBody.new(
                 inputs,
                 outputs,
-                fee.coin(),
-                latestBlock.slot + 1000
+                fee.coin()
             );
 
             finalTxBody.set_mint(rawTxBody.multiassets() as Mint);
-            finalTxBody.set_metadata_hash(rawTxBody.metadata_hash() as MetadataHash);
+            finalTxBody.set_auxiliary_data_hash(rawTxBody.auxiliary_data_hash() as AuxiliaryDataHash);
 
             const finalWitnesses = CardanoWasmLoader.Cardano.TransactionWitnessSet.new();
-            finalWitnesses.set_scripts(nativeScripts);
+            finalWitnesses.set_native_scripts(nativeScripts);
 
-            _metadata = CardanoWasmLoader.Cardano.TransactionMetadata.new(generalMetadata);
+            _metadata = CardanoWasmLoader.Cardano.AuxiliaryData.new();
+            _metadata.set_metadata(generalMetadata);
             let transaction = CardanoWasmLoader.Cardano.Transaction.new(
                 finalTxBody,
                 finalWitnesses,
@@ -440,7 +445,7 @@ class CardanoWalletInterop {
     }
 
     private static async SelectUtxosAsync(amount: number): Promise<TransactionUnspentOutput[]> {
-        const utxosHex = await window.cardano.getUtxos();
+        const utxosHex = await Bifrost.getUtxosRawAsync();
         const utxos: TransactionUnspentOutput[] = utxosHex
             .map(utxo => CardanoWasmLoader.Cardano.TransactionUnspentOutput.from_bytes(Buffer.from(utxo, "hex")));
 
@@ -454,7 +459,7 @@ class CardanoWalletInterop {
             else
                 return 0;
         });
-        
+
         const selectedUtxos: TransactionUnspentOutput[] = [];
         for (let i in sortedUtxos) {
             selectedUtxos.push(sortedUtxos[i]);
@@ -464,7 +469,7 @@ class CardanoWalletInterop {
 
             if (sum >= amount) break;
         }
-        
+
         return selectedUtxos;
     }
 
