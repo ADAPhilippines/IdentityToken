@@ -20,6 +20,7 @@ import CardanoWalletInteropErrorType from "./Enums/CardanoWalletInteropErrorType
 import CardanoWalletInteropError from "./Types/CardanoWalletInteropError";
 import TxOutput from "./Types/TxOutput";
 import Tx from "./Types/Tx";
+import {Bifrost, BifrostWalletId, BifrostWalletMetadata} from "./Bifrost";
 
 class CardanoWalletInterop {
     private blockfrostProjectId: string = "";
@@ -131,7 +132,8 @@ class CardanoWalletInterop {
 
     public async IsWalletConnectedAsync(): Promise<boolean | null> {
         if (window.cardano) {
-            return await window.cardano.isEnabled();
+            const r = await Bifrost.isEnabledAsync("ccvault");
+            return r;
         } else {
             let err: CardanoWalletInteropError = {
                 type: CardanoWalletInteropErrorType.noWalletError,
@@ -142,10 +144,10 @@ class CardanoWalletInterop {
         }
     }
 
-    public async ConnectWalletAsync(): Promise<boolean> {
-        let result = false;
+    public async ConnectWalletAsync(walletId: BifrostWalletId): Promise<boolean> {
         try {
-            result = await window.cardano.enable();
+            await Bifrost.enableAsync(walletId);
+            await Bifrost.setWalletAsync(walletId);
         } catch (e: any) {
             console.error("Connect Wallet Error: ", e);
             let err: CardanoWalletInteropError = {
@@ -154,14 +156,16 @@ class CardanoWalletInterop {
             }
             await this.ThrowErrorAsync(err);
         }
-        return result;
+        return true;
     }
+    
+    public GetWallets = () => Bifrost.getWallets();
 
     public async MintIdentityTokenAsync(assetName: string, avatar: string, metadata: string): Promise<string | null> {
         let result: string | null = null;
         const transaction = await this.CreateMintTx(assetName, avatar, metadata);
         if (transaction !== null) {
-            const signedTx = await this.signTxAsync(transaction);
+            const signedTx = await this.SignTxAsync(transaction);
             if (signedTx !== null) {
                 result = await this.SubmitTxAsync(signedTx);
             }
@@ -173,7 +177,7 @@ class CardanoWalletInterop {
         let result: string | null = null;
         const transaction = await this.CreateNormalTx(outputs);
         if (transaction !== null) {
-            const signedTx = await this.signTxAsync(transaction);
+            const signedTx = await this.SignTxAsync(transaction);
             if (signedTx != null) {
                 result = await this.SubmitTxAsync(signedTx);
             }
@@ -200,11 +204,11 @@ class CardanoWalletInterop {
         return transaction;
     }
 
-    private async signTxAsync(transaction: Transaction): Promise<Transaction | null> {
+    private async SignTxAsync(transaction: Transaction): Promise<Transaction | null> {
         let result: Transaction | null = null;
         try {
             const transactionHex = Buffer.from(transaction.to_bytes()).toString("hex");
-            const witnesses = await window.cardano.signTx(transactionHex);
+            const witnesses = await Bifrost.signTxRawAsync(transactionHex);
 
             const txWitnesses = transaction.witness_set();
             const txVkeys = txWitnesses.vkeys();
@@ -269,13 +273,14 @@ class CardanoWalletInterop {
             const txBuilder = CardanoWasmLoader.Cardano.TransactionBuilder.new(
                 CardanoWasmLoader.Cardano.LinearFee.new(
                     CardanoWasmLoader.Cardano.BigNum.from_str(protocolParams.min_fee_a.toString()),
-                    CardanoWasmLoader.Cardano.BigNum.from_str(protocolParams.min_fee_b.toString())),
+                    CardanoWasmLoader.Cardano.BigNum.from_str(protocolParams.min_fee_b.toString())
+                ),
                 CardanoWasmLoader.Cardano.BigNum.from_str(protocolParams.min_utxo.toString()),
                 CardanoWasmLoader.Cardano.BigNum.from_str(protocolParams.pool_deposit.toString()),
                 CardanoWasmLoader.Cardano.BigNum.from_str(protocolParams.key_deposit.toString()),
                 protocolParams.max_val_size,
                 protocolParams.max_tx_size
-                );
+            );
 
             const utxos = await CardanoWalletInterop.SelectUtxosAsync(4000000);
             utxos.forEach(utxo => {
@@ -296,7 +301,7 @@ class CardanoWalletInterop {
 
             txBuilder.set_ttl(latestBlock.slot + 1000);
 
-            const addressHex = (await window.cardano.getUsedAddresses())[0];
+            const addressHex = (await Bifrost.getUsedAddressesRawAsync())[0];
             const addressBuffer = Buffer.from(addressHex, "hex");
             const address = CardanoWasmLoader.Cardano.Address.from_bytes(addressBuffer);
             txBuilder.add_change_if_needed(address);
@@ -326,8 +331,7 @@ class CardanoWalletInterop {
 
     private async CreateMintTx(assetName: string, avatar: string, metadata: string): Promise<Transaction | null> {
         try {
-            const MAX_INPUTS = 20;
-            const addressHex = (await window.cardano.getUsedAddresses())[0];
+            const addressHex = (await Bifrost.getUsedAddressesRawAsync())[0];
             const addressBuffer = Buffer.from(addressHex, "hex");
             const address = CardanoWasmLoader.Cardano.Address.from_bytes(addressBuffer);
 
@@ -441,7 +445,7 @@ class CardanoWalletInterop {
     }
 
     private static async SelectUtxosAsync(amount: number): Promise<TransactionUnspentOutput[]> {
-        const utxosHex = await window.cardano.getUtxos();
+        const utxosHex = await Bifrost.getUtxosRawAsync();
         const utxos: TransactionUnspentOutput[] = utxosHex
             .map(utxo => CardanoWasmLoader.Cardano.TransactionUnspentOutput.from_bytes(Buffer.from(utxo, "hex")));
 
@@ -455,7 +459,7 @@ class CardanoWalletInterop {
             else
                 return 0;
         });
-        
+
         const selectedUtxos: TransactionUnspentOutput[] = [];
         for (let i in sortedUtxos) {
             selectedUtxos.push(sortedUtxos[i]);
@@ -465,7 +469,7 @@ class CardanoWalletInterop {
 
             if (sum >= amount) break;
         }
-        
+
         return selectedUtxos;
     }
 

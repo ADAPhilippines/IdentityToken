@@ -16,6 +16,9 @@ namespace IdentityToken.UI.Common.Components
         private string ToastMessage { get; set; } = string.Empty;
         private bool IsToastError { get; set; }
         private bool ShouldShowToast { get; set; }
+        private bool IsChoosingWallet { get; set; }
+        private List<CardanoWalletMetadata>? Wallets { get; set; }
+        private string SelectedWallet { get; set; } = string.Empty;
 
         private static List<IdentityTokenMetadatum> TokenMetadataInitialState =>
             new()
@@ -80,8 +83,12 @@ namespace IdentityToken.UI.Common.Components
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
+            {
                 if (CardanoWalletInteropService is not null)
+                {
                     CardanoWalletInteropService.Error += CardanoWalletInteropOnError;
+                }
+            }
 
             await base.OnAfterRenderAsync(firstRender);
         }
@@ -93,10 +100,20 @@ namespace IdentityToken.UI.Common.Components
             StateHasChanged();
         }
 
-        private async void OnMintBtnClicked()
+        private async void OnChooseMintingWallet(string walletId)
+        {
+            IsChoosingWallet = false;
+            await InvokeAsync(StateHasChanged);
+            if (CardanoWalletInteropService is null) return;
+            await CardanoWalletInteropService.ConnectWalletAsync(SelectedWallet = walletId);
+            await ProceedMintAsync();
+        }
+
+        private async Task ProceedMintAsync()
         {
             IsLoading = true;
             LoadingMessage = "Validating Inputs...";
+            await InvokeAsync(StateHasChanged);
             if (TokenMetadata[0].Value.Length == 0 || TokenMetadata[1].Value.Length == 0)
             {
                 IsLoading = false;
@@ -129,13 +146,13 @@ namespace IdentityToken.UI.Common.Components
             }
 
             var metadataString = JsonSerializer.Serialize(metadataDictionary);
-            
+
             LoadingMessage = "Building Transaction...";
             if (CardanoWalletInteropService is null) return;
 
             var isWalletConnected = await CardanoWalletInteropService.IsWalletConnectedAsync();
             if (!isWalletConnected)
-                isWalletConnected = await CardanoWalletInteropService.ConnectWalletAsync();
+                isWalletConnected = await CardanoWalletInteropService.ConnectWalletAsync(SelectedWallet);
 
             if (!isWalletConnected) return;
 
@@ -169,6 +186,14 @@ namespace IdentityToken.UI.Common.Components
 
             await Task.Delay(2000);
             await MintSuccess.InvokeAsync();
+        }
+
+        private async void OnMintBtnClicked()
+        {
+            if (CardanoWalletInteropService is null) return;
+            Wallets = await CardanoWalletInteropService.GetWalletAsync();
+            IsChoosingWallet = true;
+            await InvokeAsync(StateHasChanged);
         }
 
         private void OnAddNewMetadataBtnClicked()

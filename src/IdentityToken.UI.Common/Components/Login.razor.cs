@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
 using IdentityToken.UI.Common.Models;
@@ -23,11 +24,10 @@ namespace IdentityToken.UI.Common.Components
         private bool IsTxFailed { get; set; }
         private bool IsLoginSuccess { get; set; }
         private bool IsNoWalletError { get; set; } = false;
-        
-        public void Dispose()
-        {
-            ShouldAuthorizeAttempt = false;
-        }
+
+        private bool IsChoosingWallet { get; set; }
+        private List<CardanoWalletMetadata>? Wallets { get; set; }
+        private string SelectedWallet { get; set; } = string.Empty;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -54,13 +54,23 @@ namespace IdentityToken.UI.Common.Components
             await InvokeAsync(StateHasChanged);
         }
 
-        private async void OnBtnConnectWithCardanoClicked()
+        private async void OnChooseMintingWallet(string walletId)
+        {
+            IsChoosingWallet = false;
+            await InvokeAsync(StateHasChanged);
+            if (CardanoWalletInteropService is null) return;
+            await CardanoWalletInteropService.ConnectWalletAsync(SelectedWallet = walletId);
+            await ProceedLoginAsync();
+        }
+
+        private async Task ProceedLoginAsync()
         {
             if (CardanoWalletInteropService is null) return;
-            
+
             var isWalletConnected = await CardanoWalletInteropService.IsWalletConnectedAsync();
+
             if (!isWalletConnected)
-                isWalletConnected = await CardanoWalletInteropService.ConnectWalletAsync();
+                isWalletConnected = await CardanoWalletInteropService.ConnectWalletAsync("test");
 
             if (!isWalletConnected)
             {
@@ -68,12 +78,12 @@ namespace IdentityToken.UI.Common.Components
                 await InvokeAsync(StateHasChanged);
                 return;
             }
-            
+
             ShouldAuthorizeAttempt = false;
             IsLoading = true;
             LoadingMessage = "Signing and Submitting Transaction...";
             await InvokeAsync(StateHasChanged);
-            
+
             var txHash = await CardanoWalletInteropService.SendAdaAsync(new[]
             {
                 new TxOutput()
@@ -87,15 +97,15 @@ namespace IdentityToken.UI.Common.Components
             {
                 LoadingMessage = $"Transaction Submitted to the Blockchain! Waiting for Confirmation. TxID: {txHash}";
                 await InvokeAsync(StateHasChanged);
-                
+
                 await CardanoWalletInteropService.GetTransactionAsync(txHash);
                 var identity = await AuthService.Authorize(WalletAddress);
-                
+
                 IsLoginSuccess = true;
                 await InvokeAsync(StateHasChanged);
-                
+
                 await LocalStorageService.SetItemAsync("identity", identity);
-                
+
                 await Task.Delay(1000);
                 AuthService.Authorized();
             }
@@ -103,8 +113,16 @@ namespace IdentityToken.UI.Common.Components
             {
                 IsTxFailed = true;
             }
-            
+
             IsLoading = false;
+            await InvokeAsync(StateHasChanged);
+        }
+
+        private async void OnBtnConnectWithCardanoClicked()
+        {
+            if (CardanoWalletInteropService is null) return;
+            Wallets = await CardanoWalletInteropService.GetWalletAsync();
+            IsChoosingWallet = true;
             await InvokeAsync(StateHasChanged);
         }
 
@@ -129,6 +147,11 @@ namespace IdentityToken.UI.Common.Components
                     Console.WriteLine(e);
                 }
             }
+        }
+
+        public void Dispose()
+        {
+            ShouldAuthorizeAttempt = false;
         }
     }
 }

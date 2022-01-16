@@ -38,8 +38,14 @@ public class CardanoWalletInteropService
     {
         if (_jsRuntime is null) return null;
         await EnsureErrorHandlerIsSet();
-        return await _jsRuntime
-            .InvokeAsync<Transaction?>("CardanoWalletInterop.GetTransactionAsync", hash);
+        return await _jsRuntime.InvokeAsync<Transaction?>("CardanoWalletInterop.GetTransactionAsync", hash);
+    }
+
+    public async ValueTask<List<CardanoWalletMetadata>?> GetWalletAsync()
+    {
+        if (_jsRuntime is null) return null;
+        await EnsureErrorHandlerIsSet();
+        return await _jsRuntime.InvokeAsync<List<CardanoWalletMetadata>?>("CardanoWalletInterop.GetWallets");
     }
 
     public async ValueTask<bool> IsWalletConnectedAsync()
@@ -49,14 +55,14 @@ public class CardanoWalletInteropService
         return await _jsRuntime.InvokeAsync<bool>("CardanoWalletInterop.IsWalletConnectedAsync");
     }
 
-    public async ValueTask<bool> ConnectWalletAsync()
+    public async ValueTask<bool> ConnectWalletAsync(string walletId)
     {
         if (_jsRuntime is null) return false;
         await EnsureErrorHandlerIsSet();
-        return await _jsRuntime.InvokeAsync<bool>("CardanoWalletInterop.ConnectWalletAsync");
+        return await _jsRuntime.InvokeAsync<bool>("CardanoWalletInterop.ConnectWalletAsync", walletId);
     }
 
-    public async ValueTask SetErrorHandlerAsync()
+    private async ValueTask SetErrorHandlerAsync()
     {
         if (_jsRuntime is null) return;
         var objRef = DotNetObjectReference.Create(this);
