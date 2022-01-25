@@ -53,7 +53,7 @@ public class IdentityController : ControllerBase
     if (authWallet is null) return BadRequest("Invalid auth code");
 
     // Create HttpClient
-    using var client = _httpClientFactory.CreateClient("blockfrost");
+    using var client = _httpClientFactory.CreateClient("blockfrost_mainnet");
 
     // Get System Wallet Address Transactions
     var systemWalletAddressTxsResponse = await client.GetAsync($"addresses/{authCode}/transactions?order=desc");
@@ -163,9 +163,9 @@ public class IdentityController : ControllerBase
               };
               identityTokens.Add(identityToken);
             }
-            catch (Exception ex)
+            catch
             {
-              Logger.Log(LogLevel.Information, ex, "IdentityToken definition not found in metadata");
+              // Logger.Log(LogLevel.Information, ex, "IdentityToken definition not found in metadata");
             }
           }
         }
@@ -213,5 +213,103 @@ public class IdentityController : ControllerBase
     await _identityDbContext.SaveChangesAsync();
 
     return Ok(authenticatedIdentity);
+  }
+
+
+  [HttpGet("{network}/{address}")]
+  public async Task<IActionResult> GetIdentityByAddress(string network, string address)
+  {
+    return Ok(await GetIdentityTokenByAddressAsync(address, network));
+  }
+
+  private async Task<List<CardanoIdentityToken>?> GetIdentityTokenByAddressAsync(string walletAddress, string network)
+  {
+    using var client = _httpClientFactory.CreateClient($"blockfrost_{network}");
+    
+    var addressResponse = await client.GetFromJsonAsync<CardanoAddressResponse>($"addresses/{walletAddress}");
+    if (addressResponse is null) return null;
+
+    // Inspect Assets
+    var tempIdentityTokens = new List<CardanoAddressAssetResponse>();
+    var accountAssetsPage = 1;
+
+    while (true)
+    {
+      var addressAssets = await client.GetFromJsonAsync<IEnumerable<CardanoAddressAssetResponse>>($"accounts/{addressResponse.StakeAddress}/addresses/assets?order=desc&page={accountAssetsPage++}");
+      var responseIdentityToken = addressAssets?.Where(x => CardanoHelper.IsIdentityToken(x.Unit)).ToList() ?? new List<CardanoAddressAssetResponse>();
+
+      // For now we only support one identity token per address
+      if (responseIdentityToken.Any())
+      {
+        tempIdentityTokens.AddRange(responseIdentityToken);
+        break;
+      }
+
+      if (addressAssets is not null && addressAssets.Count() < 100) break;
+    }
+
+    if (tempIdentityTokens.Count <= 0) return null;
+
+    // Initialize Identity Tokens
+    var identityTokens = new List<CardanoIdentityToken>();
+
+    // Construct Identity Tokens from Assets
+    foreach (var tempIdentityToken in tempIdentityTokens)
+    {
+      if (tempIdentityToken is null || tempIdentityToken.Unit is null) continue;
+
+      var assets = await client
+          .GetFromJsonAsync<IEnumerable<CardanoAssetHistoryResponse>>($"assets/{tempIdentityToken.Unit}/history?order=desc");
+
+      assets = assets?.Where(x => x.Action == "minted").ToList();
+
+      if (assets is null || !assets.Any()) continue;
+      foreach (var asset in assets)
+      {
+        var assetName = CardanoHelper.HexToAscii(tempIdentityToken.Unit[56..]);
+        var identityToken = new CardanoIdentityToken
+        {
+          PolicyId = tempIdentityToken.Unit[0..56],
+          AssetName = assetName
+        };
+
+        // Query Asset Metadata
+        var metadata = await client.GetFromJsonAsync<IEnumerable<CardanoTxMetadataResponse>>($"txs/{asset.TxHash}/metadata");
+
+        // Check if metadata contains IdentityToken definition
+        if (metadata is null) continue;
+
+        foreach (var meta in metadata)
+        {
+          if (meta.Label == "7368")
+          {
+            try
+            {
+              identityToken.Avatar = new IdentityAvatar
+              {
+                Source = meta.JsonMetadata
+                      .GetProperty(identityToken.PolicyId)
+                      .GetProperty(assetName)
+                      .GetProperty("avatar")
+                      .GetProperty("src")
+                      .GetString(),
+                Protocol = meta.JsonMetadata
+                      .GetProperty(identityToken.PolicyId)
+                      .GetProperty(assetName)
+                      .GetProperty("avatar")
+                      .GetProperty("protocol")
+                      .GetString()
+              };
+              identityTokens.Add(identityToken);
+            }
+            catch
+            {
+              // Logger.Log(LogLevel.Information, ex, "IdentityToken definition not found in metadata");
+            }
+          }
+        }
+      }
+    }
+    return identityTokens;
   }
 }

@@ -16,10 +16,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSignalR();
 builder.Services.AddIdentityDbContextFactory(o => o.UseNpgsql(builder.Configuration.GetConnectionString("IdentityTokenDb")));
 builder.Services.AddControllers();
-builder.Services.AddHttpClient("blockfrost", c =>
+builder.Services.AddHttpClient("blockfrost_mainnet", c =>
 {
     c.BaseAddress = new Uri("https://cardano-mainnet.blockfrost.io/api/v0/");
-    c.DefaultRequestHeaders.Add("project_id", builder.Configuration.GetValue<string>("BlockfrostProjectId"));
+    c.DefaultRequestHeaders.Add("project_id", builder.Configuration.GetValue<string>("BlockfrostProjectId_Mainnet"));
+});
+builder.Services.AddHttpClient("blockfrost_testnet", c =>
+{
+    c.BaseAddress = new Uri("https://cardano-testnet.blockfrost.io/api/v0/");
+    c.DefaultRequestHeaders.Add("project_id", builder.Configuration.GetValue<string>("BlockfrostProjectId_Testnet"));
 });
 builder.Services.AddSwaggerGen(c =>
 {

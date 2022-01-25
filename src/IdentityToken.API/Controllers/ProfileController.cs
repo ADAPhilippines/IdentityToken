@@ -35,7 +35,7 @@ public class ProfileController : ControllerBase
         var paymentAddress = body.PaymentAddress;
 
         // Create HttpClient
-        using var client = _httpClientFactory.CreateClient("blockfrost");
+        using var client = _httpClientFactory.CreateClient("blockfrost_mainnet");
 
         // Inspect Wallet Address
         var stakeAddress = string.Empty;
@@ -162,7 +162,7 @@ public class ProfileController : ControllerBase
         if (profile is null) return NotFound();
 
         // Create HttpClient
-        using var client = _httpClientFactory.CreateClient("blockfrost");
+        using var client = _httpClientFactory.CreateClient("blockfrost_mainnet");
 
         var accountAssetsPage = 1;
         var IsIdentityTokenFound = false;
@@ -281,7 +281,7 @@ public class ProfileController : ControllerBase
         if (profile is null) return NotFound();
 
         // Create HttpClient
-        using var client = _httpClientFactory.CreateClient("blockfrost");
+        using var client = _httpClientFactory.CreateClient("blockfrost_mainnet");
 
         var addressAssets = await client
                .GetFromJsonAsync<IEnumerable<CardanoAddressAssetResponse>>($"accounts/{profile.StakeAddress}/addresses/assets?order=desc&count={limit}&page={page}");
